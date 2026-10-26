@@ -1,0 +1,23 @@
+{
+ "schema": 1,
+ "id": "rhprobe",
+ "name": "RH Probe (test)",
+ "description": "TEST ENTRY - not a real app.",
+ "developer": "RetroHatch tests",
+ "source": "https://example.invalid/test/rhprobe",
+ "license": "unknown",
+ "category": "application",
+ "artifacts": [
+  {
+   "device": "rg-nano",
+   "firmware": "funkeyos-drum78",
+   "format": "opk",
+   "status": "available",
+   "version": "1.1.0",
+   "size": 4096,
+   "compatibility": {
+    "level": "verified"
+   }
+  }
+ ]
+}

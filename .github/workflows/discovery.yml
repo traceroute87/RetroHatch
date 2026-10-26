@@ -1,0 +1,35 @@
+# Weekly candidate discovery. Read-only on the repo; only opens/edits ONE issue. Never publishes or installs anything.
+name: discovery
+on:
+  schedule:
+    - cron: "23 5 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tests/test_discover.py
+      - run: python3 -I discovery/discover.py --out out
+      - uses: actions/upload-artifact@v4
+        with: {name: discovery, path: out}
+      - name: Create or update the single discovery issue
+        run: |
+          S=out/summary-rg-nano.json
+          field() { python3 -c "import json,sys;print(json.load(open('$S'))[sys.argv[1]])" "$1"; }
+          [ "$(field complete)" = "True" ] || { echo "::warning::incomplete run (API limits/failures); issue left unchanged"; exit 0; }
+          [ "$(field actionable)" != "0" ] || { echo "no actionable candidates"; exit 0; }
+          MARK="$(field marker)"
+          # same candidate set already filed (open or closed): do nothing
+          if gh issue list --label discovery --state all --limit 30 --json body --jq '.[].body' | grep -qF "$MARK"; then echo "unchanged"; exit 0; fi
+          gh label create discovery --color 0e8a16 --description "Automated candidate discovery" 2>/dev/null || true
+          N=$(gh issue list --label discovery --state open --json number --jq '.[0].number // empty')
+          if [ -n "$N" ]; then gh issue edit "$N" --body-file out/issue-rg-nano.md   # edit, not comment: no notification spam
+          else gh issue create --label discovery --title "Discovery: rg-nano candidates" --body-file out/issue-rg-nano.md; fi

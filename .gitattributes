@@ -1,0 +1,14 @@
+# Byte-exact files: a line-ending change would break hashes or signatures.
+vendor/monocypher/** -text
+tests/trust_fixture/** -text
+tests/rfc8032_vectors.h -text
+site/catalog/* -text
+platforms/nano/ui/ca-bundle.crt -text
+*.opk binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.fnt binary
+# Shell scripts and workflows run on Linux
+*.sh text eol=lf
+*.yml text eol=lf

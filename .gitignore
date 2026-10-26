@@ -1,0 +1,66 @@
+# ---- secrets: never commit ----
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+id_rsa*
+id_ed25519*
+rh-signing*
+.env
+.env.*
+*.env
+secrets/
+secret*
+credentials*
+*.token
+*.pass
+*.passphrase
+.netrc
+.ssh/
+.retrohatch-dev/
+
+# ---- build outputs, packages, binaries ----
+build/
+dist/
+out/
+*.opk
+*.opk.new
+*.opk.bak
+*.pkg
+*.o
+*.a
+*.so
+*.elf
+*.img
+*.bak
+*.tmp
+*.part
+# public, deliberately tracked test fixture (a fake, non-executable blob)
+!tests/trust_fixture/examplepad_funkey-s.opk
+# compiled test programs
+tests/nano_install_test
+tests/ui_nav_test
+tests/ui_ops_test
+tests/ui_signed_test
+tests/trust_native_test
+tests/trust_state_test
+
+# ---- caches and test-generated artifacts ----
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+graphify-out/
+.claude/
+
+# ---- local machine / editor ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.swp

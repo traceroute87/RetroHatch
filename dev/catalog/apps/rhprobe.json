@@ -1,0 +1,27 @@
+{
+ "schema": 1,
+ "id": "rhprobe",
+ "name": "RH Probe (test)",
+ "description": "TEST ENTRY - DEV catalog only. Not a real app.",
+ "developer": "traceroute87",
+ "source": "https://example.invalid/rhprobe",
+ "license": "MIT",
+ "category": "application",
+ "artifacts": [
+  {
+   "device": "rg-nano",
+   "firmware": "funkeyos-drum78",
+   "format": "opk",
+   "status": "available",
+   "version": "1.1.0",
+   "size": 4096,
+   "sha256": "abad12c3cfb11db70928b9061cf9034ecc4c0ee60450f85ceb8631f3c9a7d205",
+   "install": {
+    "dest_name": "rhprobe_funkey-s.opk"
+   },
+   "compatibility": {
+    "level": "verified"
+   }
+  }
+ ]
+}

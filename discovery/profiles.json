@@ -1,0 +1,39 @@
+{
+  "rg-nano": {
+    "queries": [
+      "topic:funkeyos",
+      "topic:rg-nano",
+      "topic:funkey-s",
+      "\"RG Nano\" in:readme,description",
+      "funkeyos in:readme,description",
+      "funkey-s opk in:readme,description"
+    ],
+    "direct": [
+      "rg nano",
+      "rgnano",
+      "funkeyos",
+      "funkey os"
+    ],
+    "family": [
+      "funkey s",
+      "funkey"
+    ],
+    "package_ext": [
+      ".opk"
+    ],
+    "other": [
+      "miyoo",
+      "trimui",
+      "rg35xx",
+      "rg351",
+      "rg353",
+      "rg40xx",
+      "retroid",
+      "steam deck",
+      "analogue pocket",
+      "odroid",
+      "gkd",
+      "playdate"
+    ]
+  }
+}

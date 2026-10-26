@@ -1,0 +1,62 @@
+# Publishes site/ (the SIGNED catalog) to GitHub Pages. The private signing key is never here: you sign offline
+# (docs/KEY_CEREMONY.md, docs/PUBLISHING.md) and commit site/catalog/index.json + index.json.sig.
+# This workflow refuses to deploy anything that does not verify, so an unsigned, unapproved or rolled-back
+# catalog can never go live. Enable Pages with Source = "GitHub Actions" in the repository settings.
+name: publish-catalog
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", "catalog/production.pub"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install "cryptography>=43" "jsonschema>=4"
+      - name: catalog files and tools are sound
+        run: |
+          python tools/validate.py
+          python tests/test_validate.py
+          python tests/test_trust.py
+      - name: production key is set
+        run: test -s catalog/production.pub
+      - name: signature, approval gates and policy of the catalog about to be published
+        run: python tools/trust.py verify site/catalog/index.json
+      - name: serial must not go backwards (compared with the live catalog)
+        run: |
+          url="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/catalog/index.json"
+          if curl -fsS "$url" -o live.json; then
+            python - <<'PY'
+          import hashlib, json, sys
+          sys.path.insert(0, "tools")
+          import trust
+          live = open("live.json", "rb").read()
+          json.dump({"serial": trust.strict_loads(live)["serial"], "sha256": hashlib.sha256(live).hexdigest()}, open("state.json", "w"))
+          PY
+            python tools/trust.py verify site/catalog/index.json --state state.json
+          else
+            echo "no live catalog yet (first publish)"
+          fi
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: {path: site}
+      - id: deployment
+        uses: actions/deploy-pages@v4

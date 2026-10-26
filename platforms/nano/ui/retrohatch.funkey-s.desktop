@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=RetroHatch
+Comment=App installer
+Exec=run.sh
+Icon=retrohatch
+Categories=applications

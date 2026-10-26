@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "kishmish-nano",
+  "name": "Kishmish Nano",
+  "description": "A tiny Siamese virtual pet. Feed him, pet him, nap, play the star minigame.",
+  "developer": "Alialhashemi23",
+  "source": "https://github.com/Alialhashemi23/kishmish-nano",
+  "license": "MIT",
+  "category": "application",
+  "artifacts": [
+    {
+      "device": "rg-nano",
+      "firmware": "funkeyos-drum78",
+      "format": "opk",
+      "status": "unavailable",
+      "unavailable_reason": "Awaiting RG Nano hardware test of this exact file on this firmware, then human approval.",
+      "version": "0.1.0",
+      "url": "https://github.com/Alialhashemi23/kishmish-nano/releases/download/v0.1.0/kishmish-nano.opk",
+      "sha256": "3dfa9fa77242d46743611c5f281fca0e3df40a481b86e857dac13c932abae2f9",
+      "size": 692224,
+      "install": {"dest_name": "kishmish-nano_funkey-s.opk"},
+      "compatibility": {"level": "untested"}
+    }
+  ]
+}

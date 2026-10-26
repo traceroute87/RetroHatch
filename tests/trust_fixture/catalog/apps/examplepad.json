@@ -1,0 +1,36 @@
+{
+ "schema": 1,
+ "id": "examplepad",
+ "name": "ExamplePad (fixture)",
+ "description": "FIXTURE ONLY - not a real app.",
+ "developer": "retrohatch-fixture",
+ "source": "https://github.com/retrohatch-fixture/examplepad",
+ "license": "MIT",
+ "category": "utility",
+ "artifacts": [
+  {
+   "device": "rg-nano",
+   "firmware": "funkeyos-drum78",
+   "format": "opk",
+   "status": "available",
+   "version": "1.0.0",
+   "url": "https://github.com/retrohatch-fixture/examplepad/releases/download/v1.0.0/examplepad_funkey-s.opk",
+   "sha256": "0687e32859e6102f99ae34b15249396dd0a0e3f7455d759a258b15b21dc42f0e",
+   "size": 232,
+   "install": {
+    "dest_name": "examplepad_funkey-s.opk"
+   },
+   "compatibility": {
+    "level": "verified",
+    "evidence": [
+     {
+      "sha256": "0687e32859e6102f99ae34b15249396dd0a0e3f7455d759a258b15b21dc42f0e",
+      "date": "2026-10-26",
+      "tester": "fixture",
+      "note": "synthetic"
+     }
+    ]
+   }
+  }
+ ]
+}

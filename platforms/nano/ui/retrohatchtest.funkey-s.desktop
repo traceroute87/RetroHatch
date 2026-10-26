@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=RetroHatch TEST
+Comment=Test data only
+Exec=run.sh
+Icon=retrohatchtest
+Categories=applications

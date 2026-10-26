@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "tarafi",
+  "name": "TaraFi",
+  "description": "Music player.",
+  "developer": "traceroute87",
+  "source": "https://github.com/traceroute87/TaraFi",
+  "license": "unknown",
+  "category": "application",
+  "artifacts": [
+    {
+      "device": "rg-nano",
+      "firmware": "funkeyos-drum78",
+      "format": "opk",
+      "status": "unavailable",
+      "unavailable_reason": "No published release: version, URL, size, SHA-256, architecture and test evidence not yet recorded; license not declared in repo.",
+      "compatibility": {"level": "untested"}
+    }
+  ]
+}

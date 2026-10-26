@@ -1,0 +1,16 @@
+{
+ "schema": 1,
+ "approvals": [
+  {
+   "app": "examplepad",
+   "device": "rg-nano",
+   "firmware": "funkeyos-drum78",
+   "sha256": "0687e32859e6102f99ae34b15249396dd0a0e3f7455d759a258b15b21dc42f0e",
+   "size": 232,
+   "release": "https://github.com/retrohatch-fixture/examplepad/releases/tag/v1.0.0",
+   "approved_by": "fixture",
+   "date": "2026-10-26"
+  }
+ ],
+ "revoked": []
+}

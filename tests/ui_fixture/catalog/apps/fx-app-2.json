@@ -1,0 +1,23 @@
+{
+ "schema": 1,
+ "id": "fx-app-2",
+ "name": "Fixture App 2",
+ "description": "Short fixture.",
+ "developer": "fixture-dev",
+ "source": "https://example.invalid/fx/2",
+ "license": "MIT",
+ "category": "application",
+ "artifacts": [
+  {
+   "device": "rg-nano",
+   "firmware": "funkeyos-drum78",
+   "format": "opk",
+   "status": "available",
+   "version": "1.2.3",
+   "size": 1468006,
+   "compatibility": {
+    "level": "verified"
+   }
+  }
+ ]
+}

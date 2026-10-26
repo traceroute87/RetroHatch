@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=RetroHatch DEV
+Comment=DEV build - test installs only
+Exec=run.sh
+Icon=retrohatchdev
+Categories=applications

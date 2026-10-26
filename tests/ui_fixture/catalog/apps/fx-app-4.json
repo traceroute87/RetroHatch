@@ -1,0 +1,23 @@
+{
+ "schema": 1,
+ "id": "fx-app-4",
+ "name": "Fixture App 4",
+ "description": "Fixture entry 4 used only by the UI tests; not a real app.",
+ "developer": "fixture-dev",
+ "source": "https://example.invalid/fx/4",
+ "license": "MIT",
+ "category": "application",
+ "artifacts": [
+  {
+   "device": "rg-nano",
+   "firmware": "funkeyos-drum78",
+   "format": "opk",
+   "status": "available",
+   "version": "1.2.3",
+   "size": 1468006,
+   "compatibility": {
+    "level": "verified"
+   }
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=RH Probe (test)
+Comment=RetroHatch test package
+Exec=run.sh
+Icon=rhprobe
+Categories=applications
