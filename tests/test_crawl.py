@@ -684,3 +684,45 @@ r = C.update_packages(zs, [zc(700), zm], "2026-10-29"); z = zs["https://z.exampl
 assert r["changed"] == 1 and z["state"] == "changed" and z["previous"]["size"] == 500 and z["size"] == 700
 C.fetch = real_fetch
 print("release alias tests OK")
+
+# ---- submitted leads: maintainer-provided repository URLs, validated, crawled normally, reported apart, never auto-approved ----
+ok_, bad_ = C.submitted_leads("https://github.com/Dev/Game.git, https://gitlab.com/grp/sub/player/ https://codeberg.org/o/r "
+                              "https://GITHUB.com/dev/game http://github.com/a/b https://user:pw@github.com/a/b https://github.com:8443/a/b "
+                              "https://github.com/a/b?tab=readme https://github.com/a/b#readme https://example.org/a/b https://www.github.com/a/b "
+                              "https://raw.githubusercontent.com/a/b https://github.com/a https://github.com/a/b/blob/main/x.opk "
+                              "https://gitlab.com/a/b/-/tree/main https://github.com/topics/funkey https://gitlab.com/explore/projects https://[x")
+assert ok_ == [("repo", "Dev/Game", "https://github.com/Dev/Game.git"), ("forge", "gitlab.com/grp%2Fsub%2Fplayer|grp/sub/player", "https://gitlab.com/grp/sub/player"),
+               ("forge", "codeberg.org/o/r", "https://codeberg.org/o/r")], ok_
+assert [r for _, r in bad_] == ["duplicate", "not https", "credentials not allowed", "port not allowed", "query string not allowed", "fragment not allowed",
+                                "unsupported host", "unsupported host", "unsupported host", "not a repository root", "not a repository root",
+                                "not a repository root", "not a repository root", "not a repository root", "not a URL"], bad_
+many_ = C.submitted_leads(" ".join(f"https://github.com/o/r{i}" for i in range(12)))
+assert len(many_[0]) == C.SUBMIT_MAX and [r for _, r in many_[1]] == ["over the limit of 10"] * 2 and C.submitted_leads("") == ([], [])
+# a GitLab repo whose name has no device keyword: README read, its external build link verified, kept apart from autonomous apps
+def sub_run(readme, text):
+    C.fetch = forge_fetch(readme); leads, _ = C.submitted_leads(text)
+    c = C.Crawl()
+    for kind, key, url in leads: c.push(kind, key, {"from": C.SUBMITTED, "anchor": url}, 0)
+    c.run(); sub = C.mark_submitted(c, leads); return c, sub, C.unique_apps(c)
+c, sub, apps = sub_run(README, "https://gitlab.com/someone/player")
+s = sub[0]; inst = [p for p in s["packages"] if p.get("judgement") == "installable"]
+assert s["reached"] and s["readme_status"] == 200 and [p["name"] for p in inst] == ["player.opk"] and inst[0]["magic_squashfs"] is True
+assert apps == [] and all(p["via"][0] == {"from": C.SUBMITTED, "anchor": "https://gitlab.com/someone/player"} for p in s["packages"])   # not autonomous
+st = {}; C.update_packages(st, c.pkgs.values(), "2026-10-28"); assert st[ZURL]["via"][0]["from"] == C.SUBMITTED and st[ZURL]["state"] == "verified"
+c = C.Crawl(); C.seed_packages(c, st, "2026-11-20"); k_, key_, via_, _ = c.q[0]
+assert key_ == ZURL and via_["first_found_via"] == C.SUBMITTED and C.is_submitted({"via": [via_]})                         # rechecks stay apart too
+assert "Submitted leads (separate from the counts above): accepted / rejected / installable packages | 1 / 0 / 1" in C.stats_md(
+    {"unique_installable_apps": [], "as_of": "2026-10-28", "submitted_leads": {"accepted": [{**s, "packages": [{"judgement": p.get("judgement")} for p in s["packages"]]}], "rejected": []}}, {})
+# same repo found by autonomous discovery (forum link): counted as an autonomous app as before
+C.fetch = forge_fetch(README); c = C.Crawl(); c.push("page", "https://forum.example.org/t/1", {"from": "test", "score": 5}, 0); c.run()
+assert [a["name"] for a in C.unique_apps(c)] == ["player.opk"]
+# a submitted repo for another device: inspected, its package still judged by the normal rules (not installable)
+c, sub, apps = sub_run(README, "https://gitlab.com/someone/player")
+c.repos["gitlab.com/someone%2fplayer|someone/player"]["verdict"] = "other_device"; C.unique_apps(c)
+assert all(p["judgement"] == "false-positive" for p in sub[0]["packages"] if p["kind"] == "zip")                    # same exclusion rules as discovery
+# rejected URLs are never queued, so never fetched
+n0 = C.NREQ
+c, sub, apps = sub_run("", "https://user:pw@gitlab.com/someone/player http://github.com/a/b https://gitlab.com/someone/player/-/raw/main/x.opk")
+assert sub == [] and not c.pkgs and not c.repos and not c.pages and C.NREQ == n0   # nothing queued, no request made
+C.fetch = real_fetch
+print("submitted lead tests OK")

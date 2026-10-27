@@ -422,7 +422,8 @@ class Crawl:
     def add_pkg(self, kind, url, via, depth):
         if self.alias(kind, url, via, depth): return
         gh = lambda s: (re.match(r"https://(?:github\.com|raw\.githubusercontent\.com)/([\w.-]+/[\w.-]+)/", s or "") or [None, None])[1]
-        repo = via.get("repo") or gh(url) or gh(via.get("from"))   # raw URLs and README links keep the repo, so judge() sees its verdict
+        fk = classify(via.get("from") or "")   # a GitLab/Codeberg README link: its forge project key
+        repo = via.get("repo") or gh(url) or gh(via.get("from")) or (fk[1] if fk[0] == "forge" else None)   # raw URLs and README links keep the repo, so judge() sees its verdict
         host = urllib.parse.urlsplit(url).netloc.lower()
         if kind == "opk":
             ok, size, st = probe_opk(url)
@@ -652,6 +653,15 @@ def report(res, c):
                  f"- {pl['stored_before']} stored before, {pl['stored_after']} after; {pl['verified']} verified this run ({pl['new']} new), "
                  f"{pl['changed']} CHANGED (size/contents differ; review), {pl['unreachable']} unreachable download URLs (kept), {pl.get('unverified_members', 0)} unverified ZIP members, {pl['rejected']} rejected, {pl['stale']} newly stale; "
                  f"{pl['rechecked']} stored URLs rechecked this run (max {RECHECK_MAX})"]
+    sl = res.get("submitted_leads") or {}
+    if sl.get("accepted") or sl.get("rejected"):
+        L += ["", "## Submitted leads (maintainer-provided, NOT autonomous discoveries; candidates only, never auto-approved)", ""]
+        for s in sl.get("accepted", []):
+            ok_ = [p for p in s["packages"] if p["judgement"] == "installable"]
+            L.append(f"- {s['url']}: {'reached' if s['reached'] else 'NOT reached'}, verdict {s['verdict']}, README HTTP {s['readme_status']}, "
+                     f"release {s['release'] or 'none'}; {len(ok_)} installable of {len(s['packages'])} linked packages")
+            L += [f"  - {p['name']}: {p['judgement']} ({p['reason']}) <{p['url']}>" for p in s["packages"] if p["kind"] != "zip-container"]
+        L += [f"- rejected {r['url']}: {r['reason']}" for r in sl.get("rejected", [])]
     blk = res.get("inaccessible_sources") or {}
     L += ["", "## Inaccessible sources (refused this runner; content unknown, not evidence of absence)", ""] + [f"- {h}: HTTP {u[0][1]} on {len(u)} page(s), e.g. {u[0][0]}" for h, u in sorted(blk.items())] + ([] if blk else ["None."])
     L += ["", "## Relevant sites reached", ""] + [f"- {h}: {u[0]}" for h, u in sorted(res["relevant_sites"].items())]
@@ -818,6 +828,7 @@ def stats_md(res, store):
     gh = sum("github" in (a.get("host") or "") for a in apps)
     st = collections.Counter(v.get("state") or "verified" for v in store.values())
     pl, fs = res.get("package_leads") or {}, (res.get("optional_channels") or {}).get("freeserp") or {}
+    sub = res.get("submitted_leads") or {}
     new, fresh = pl.get("new", 0), pl.get("verified", 0)   # this run's own counts, not dates (several runs can share a date)
     L = ["## Crawl statistics", "", "| | |", "|---|---|",
          f"| Verified OPKs (unique) | {len(apps)} |", f"| GitHub-hosted / other hosts | {gh} / {len(apps) - gh} |",
@@ -828,6 +839,8 @@ def stats_md(res, store):
          for side, r in (pl.get("recheck") or {}).items()] + [
          f"| This run: verified URLs / unreachable download URLs / unverified ZIP members | {pl.get('verified', 0)} / {pl.get('unreachable', 0)} / {pl.get('unverified_members', 0)} |",
          f"| This run: latest/download URLs verified via their tagged release asset / latest moved to a new tag | {pl.get('aliased', 0)} / {pl.get('alias_moved', 0)} |",
+         f"| Submitted leads (separate from the counts above): accepted / rejected / installable packages | {len(sub.get('accepted', []))} / {len(sub.get('rejected', []))} / "
+         f"{sum(p['judgement'] == 'installable' for s in sub.get('accepted', []) for p in s['packages'])} |",
          f"| FreeSerp | {fs.get('status', 'n/a')}: {fs.get('queries', 0)}/{fs.get('requests', 0)} queries ok, {fs.get('results', 0)} results, "
          f"{fs.get('new_leads', 0)} new leads, {fs.get('cached_leads', 0)} cached{', error ' + str(fs['error']) if fs.get('error') else ''} |",
          f"| Inaccessible sources | {', '.join(sorted(res.get('inaccessible_sources') or {})) or 'none'} |", ""]
@@ -839,15 +852,65 @@ def stats_md(res, store):
     return "\n".join(L)
 
 
+# ---- submitted leads: maintainer-provided repository URLs (workflow input), crawled like any other repo, reported apart --------
+SUBMITTED, SUBMIT_MAX = "submitted-lead", 10
+FORGE_KIND = {"github.com": "repo", "gitlab.com": "forge", "codeberg.org": "forge"}
+
+
+def submitted_leads(text):
+    """Whitespace/comma separated repository URLs -> ([(kind, key, url)], [(url, reason)]). Only the https root URL of a
+    GitHub, GitLab or Codeberg repository is accepted; anything else is rejected and never fetched."""
+    ok, bad, keys = [], [], set()
+    for u in re.split(r"[\s,]+", text or ""):
+        if not u: continue
+        try: p = urllib.parse.urlsplit(u); host = (p.hostname or "").lower(); p.port
+        except ValueError: bad.append((u[:200], "not a URL")); continue
+        seg = [s for s in p.path.split("/") if s]
+        why = ("too long" if len(u) > 300 else "not https" if p.scheme != "https" else "credentials not allowed" if "@" in p.netloc
+               else "port not allowed" if p.port is not None else "query string not allowed" if p.query or "?" in u
+               else "fragment not allowed" if p.fragment or "#" in u else "unsupported host" if host not in FORGE_KIND
+               else "not a repository root" if not all(re.fullmatch(r"[\w.-]+", s) for s in seg) or len(seg) < 2 or "-" in seg or (host != "gitlab.com" and len(seg) != 2) else None)
+        kind, key = classify(f"https://{host}/" + "/".join(seg)) if not why else (None, None)
+        if not why and kind != FORGE_KIND[host]: why = "not a repository root"   # e.g. github.com/topics/x, gitlab.com/explore/x
+        if not why and key.lower() in keys: why = "duplicate"
+        if not why and len(ok) >= SUBMIT_MAX: why = f"over the limit of {SUBMIT_MAX}"
+        if why: bad.append((u[:200], why)); continue
+        keys.add(key.lower()); ok.append((kind, key, f"https://{host}/" + "/".join(seg)))
+    return ok, bad
+
+
+def mark_submitted(c, leads):
+    """Packages linked directly from a submitted repository (README, release assets, repository files) get a leading
+    {"from": "submitted-lead"} provenance entry: kept out of the autonomous app count, now and when the store rechecks them.
+    A package also found autonomously earlier in the run keeps its autonomous provenance (first discovery wins).
+    -> per lead {"url", "key", "reached", "verdict", "readme_status", "release", "packages": [package dicts]}."""
+    out = []
+    for kind, key, url in leads:
+        r = c.repos.get(key.lower()) or {}
+        base = (r.get("url") or "").lower()
+        frm = lambda v: (v.get("from") or "").lower()
+        pk = [p for p in c.pkgs.values() if base and any(frm(v) == base or frm(v).startswith(base + "/") for v in p["via"])]
+        for p in pk:
+            if p["via"][0].get("from") != SUBMITTED: p["via"].insert(0, {"from": SUBMITTED, "anchor": url})
+        out.append({"url": url, "key": key, "reached": bool(r), "verdict": r.get("verdict"), "readme_status": r.get("readme_status"),
+                    "release": r.get("release"), "packages": pk})
+    return out
+
+
+def is_submitted(p):
+    return any(v.get("from") == SUBMITTED or v.get("first_found_via") == SUBMITTED for v in p["via"])
+
+
 def unique_apps(c):
-    """Judge every probed package (sets judgement/reason in place) -> installable apps, one per (name, size)."""
+    """Judge every probed package (sets judgement/reason in place) -> installable apps, one per (name, size). Packages from
+    submitted leads are judged the same way but reported apart, never counted as autonomous discoveries."""
     apps = {}
     for p in c.pkgs.values():
         if p["kind"] == "zip-container": continue
         verdict, why = judge(p, c)
         p["judgement"], p["reason"] = verdict, why
         if why in ("named for another device", "repo evidence: other_device"): p["other_device_evidence"] = why   # kept for future profiles, never installable here
-        if verdict == "installable" and not p.get("alias_of"):   # an alias is the same file as its tagged asset, never a second app
+        if verdict == "installable" and not p.get("alias_of") and not is_submitted(p):   # an alias is the same file as its tagged asset, never a second app
             key = (p["name"].lower(), p["size"])
             a_ = apps.setdefault(key, {**p, "also_via": [], "license": ((c.repos.get((p["repo"] or "").lower()) or {}).get("meta") or {}).get("license")})
             if a_ is not p: a_["also_via"] += p["via"]
@@ -863,6 +926,7 @@ def main():
     ap.add_argument("--lead-cache", default=None, help="JSON file of FreeSerp leads kept between runs")
     ap.add_argument("--package-leads", default=None, help="JSON store of verified download URLs, revalidated and updated each run")
     ap.add_argument("--package-seed", default=None, help="read-only JSON store merged in first (e.g. a committed snapshot)")
+    ap.add_argument("--submitted", default="", help=f"up to {SUBMIT_MAX} GitHub/GitLab/Codeberg repository URLs (unapproved leads, reported separately)")
     a = ap.parse_args()
     global MAX_REQ, DEADLINE_S
     MAX_REQ, DEADLINE_S = a.max_req or MAX_REQ, a.deadline or DEADLINE_S
@@ -874,6 +938,8 @@ def main():
         if f: store.update({u: v for u, v in load_leads(f, "last_checked").items() if v.get("kind") in ("opk", "zip")})   # load_leads drops malformed entries
     scans_path = Path(a.package_leads).with_name("tree-scans.json") if a.package_leads else None
     c.tree_scans = load_scans(scans_path) if scans_path else {}
+    leads, rejected = submitted_leads(a.submitted)
+    for kind, key, url in leads: c.push(kind, key, {"from": SUBMITTED, "anchor": url}, 0)   # queued first; same handlers, checks and budget
     try:
         c.tree_known = tree_known(store)
         rechecked = seed_packages(c, store)
@@ -882,7 +948,9 @@ def main():
         c.run()
     except Exception as e:   # a crash must still leave a report that says INCOMPLETE
         notes.append(f"crawl error: {type(e).__name__}: {e}"[:200])
+    sub = mark_submitted(c, leads)
     uniq = unique_apps(c)
+    for s in sub: s["packages"] = [{k: p.get(k) for k in ("url", "name", "kind", "size", "judgement", "reason")} for p in s["packages"]]
     why = assess(notes, len(c.q) + len(c.pq), STOP, FAILS, c.dropped)
     caps = [n for n, hit in (("repos", len(c.repos) >= MAX_REPOS), ("pages", len(c.pages) >= MAX_PAGES), ("owners", len(c.owners) >= MAX_OWNERS)) if hit]
     sites = {}
@@ -895,6 +963,7 @@ def main():
            "repos": list(c.repos.values()), "pages": list(c.pages.values()), "owners": list(c.owners.values()),
            "relevant_sites": sites, "inaccessible_sources": inaccessible(c.pages.values()), "skipped": c.dropped, "failures": FAILS[:60], "optional_channels": optional}
     res.update(complete=not why, incomplete_reasons=why, caps_hit=caps)
+    res["submitted_leads"] = {"accepted": sub, "rejected": [{"url": u, "reason": r} for u, r in rejected]}
     res["package_leads"] = {"stored_before": len(store), "rechecked": rechecked, **update_packages(store, c.pkgs.values(), res["as_of"]), "stored_after": len(store)}
     res["package_leads"]["recheck"] = recheck_stats(store, c.recheck, int(T0))
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
