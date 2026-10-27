@@ -270,3 +270,17 @@ assert C.seed_packages(C.Crawl(), zips) == C.RECHECK_MAX // 8                   
 bad = os.path.join(tempfile.mkdtemp(), "pk.json"); open(bad, "w").write(json.dumps({"file:///x.opk": {"kind": "opk", "last_verified": "2026-10-27"}, "https://ok.example/a.opk": {"kind": "opk", "last_verified": "2026-10-27"}}))
 assert list(C.load_leads(bad, "last_verified")) == ["https://ok.example/a.opk"]                       # malformed / non-http entries dropped
 print("package lead store tests OK")
+
+# ---- job summary statistics (reviewable without downloading the artifact) ---------------------------------------------------
+res = {"as_of": "2026-10-27", "unique_installable_apps": [{"host": "github.com"}, {"host": "static.miraheze.org"}, {"host": "static.miraheze.org"}],
+       "package_leads": {"rechecked": 7}, "inaccessible_sources": {"wiki.example.org": []},
+       "optional_channels": {"freeserp": {"status": "ok", "queries": 16, "requests": 16, "results": 160, "new_leads": 3, "cached_leads": 92, "error": None}}}
+store = {"https://a/x.opk": {"name": "x.opk", "first_seen": "2026-10-27", "last_verified": "2026-10-27", "state": "verified"},
+         "https://a/y.opk": {"name": "y.opk", "first_seen": "2026-10-01", "last_verified": "2026-10-27", "state": "changed", "last_status": "ok"},
+         "https://a/z.opk": {"name": "z.opk", "first_seen": "2026-10-01", "last_verified": "2026-10-01", "state": "unreachable", "last_status": "HTTP 403"}}
+md = C.stats_md(res, store)
+for want in ("| Verified OPKs (unique) | 3 |", "| GitHub-hosted / other hosts | 1 / 2 |", "changed 1, unreachable 1, verified 1",
+             "| 1 / 1 / 1 |", "ok: 16/16 queries ok", "wiki.example.org", "**Changed packages (1)**", "z.opk (HTTP 403): https://a/z.opk"):
+    assert want in md, (want, md)
+print("job summary tests OK")
+

@@ -6,7 +6,7 @@ directory with Range requests. Metadata only; never writes catalog/, never insta
 
   python discovery/crawl.py [--out build/discovery]
 """
-import argparse, heapq, hashlib, http.client, ipaddress, json, os, re, socket, struct, sys, time, urllib.error, urllib.parse, urllib.request, zlib
+import argparse, collections, heapq, hashlib, http.client, ipaddress, json, os, re, socket, struct, sys, time, urllib.error, urllib.parse, urllib.request, zlib
 from collections import deque
 from datetime import date
 from pathlib import Path
@@ -618,6 +618,30 @@ def update_packages(store, pkgs, today):
     return n
 
 
+def stats_md(res, store):
+    """Key numbers for the Actions job summary, so the run can be reviewed without downloading the artifact."""
+    apps, today = res["unique_installable_apps"], res["as_of"]
+    gh = sum("github" in (a.get("host") or "") for a in apps)
+    st = collections.Counter(v.get("state") or "verified" for v in store.values())
+    new = sum(v.get("first_seen") == today for v in store.values())
+    fresh = sum(v.get("last_verified") == today for v in store.values())
+    pl, fs = res.get("package_leads") or {}, (res.get("optional_channels") or {}).get("freeserp") or {}
+    L = ["## Crawl statistics", "", "| | |", "|---|---|",
+         f"| Verified OPKs (unique) | {len(apps)} |", f"| GitHub-hosted / other hosts | {gh} / {len(apps) - gh} |",
+         f"| Package lead store | {len(store)} entries: " + ", ".join(f"{k} {v}" for k, v in sorted(st.items())) + " |",
+         f"| New this run / re-verified / retained (not verified this run) | {new} / {fresh - new} / {len(store) - fresh} |",
+         f"| Stored URLs rechecked this run | {pl.get('rechecked', 0)} (budget {RECHECK_MAX} requests) |",
+         f"| FreeSerp | {fs.get('status', 'n/a')}: {fs.get('queries', 0)}/{fs.get('requests', 0)} queries ok, {fs.get('results', 0)} results, "
+         f"{fs.get('new_leads', 0)} new leads, {fs.get('cached_leads', 0)} cached{', error ' + str(fs['error']) if fs.get('error') else ''} |",
+         f"| Inaccessible sources | {', '.join(sorted(res.get('inaccessible_sources') or {})) or 'none'} |", ""]
+    for state in ("changed", "unreachable", "stale", "rejected"):
+        rows = sorted((u, v) for u, v in store.items() if v.get("state") == state)
+        if rows:
+            L += [f"**{state.capitalize()} packages ({len(rows)})**", ""] + [f"- {v.get('name') or u} ({v.get('last_status', '')}): {u}" for u, v in rows[:15]] + \
+                 ([f"- ...and {len(rows) - 15} more"] if len(rows) > 15 else []) + [""]
+    return "\n".join(L)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", default=str(D.ROOT / "build" / "discovery"))
@@ -678,6 +702,7 @@ def main():
     (out / "summary.json").write_text(json.dumps({"complete": not why, "reasons": why, "caps_hit": caps, "skipped": c.dropped, "apps": len(uniq), "digest": digest, "authenticated": res["authenticated"],
                                                   "requests": NREQ, "seconds": res["seconds"]}) + "\n")
     print(md.split("## Unique")[0])   # the status header goes to the step summary
+    print(stats_md(res, store))
 
 
 if __name__ == "__main__":
