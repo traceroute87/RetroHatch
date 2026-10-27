@@ -225,6 +225,7 @@ class Crawl:
         self.tree_known = {}   # (repo lower, path) -> {"blob", "url"} of files already in the package store (set by main())
         self.tree_left, self.tree_salt = TREE_RUN_MAX, str(T0)
         self.tree_scans = {}   # repo lower -> {"repo", "commit", "complete", "scanned", "packages"}, kept between runs (set by main())
+        self.releases, self.deferred = {}, set()   # repo lower -> {"tag", "assets": {file name: tagged URL}} resolved THIS run; latest URLs requeued once
 
     def drop(self, why): self.dropped[why] = self.dropped.get(why, 0) + 1
 
@@ -303,8 +304,11 @@ class Crawl:
         if tm:
             r["release"] = urllib.parse.unquote(tm.group(1))
             st, _, b, _ = fetch(f"https://github.com/{full}/releases/expanded_assets/{tm.group(1)}")
+            rel = self.releases[full.lower()] = {"tag": r["release"], "assets": {}}
             for href in dict.fromkeys(re.findall(r'href="(/[^"]+/releases/download/[^"]+)"', b.decode("utf-8", "replace"))):
                 u = "https://github.com" + href
+                if href.lower().startswith(f"/{full}/releases/download/{tm.group(1)}/".lower()):   # this repo's latest tag only
+                    rel["assets"][urllib.parse.unquote(href.rsplit("/", 1)[1])] = u
                 if href.lower().endswith(".opk"): self.push("opk", u, {"from": r["url"] + "/releases/tag/" + tm.group(1), "anchor": "release asset", "repo": full}, depth + 1)
                 elif href.lower().endswith(".zip"): self.push("zip", u, {"from": r["url"] + "/releases/tag/" + tm.group(1), "anchor": "release asset", "repo": full}, depth + 1)
             if r["verdict"] in ("supports", "family") and "/" in full:   # a device-relevant author: look at their other repos too
@@ -395,7 +399,28 @@ class Crawl:
                 u = f"https://archive.org/download/{ident}/{urllib.parse.quote(n)}"
                 self.push("opk" if n.lower().endswith(".opk") else "zip", u, {"from": rec["url"], "anchor": "archive.org file", "repo": rec["repo"]}, depth + 1)
 
+    def alias(self, kind, url, via, depth):
+        """A github.com/<repo>/releases/latest/download/<file> link is the asset of the repo's latest release. When this run resolved
+        that tag, listed <file> among its assets and verified the tagged URL, the latest URL inherits that probe instead of downloading
+        the same file again; the record says so (alias_of, alias_tag). Anything less (repo not visited, file not in the tag, tagged
+        probe failed or not run yet) -> False: probed normally. Name and size never establish an alias."""
+        m = LATEST.match(url)
+        rel = self.releases.get(m[1].lower()) if m else None
+        t = rel and rel["assets"].get(urllib.parse.unquote(m[2]))
+        if not t: return False
+        tp = self.pkgs.get(t)
+        if tp is None and url not in self.deferred:   # the tagged asset is still queued (pushed after the README link): look again after it
+            self.deferred.add(url); self.q.append((kind, url, via, depth)); return True
+        mem = [p for p in self.pkgs.values() if p.get("container") == t]
+        if not tp or (tp.get("magic_squashfs") is not True if kind == "opk" else tp.get("note") or not mem or any(p.get("magic_squashfs") is not True for p in mem)):
+            return False
+        link = {"url": url, "via": [via], "alias_of": t, "alias_tag": rel["tag"]}
+        self.pkgs[url] = {**tp, **link}
+        for p in mem: self.pkgs[f"{url}!{p['path']}"] = {**p, **link, "container": url}
+        return True
+
     def add_pkg(self, kind, url, via, depth):
+        if self.alias(kind, url, via, depth): return
         gh = lambda s: (re.match(r"https://(?:github\.com|raw\.githubusercontent\.com)/([\w.-]+/[\w.-]+)/", s or "") or [None, None])[1]
         repo = via.get("repo") or gh(url) or gh(via.get("from"))   # raw URLs and README links keep the repo, so judge() sees its verdict
         host = urllib.parse.urlsplit(url).netloc.lower()
@@ -634,6 +659,8 @@ def report(res, c):
 
 
 # ---- package lead store: verified download URLs kept between runs, separate from catalog/ -----------------------------------
+LATEST = re.compile(r"https://github\.com/([\w.-]+/[\w.-]+)/releases/latest/download/([^/?#]+)$")
+ALIAS_DAYS = 14   # a latest/download alias not re-established for this long is rechecked like any other URL
 PKG_MAX, RECHECK_MAX, REJECT_MAX, SCAN_MAX = 2000, 60, 500, 2000   # stored entries (~650 B each in the Actions cache); request budget for re-probing stored URLs per run (rotating, least recently checked first)
 # state: verified | unreachable (last check failed) | stale (not verified for CACHE_DAYS) | changed (size/contents differ from what
 # was verified) | rejected (answered with a non-SquashFS body). Nothing is deleted on age; rejected entries stay as tombstones so a
@@ -658,8 +685,9 @@ def seed_packages(c, store, today=None):
     """Re-queue stored URLs at depth 0 in recheck_order(), within RECHECK_MAX requests (OPK = 1 Range read, ZIP = 3 + one per
     member, max 12). Each is fetched like any discovered link (check(), Range probe, judge()), so a source page that later
     blocks us (403) does not hide packages it once linked to. -> number of URLs queued (the list is kept in c.recheck)."""
-    cost, c.recheck = 0, []
-    for url in recheck_order(store, today or date.today().isoformat()):
+    cost, c.recheck, today = 0, [], today or date.today().isoformat()
+    for url in recheck_order(store, today):
+        if alias_fresh(store[url], today): continue   # its tagged twin is the one checked; no budget spent on the same file twice
         w = 1 if store[url]["kind"] == "opk" else 3 + min(12, len(store[url].get("members") or []))
         if cost + w > RECHECK_MAX: continue   # a cheaper entry may still fit; a skipped one keeps its old date and leads next run
         cost += w; c.recheck.append(url)
@@ -668,6 +696,12 @@ def seed_packages(c, store, today=None):
         c.push(v["kind"], url, {"from": "package-lead-store", "anchor": "previously verified " + v["last_verified"], "repo": v.get("repo"),
                                 "first_found_via": (v.get("via") or [{}])[0].get("from")}, 0)
     return len(c.recheck)
+
+
+def alias_fresh(v, today):
+    """A latest/download URL whose alias to a verified tagged asset was established within ALIAS_DAYS."""
+    try: return (date.fromisoformat(today) - date.fromisoformat((v.get("alias") or {})["at"])).days <= ALIAS_DAYS
+    except (KeyError, TypeError, ValueError): return False   # none or malformed: rechecked normally
 
 
 def load_scans(path):
@@ -709,13 +743,14 @@ def update_packages(store, pkgs, today, now=None):
     """-> per-run counts (distinct URLs). Verified packages are added/refreshed; a different size or ZIP member set marks the entry
     "changed" (previous values kept); an unreachable download URL is kept and marked; a non-SquashFS body marks "rejected";
     long-unverified ones turn "stale". A ZIP member whose header was not read is "unverified", not an unreachable URL."""
-    n = {"changed": 0, "rejected": 0, "stale": 0, "unverified_members": 0}
-    ok, new, down = set(), set(), set()
-    seen_zip = {}
+    n = {"changed": 0, "rejected": 0, "stale": 0, "unverified_members": 0, "alias_moved": 0}
+    ok, new, down, aliased = set(), set(), set(), set()
+    seen_zip, zsize = {}, {}
     for p in pkgs:
         if p["kind"] == "zip-container":   # the ZIP's own reachability: its directory could not be listed
             old = store.get(p["url"])
             if old and p.get("note"): down.add(p["url"]); old.update(last_checked=today, last_status=p["note"][:60])
+            elif p.get("size"): zsize[p["url"]] = p["size"]
             continue
         url, kind = (p["url"], "opk") if p["kind"] == "direct" else (p["container"], "zip")
         old = store.get(url)
@@ -734,6 +769,11 @@ def update_packages(store, pkgs, today, now=None):
             rec.update(name=p["name"] if kind == "opk" else url.rsplit("/", 1)[-1], size=p["size"] if kind == "opk" else rec.get("size"), host=p["host"],
                        repo=p.get("repo"), last_verified=today, last_checked=today, last_status="ok")
             rec["state"] = "changed" if rec.get("state") == "changed" else "verified"   # "changed" stays until a human reviews it
+            if p.get("alias_of"):   # verified through the tagged asset probed this run; a different tag = latest moved (kept as history)
+                a = {"of": p["alias_of"], "tag": p["alias_tag"], "at": today}
+                if (rec.get("alias") or {}).get("tag") not in (None, a["tag"]): rec["previous_alias"] = rec["alias"]; n["alias_moved"] += 1
+                rec["alias"], rec["verified_via"] = a, p["alias_of"]; aliased.add(url)
+            else: rec.pop("verified_via", None)   # probed directly this run
             for v in p["via"]:
                 if v.get("from") != "package-lead-store" and v not in rec["via"]: rec["via"] = (rec["via"] + [v])[:3]   # original provenance only
         elif old and p.get("magic_squashfs") is False and p.get("status") in (200, 206):
@@ -754,11 +794,11 @@ def update_packages(store, pkgs, today, now=None):
     nv = sorted((u for u, v in store.items() if v.get("never_verified") and v.get("state") == "rejected"), key=lambda u: store[u]["first_seen"])
     for u in nv[:max(0, len(nv) - REJECT_MAX)]: del store[u]   # bound for never-verified rejects; tombstones of verified files stay
     for url, names in seen_zip.items():
-        rec, names = store[url], sorted(names)
-        if rec["members"] and set(names) != set(rec["members"]):
-            rec["previous"] = {"members": rec["members"], "last_verified": rec.get("last_verified")}
+        rec, names, size = store[url], sorted(names), zsize.get(url) or store[url].get("size")
+        if rec["members"] and set(names) != set(rec["members"]) or rec.get("size") not in (None, size):   # ZIP size: unknown before, recorded now
+            rec["previous"] = {"members": rec["members"], "size": rec.get("size"), "last_verified": rec.get("last_verified")}
             rec["state"] = "changed"; n["changed"] += 1
-        rec["members"] = names[:50]
+        rec["members"], rec["size"] = names[:50], size
     for v in store.values():
         if v.get("state") in (None, "verified", "unreachable") and (date.fromisoformat(today) - date.fromisoformat(v["last_verified"])).days > CACHE_DAYS:
             v["state"] = "stale"; n["stale"] += 1   # kept, never deleted for age
@@ -769,7 +809,7 @@ def update_packages(store, pkgs, today, now=None):
     now = int(time.time() if now is None else now)
     for url in ok | down:
         if url in store: store[url]["checked_at"] = now
-    return {"verified": len(ok), "new": len(new), "unreachable": len(down - ok - {u for u in store if store[u].get("state") == "rejected"}), **n}
+    return {"verified": len(ok), "new": len(new), "unreachable": len(down - ok - {u for u in store if store[u].get("state") == "rejected"}), "aliased": len(aliased), **n}
 
 
 def stats_md(res, store):
@@ -787,6 +827,7 @@ def stats_md(res, store):
          f"| Recheck this run, {side} | {r['queued']} queued, {r['processed']} fetched, {r['verified']} verified, {r['unreachable']} unreachable |"
          for side, r in (pl.get("recheck") or {}).items()] + [
          f"| This run: verified URLs / unreachable download URLs / unverified ZIP members | {pl.get('verified', 0)} / {pl.get('unreachable', 0)} / {pl.get('unverified_members', 0)} |",
+         f"| This run: latest/download URLs verified via their tagged release asset / latest moved to a new tag | {pl.get('aliased', 0)} / {pl.get('alias_moved', 0)} |",
          f"| FreeSerp | {fs.get('status', 'n/a')}: {fs.get('queries', 0)}/{fs.get('requests', 0)} queries ok, {fs.get('results', 0)} results, "
          f"{fs.get('new_leads', 0)} new leads, {fs.get('cached_leads', 0)} cached{', error ' + str(fs['error']) if fs.get('error') else ''} |",
          f"| Inaccessible sources | {', '.join(sorted(res.get('inaccessible_sources') or {})) or 'none'} |", ""]
@@ -796,6 +837,21 @@ def stats_md(res, store):
             L += [f"**{state.capitalize()} packages ({len(rows)})**", ""] + [f"- {v.get('name') or u} ({v.get('last_status', '')}): {u}" for u, v in rows[:15]] + \
                  ([f"- ...and {len(rows) - 15} more"] if len(rows) > 15 else []) + [""]
     return "\n".join(L)
+
+
+def unique_apps(c):
+    """Judge every probed package (sets judgement/reason in place) -> installable apps, one per (name, size)."""
+    apps = {}
+    for p in c.pkgs.values():
+        if p["kind"] == "zip-container": continue
+        verdict, why = judge(p, c)
+        p["judgement"], p["reason"] = verdict, why
+        if why in ("named for another device", "repo evidence: other_device"): p["other_device_evidence"] = why   # kept for future profiles, never installable here
+        if verdict == "installable" and not p.get("alias_of"):   # an alias is the same file as its tagged asset, never a second app
+            key = (p["name"].lower(), p["size"])
+            a_ = apps.setdefault(key, {**p, "also_via": [], "license": ((c.repos.get((p["repo"] or "").lower()) or {}).get("meta") or {}).get("license")})
+            if a_ is not p: a_["also_via"] += p["via"]
+    return sorted(apps.values(), key=lambda x: (x["repo"] or x["host"], x["name"].lower()))
 
 
 def main():
@@ -826,17 +882,7 @@ def main():
         c.run()
     except Exception as e:   # a crash must still leave a report that says INCOMPLETE
         notes.append(f"crawl error: {type(e).__name__}: {e}"[:200])
-    apps = {}
-    for p in c.pkgs.values():
-        if p["kind"] == "zip-container": continue
-        verdict, why = judge(p, c)
-        p["judgement"], p["reason"] = verdict, why
-        if why in ("named for another device", "repo evidence: other_device"): p["other_device_evidence"] = why   # kept for future profiles, never installable here
-        if verdict == "installable":
-            key = (p["name"].lower(), p["size"])
-            a_ = apps.setdefault(key, {**p, "also_via": [], "license": ((c.repos.get((p["repo"] or "").lower()) or {}).get("meta") or {}).get("license")})
-            if a_ is not p: a_["also_via"] += p["via"]
-    uniq = sorted(apps.values(), key=lambda x: (x["repo"] or x["host"], x["name"].lower()))
+    uniq = unique_apps(c)
     why = assess(notes, len(c.q) + len(c.pq), STOP, FAILS, c.dropped)
     caps = [n for n, hit in (("repos", len(c.repos) >= MAX_REPOS), ("pages", len(c.pages) >= MAX_PAGES), ("owners", len(c.owners) >= MAX_OWNERS)) if hit]
     sites = {}

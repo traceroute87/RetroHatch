@@ -435,7 +435,7 @@ def tree_fetch(desc_readme, paths, calls):
     return f
 calls = []
 C.fetch = tree_fetch("# Pack\nApps for the RG Nano running FunKey OS.\n", ["Apps/Game One.opk", "Apps/b.zip", "docs/x.md"] + [f"More/m{i}.opk" for i in range(60)], calls)
-c = C.Crawl(); c.do_repo("someone/pack", {"from": "test"}, 0)
+c = C.Crawl(); c.tree_salt = "2"; c.do_repo("someone/pack", {"from": "test"}, 0)   # fixed shuffle (salt "2" queues Game One); T0 made this flaky
 r = c.repos["someone/pack"]
 q = [(k, key, via) for k, key, via, _ in c.q if via.get("anchor") == "repository file"]
 assert r["tree"]["commit"] == SHA and r["tree"]["packages"] == 61 and r["tree"]["queued"] == C.TREE_MAX == len(q) and r["tree"]["truncated"]   # bounded
@@ -616,3 +616,71 @@ json.dump({"dev/pack": {"repo": "dev/pack", "commit": A1, "complete": True, "sca
 assert list(C.load_scans(sp)) == ["dev/pack"]                                                        # malformed scan records dropped
 C.fetch = real_fetch
 print("tree scan efficiency tests OK")
+
+# ---- GitHub release aliases: latest/download/<file> inherits this run's verified probe of the tagged asset, never name + size --
+import re as _re
+def zbytes(member, body):
+    b = io.BytesIO(); z = zipfile.ZipFile(b, "w", zipfile.ZIP_STORED); z.writestr(member, body); z.close(); return b.getvalue()
+def ranged(data, rng):
+    a, b_ = map(int, _re.match(r"bytes=(\d+)-(\d+)", rng).groups()); b_ = min(b_, len(data) - 1)
+    return 206, {"Content-Range": f"bytes {a}-{b_}/{len(data)}"}, data[a:b_ + 1]
+def rel_fetch(repo, tag, assets, calls, broken=()):
+    """assets: file -> bytes of the repo's latest release; latest/download serves the same bytes (as GitHub's redirect would)."""
+    def f(url, rng=None, limit=0):
+        calls.append(url)
+        if url.endswith("/README.md"):
+            return 200, {}, ("# Games for the RG Nano\n" + "".join(f"[{n}](https://github.com/{repo}/releases/latest/download/{n})\n" for n in ("Game.opk", "Pack.zip"))).encode(), url
+        if url == f"https://github.com/{repo}/releases/latest": return 200, {}, b"", f"https://github.com/{repo}/releases/tag/{tag}"
+        if "/expanded_assets/" in url: return 200, {}, "".join(f'<a href="/{repo}/releases/download/{tag}/{n}">' for n in assets).encode(), url
+        m = _re.match(rf"https://github\.com/{repo}/releases/(?:download/{_re.escape(tag)}|latest/download)/(.+)$", url)
+        if m and m[1] in assets and rng and url not in broken: return (*ranged(assets[m[1]], rng), url)
+        return 404, {}, b"", url
+    return f
+RA, GAME, PACK = "dev/games", b"hsqs" + b"\0" * 60, zbytes("Pack/a.opk", b"hsqs" + b"\0" * 40)
+LG, LP = f"https://github.com/{RA}/releases/latest/download/Game.opk", f"https://github.com/{RA}/releases/latest/download/Pack.zip"
+T = lambda tag, n: f"https://github.com/{RA}/releases/download/{tag}/{n}"
+def rel_run(tag, assets, broken=()):
+    calls = []; C.fetch = rel_fetch(RA, tag, assets, calls, broken)
+    c = C.Crawl(); c.do_repo(RA, {"from": "test"}, 0); c.run(); C.unique_apps(c); return c, calls   # judged, as in main()
+c, calls = rel_run("v1", {"Game.opk": GAME, "Pack.zip": PACK})
+assert LG not in calls and LP not in calls and T("v1", "Game.opk") in calls and T("v1", "Pack.zip") in calls      # latest URLs: no download at all
+assert c.pkgs[LG]["alias_of"] == T("v1", "Game.opk") and c.pkgs[LG]["alias_tag"] == "v1" and c.pkgs[LG]["via"][0]["from"].endswith("README.md")
+assert c.pkgs[f"{LP}!Pack/a.opk"]["container"] == LP and c.pkgs[f"{LP}!Pack/a.opk"]["magic_squashfs"] is True
+apps = C.unique_apps(c); assert sorted(a["url"] for a in apps) == sorted([T("v1", "Game.opk"), T("v1", "Pack.zip")]) and all(not a.get("alias_of") for a in apps)   # no extra apps
+st = {}; r = C.update_packages(st, c.pkgs.values(), "2026-10-28")
+assert r["aliased"] == 2 and r["new"] == 4 and set(st) == {LG, LP, T("v1", "Game.opk"), T("v1", "Pack.zip")}       # both URLs kept
+assert st[LG]["alias"] == {"of": T("v1", "Game.opk"), "tag": "v1", "at": "2026-10-28"} and st[LG]["verified_via"] == T("v1", "Game.opk") and st[LG]["via"][0]["from"].endswith("README.md")
+assert st[LP]["size"] == st[T("v1", "Pack.zip")]["size"] == len(PACK) and st[LP]["members"] == ["a.opk"]           # ZIP size recorded
+assert "alias" not in st[T("v1", "Game.opk")] and "verified_via" not in st[T("v1", "Game.opk")]
+# recheck: a fresh alias costs nothing; its tagged twin still rotates; an expired alias is checked again
+c = C.Crawl(); C.seed_packages(c, st, "2026-11-01"); assert set(c.recheck) == {T("v1", "Game.opk"), T("v1", "Pack.zip")}
+c = C.Crawl(); C.seed_packages(c, st, "2026-11-12"); assert {LG, LP} <= set(c.recheck)                               # > ALIAS_DAYS
+assert not C.alias_fresh({"alias": {"at": "garbage"}}, "2026-11-01") and not C.alias_fresh({"alias": "x"}, "2026-11-01")
+# latest moves to v2 with a new Game.opk: alias follows the new tag, old tag kept as history, size change flagged
+GAME2 = b"hsqs" + b"\1" * 90
+c, calls = rel_run("v2", {"Game.opk": GAME2, "Pack.zip": PACK}); assert LG not in calls
+r = C.update_packages(st, c.pkgs.values(), "2026-10-29")
+assert r["alias_moved"] == 2 and st[LG]["alias"]["tag"] == "v2" and st[LG]["previous_alias"]["tag"] == "v1" and st[LG]["state"] == "changed"
+assert st[LG]["previous"]["size"] == len(GAME) and T("v1", "Game.opk") in st and st[T("v1", "Game.opk")]["state"] == "verified"
+# the file is missing from the latest tag: no alias, latest probed directly (and found missing)
+c, calls = rel_run("v3", {"Pack.zip": PACK}); assert LG in calls and "alias_of" not in c.pkgs[LG] and c.pkgs[LG]["magic_squashfs"] is None
+# the tagged probe fails: never inherited, latest probed normally and recorded as directly checked
+c, calls = rel_run("v1", {"Game.opk": GAME, "Pack.zip": PACK}, broken={T("v1", "Game.opk")})
+assert LG in calls and "alias_of" not in c.pkgs[LG] and c.pkgs[LG]["magic_squashfs"] is True and "alias_of" in c.pkgs[LP]
+C.update_packages(st, c.pkgs.values(), "2026-10-30"); assert "verified_via" not in st[LG] and st[LG]["alias"]["at"] == "2026-10-29"   # history kept, ages out
+# repo not visited this run, another repo's tag, and same name + size on other hosts: always probed, never aliased
+C.fetch = rel_fetch(RA, "v1", {"Game.opk": GAME}, calls := [])
+c = C.Crawl(); c.add_pkg("opk", LG, {"from": "x"}, 1); assert LG in calls and "alias_of" not in c.pkgs[LG]
+c = C.Crawl(); c.releases["dev/other"] = {"tag": "v1", "assets": {"Game.opk": T("v1", "Game.opk")}}; c.add_pkg("opk", LG, {"from": "x"}, 1); assert "alias_of" not in c.pkgs[LG]
+for u in ("https://static.miraheze.org/funkeywiki/1/1d/Game.opk", f"https://raw.githubusercontent.com/m/w/{'a' * 40}/files/Game.opk"):
+    c.pkgs[u] = {"kind": "direct", "name": "Game.opk", "url": u, "size": len(GAME), "magic_squashfs": True, "via": []}
+assert not c.alias("opk", "https://static.miraheze.org/funkeywiki/1/1d/Game.opk", {}, 1) and not any(p.get("alias_of") for p in c.pkgs.values())
+# ZIP size: unknown -> recorded silently; a later different size is a change with the old size kept
+zs = {}; zc = lambda size: {"kind": "zip-container", "url": "https://z.example/g.zip", "size": size, "note": ""}
+zm = {"kind": "zip", "name": "a.opk", "url": "https://z.example/g.zip", "container": "https://z.example/g.zip", "size": 9, "host": "z.example", "repo": None, "via": [], "judgement": "installable", "magic_squashfs": True}
+C.update_packages(zs, [zm], "2026-10-27"); assert zs["https://z.example/g.zip"]["size"] is None                         # old records: no size
+C.update_packages(zs, [zc(500), zm], "2026-10-28"); assert zs["https://z.example/g.zip"]["size"] == 500 and zs["https://z.example/g.zip"]["state"] == "verified"
+r = C.update_packages(zs, [zc(700), zm], "2026-10-29"); z = zs["https://z.example/g.zip"]
+assert r["changed"] == 1 and z["state"] == "changed" and z["previous"]["size"] == 500 and z["size"] == 700
+C.fetch = real_fetch
+print("release alias tests OK")
