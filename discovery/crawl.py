@@ -6,7 +6,7 @@ directory with Range requests. Metadata only; never writes catalog/, never insta
 
   python discovery/crawl.py [--out build/discovery]
 """
-import argparse, hashlib, http.client, ipaddress, json, os, re, socket, struct, sys, time, urllib.error, urllib.parse, urllib.request, zlib
+import argparse, heapq, hashlib, http.client, ipaddress, json, os, re, socket, struct, sys, time, urllib.error, urllib.parse, urllib.request, zlib
 from collections import deque
 from datetime import date
 from pathlib import Path
@@ -16,13 +16,17 @@ import discover as D
 
 UA = "retrohatch-discovery/1 (+https://github.com/traceroute87/RetroHatch)"
 MAX_REQ, MAX_PAGES, MAX_REPOS, MAX_OWNERS, MAXD, DEADLINE_S, DELAY = 1500, 80, 160, 12, 4, 1500, 0.1
+PER_HOST, LOW_PAGE_SHARE, VERIFY_RESERVE, GOOD = 8, 0.6, 0.85, 3   # pages per host; share of page budget open to low-score pages; request share after which only package checks run; "promising" score
 RESERVED = {"topics", "orgs", "features", "sponsors", "about", "pricing", "marketplace", "login", "join", "settings",
             "collections", "explore", "enterprise", "search", "apps", "site", "customer-stories", "readme", "security", "trending"}
 EXCLUDE = re.compile(r"theme|firmware|bootloader|kernel|skin|wallpaper|bios|toolchain", re.I)
 HINT = re.compile(r"opk|funkey|rg[ -_]?nano|third[ -_]party|applications?|apps\b|games?|homebrew|collection|download|release|wiki|ports?", re.I)
 NOISE = re.compile(r"[?&](action=(history|edit|info|submit|raw|purge)|oldid=|diff=|veaction=|printable=|curid=)|/Special:|/Talk:|/User:", re.I)   # wiki history/edit/special pages
+STRONG = re.compile(r"opk|third[ -_]?party|homebrew|applications?|software|emulators?|downloads?|releases?|collections?|catalog", re.I)   # software-index / download vocabulary
+JUNK_HOST = re.compile(r"(^|\.)(facebook|twitter|x|linkedin|pinterest|instagram|tiktok|youtube|youtu|whatsapp|wa|telegram|t|tumblr|amazon|ebay|aliexpress|alibaba|walmart|etsy|temu|banggood|paypal|patreon|ko-fi)\.(com|be|co|me|org|net|co\.uk|de)$", re.I)
+JUNK_PATH = re.compile(r"/(share|sharer|intent|login|log-in|signin|sign-in|signup|sign-up|register|account|my-account|cart|checkout|basket|wishlist|privacy|terms|cookies?|contact|about-us|careers|newsletter|subscribe|shop|store|products?|buy)(/|$|\.php)|[?&](share|replytocom|add-to-cart)=|^mailto:", re.I)
 IMG = re.compile(r"\.(png|jpe?g|gif|svg|webp|ico|css|js|mp4|webm|pdf)(\?|$)", re.I)
-LINK = re.compile(r'<a\s[^>]*?href=["\']([^"\']+)["\'][^>]*>(.*?)</a>|\[([^\]]*)\]\(\s*<?(\S+?)>?\s*\)|(https?://[^\s<>"\')\]]+)', re.S | re.I)
+LINK = re.compile(r'<a\s[^>]*?href=(?:["\']([^"\']+)["\']|([^\s"\'>]+))[^>]*>(.*?)</a>|\[([^\]]*)\]\(\s*<?(\S+?)>?\s*\)|(https?://[^\s<>"\')\]]+)', re.S | re.I)
 
 PROF = json.loads((D.HERE / "profiles.json").read_text(encoding="utf-8"))["rg-nano"]
 DRE, FRE = D.term_re(PROF["direct"]), D.term_re(PROF["family"])
@@ -100,7 +104,7 @@ def total_size(h, st, n):
 
 def probe_opk(url):
     st, h, b, _ = fetch(url, "bytes=0-3", 4)
-    return (b == b"hsqs"), total_size(h, st, 4), st
+    return (b == b"hsqs") if st in (200, 206) else None, total_size(h, st, 4), st   # unreachable (403/404/login wall) = unknown, not "not an OPK"
 
 
 def list_zip(url):
@@ -153,9 +157,9 @@ def zip_member_is_opk(url, e):
 def links_of(text, base):
     out = {}
     for m in LINK.finditer(text or ""):
-        if m.group(1): href, anchor = m.group(1), re.sub(r"<[^>]+>", "", m.group(2))
-        elif m.group(4): href, anchor = m.group(4), m.group(3)
-        else: href, anchor = m.group(5), ""
+        if m.group(1) or m.group(2): href, anchor = m.group(1) or m.group(2), re.sub(r"<[^>]+>", "", m.group(3))
+        elif m.group(5): href, anchor = m.group(5), m.group(4)
+        else: href, anchor = m.group(6), ""
         u = urllib.parse.urljoin(base, re.sub(r"&amp;", "&", href.strip())).split("#")[0].rstrip(".,;")
         if u.startswith(("http://", "https://")) and not IMG.search(u) and not NOISE.search(u):
             out.setdefault(u, " ".join(anchor.split())[:80])
@@ -166,23 +170,43 @@ def classify(u):
     p = urllib.parse.urlsplit(u)
     host, path = p.netloc.lower().removeprefix("www."), p.path
     low = (path + ("?" + p.query if p.query else "")).lower()   # also catches download.php?file=X.opk
-    if re.search(r"\.opk($|&)", low): return "opk", u.replace("/blob/", "/raw/") if host == "github.com" else u
-    if re.search(r"\.zip($|&)", low): return "zip", u.replace("/blob/", "/raw/") if host == "github.com" else u
+    raw = u.replace("/blob/", "/raw/") if host == "github.com" else u.replace("/-/blob/", "/-/raw/") if host == "gitlab.com" else u   # file view page -> the file itself
+    if re.search(r"\.opk($|&)", low): return "opk", raw
+    if re.search(r"\.zip($|&)", low): return "zip", raw
     seg = [s for s in path.split("/") if s]
     if host == "github.com" and seg and seg[0].lower() not in RESERVED:
         if len(seg) == 1: return "owner", seg[0]
         if not re.fullmatch(r"[\w.-]+", seg[1]): return None, u
         return "repo", f"{seg[0]}/{re.sub(r'[.]git$', '', seg[1])}"
     if host.endswith(("githubusercontent.com", "github.com")): return None, u
+    if JUNK_HOST.search(host) or JUNK_PATH.search(low): return None, u   # social sharing, login/account, retail/marketing: never queued
     return "page", u
+
+
+def pscore(anchor, u):
+    """How promising a link is as a software index / download page (0 = not worth a request)."""
+    p = urllib.parse.urlsplit(u)
+    t = anchor + " " + urllib.parse.unquote(p.path + " " + p.query)
+    return 2 * len(STRONG.findall(t)) + len(HINT.findall(t)) + 2 * len(DRE.findall(D.norm(t)))
+
+
+class PQ:
+    """Page queue, best score first (FIFO among equals). Same surface as the deque it replaces."""
+    def __init__(self): self.h, self.n = [], 0
+    def append(self, item): heapq.heappush(self.h, (-(item[2].get("score") or 0), self.n, item)); self.n += 1
+    def popleft(self): return heapq.heappop(self.h)[2]
+    def __iter__(self): return (x[2] for x in sorted(self.h))
+    def __len__(self): return len(self.h)
 
 
 class Crawl:
     def __init__(self):
-        self.q, self.pq, self.seen = deque(), deque(), set()   # pq: pages first (cheap, link-rich) so packages cannot starve them
+        self.q, self.pq, self.seen = deque(), PQ(), set()   # pq: pages first (cheap, link-rich) so packages cannot starve them
         self.repos, self.pages, self.owners, self.pkgs, self.sites = {}, {}, {}, {}, {}
         self.known_src, self.known_ids = D.known_catalog()
-        self.pending_meta = {}
+        self.pending_meta, self.hosts, self.dropped = {}, {}, {}
+
+    def drop(self, why): self.dropped[why] = self.dropped.get(why, 0) + 1
 
     def push(self, kind, key, via, depth):
         k = (kind, key.lower() if kind != "page" else key)
@@ -197,33 +221,40 @@ class Crawl:
         if d is not None and len(d["via"]) < 5 and via not in d["via"]: d["via"].append(via)
 
     def harvest(self, text, base, via, depth, relevant):
-        """Queue what the page links to. Packages always; repos/owners/pages only from device-relevant text."""
+        """Queue what the page links to. Packages always; repos/owners/pages only from device-relevant text.
+        relevant == "family" (page names only the device family, e.g. FunKey): follow promising page links only (score >= GOOD)."""
         scored = []
         for u, anchor in links_of(text, base).items():
             kind, key = classify(u)
             v = {"from": base, "anchor": anchor}
             if kind in ("opk", "zip"): self.push(kind, key, v, depth + 1)
-            elif kind == "repo" and relevant: self.push(kind, key, v, depth + 1)
+            elif kind == "repo" and relevant is True: self.push(kind, key, v, depth + 1)
             elif kind == "page" and relevant and depth < MAXD:
                 if "shields.io" in u: continue   # badge images are not pages
-                s = len(HINT.findall(anchor)) + 2 * len(DRE.findall(D.norm(anchor + " " + u)))
-                if s: scored.append((-s, u, v))
+                s = pscore(anchor, u)
+                if s and (relevant is True or s >= GOOD): scored.append((-s, u, {**v, "score": s}))
         for _, u, v in sorted(scored)[:6]:
             self.push("page", u, v, depth + 1)
 
     def do_page(self, url, via, depth):
-        if len(self.pages) >= MAX_PAGES: return
+        host = urllib.parse.urlsplit(url).netloc.lower().removeprefix("www.")
+        if len(self.pages) >= MAX_PAGES: return self.drop("page cap")
+        if via.get("score", 0) < GOOD and len(self.pages) >= MAX_PAGES * LOW_PAGE_SHARE: return self.drop("page budget reserved for promising pages")
+        if self.hosts.get(host, 0) >= PER_HOST: return self.drop("per-host limit")
+        self.hosts[host] = self.hosts.get(host, 0) + 1
         st, h, b, final = fetch(url)
         rec = self.pages[url] = {"url": url, "status": st, "via": [via], "depth": depth, "relevant": False}
         if st != 200 or "html" not in (h.get("Content-Type") or "text/html").lower() and "text" not in (h.get("Content-Type") or "text"):
             return
         text = b.decode("utf-8", "replace")
-        rec["relevant"] = bool(DRE.search(D.norm(re.sub(r"<[^>]+>", " ", text))))
+        plain = D.norm(re.sub(r"<[^>]+>", " ", text))
+        rec["relevant"] = bool(DRE.search(plain))
+        rec["family"] = not rec["relevant"] and bool(FRE.search(plain))
         rec["host"] = urllib.parse.urlsplit(final).netloc.lower()
-        self.harvest(text, final, via, depth, rec["relevant"])
+        self.harvest(text, final, via, depth, True if rec["relevant"] else "family" if rec["family"] else False)
 
     def do_owner(self, name, via, depth):
-        if len(self.owners) >= MAX_OWNERS: return
+        if len(self.owners) >= MAX_OWNERS: return self.drop("owner cap")
         rec = self.owners[name.lower()] = {"owner": name, "via": [via], "repos": []}
         st, _, b, _ = fetch(f"https://github.com/{name}?tab=repositories")
         if st != 200: rec["status"] = st; return
@@ -233,7 +264,7 @@ class Crawl:
             self.push("repo", full, {"from": f"https://github.com/{name}?tab=repositories", "anchor": "owner listing"}, depth + 1)
 
     def do_repo(self, full, via, depth):
-        if len(self.repos) >= MAX_REPOS: return
+        if len(self.repos) >= MAX_REPOS: return self.drop("repo cap")
         r = self.repos[full.lower()] = {"repo": full, "url": f"https://github.com/{full}", "via": [via], "meta": self.pending_meta.get(full.lower(), {}), "packages": [],
                                         "in_catalog": D.norm_url(f"https://github.com/{full}") in self.known_src or full.split("/")[1].lower() in self.known_ids}
         if r["in_catalog"]: return
@@ -317,6 +348,7 @@ class Crawl:
         while self.q or self.pq:
             n += 1   # pages (cheap, link-rich) go 2:1 ahead of packages/repos, but neither queue can starve the other
             kind, key, via, depth = (self.pq if self.pq and (n % 3 or not self.q) else self.q).popleft()
+            if kind not in ("opk", "zip") and NREQ >= MAX_REQ * VERIFY_RESERVE: self.drop("requests reserved for package verification"); continue
             if kind == "page": self.do_page(key, via, depth)
             elif kind == "owner": self.do_owner(key, via, depth)
             elif kind == "forge": self.do_forge(key, via, depth)
@@ -412,7 +444,7 @@ def seed_freeserp(c, cache_path=None, today=None):
         via = {"from": "freeserp-search", "anchor": query + (" [cached lead]" if cached else ""), "title": title[:80]}
         if kind in ("opk", "zip", "repo"): c.push(kind, key, via, 0)
         elif kind == "page" and (DRE.search(text) or FRE.search(text)) and pages[0] < FS_MAX_PAGES:
-            pages[0] += 1; c.push("page", key, via, 0)
+            pages[0] += 1; c.push("page", key, {**via, "score": max(GOOD + 1, pscore(title, url))}, 0)
 
     for url, v in leads.items():
         feed(url, v.get("title", ""), "", (v.get("queries") or ["cache"])[0], True); st_out["cached_leads"] += 1
@@ -452,15 +484,18 @@ def judge(p, c):
     r = c.repos.get((p["repo"] or "").lower())
     if r and r.get("verdict") in ("incompatible", "other_device"): return "false-positive", f"repo evidence: {r['verdict']}"
     if r and r.get("in_catalog"): return "false-positive", "already in catalog"
-    if p["magic_squashfs"] is None: return "unverified", "OPK inside ZIP; magic not read (member limit/unreadable)"
+    if p["magic_squashfs"] is None:
+        return "unverified", f"download not reachable (HTTP {p['status']})" if p["kind"] == "direct" else "OPK inside ZIP; magic not read (member limit/unreadable)"
     return "installable", "squashfs magic verified" + (" inside ZIP" if p["kind"] == "zip" else "")
 
 
-def assess(notes, queue_left, stop, fails):
+def assess(notes, queue_left, stop, fails, dropped=None):
     """Reasons this run must NOT be treated as authoritative (empty list = complete)."""
     why = list(notes)
     if stop: why.append(f"stopped early: {stop[0]}")
     if queue_left: why.append(f"{queue_left} queued items not processed")
+    lim = {k: v for k, v in (dropped or {}).items() if k != "per-host limit"}   # per-host is deliberate noise control, the rest is budget exhaustion
+    if lim: why.append("coverage-limited, results are NOT exhaustive: " + ", ".join(f"{k} ({v} skipped)" for k, v in sorted(lim.items())))
     rl = [u for u, s in fails if s == 429 or (s == 403 and "api.github.com" in str(u))]
     if rl: why.append(f"rate limited ({len(rl)} responses, e.g. {rl[0][:80]})")
     return why
@@ -514,7 +549,7 @@ def main():
             a_ = apps.setdefault(key, {**p, "also_via": [], "license": ((c.repos.get((p["repo"] or "").lower()) or {}).get("meta") or {}).get("license")})
             if a_ is not p: a_["also_via"] += p["via"]
     uniq = sorted(apps.values(), key=lambda x: (x["repo"] or x["host"], x["name"].lower()))
-    why = assess(notes, len(c.q) + len(c.pq), STOP, FAILS)
+    why = assess(notes, len(c.q) + len(c.pq), STOP, FAILS, c.dropped)
     caps = [n for n, hit in (("repos", len(c.repos) >= MAX_REPOS), ("pages", len(c.pages) >= MAX_PAGES), ("owners", len(c.owners) >= MAX_OWNERS)) if hit]
     sites = {}
     for pg in c.pages.values():
@@ -524,7 +559,7 @@ def main():
            "unique_installable_apps": uniq,
            "packages": [p for p in c.pkgs.values()],
            "repos": list(c.repos.values()), "pages": list(c.pages.values()), "owners": list(c.owners.values()),
-           "relevant_sites": sites, "failures": FAILS[:60], "optional_channels": optional}
+           "relevant_sites": sites, "skipped": c.dropped, "failures": FAILS[:60], "optional_channels": optional}
     res.update(complete=not why, incomplete_reasons=why, caps_hit=caps)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     (out / "discovery-results.json").write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
@@ -532,7 +567,7 @@ def main():
     md = report(res, c)
     (out / "discovery-results.md").write_text(md, encoding="utf-8")
     digest = hashlib.sha256("\n".join(sorted(f"{x['name'].lower()}:{x['size']}" for x in uniq)).encode()).hexdigest()[:12]
-    (out / "summary.json").write_text(json.dumps({"complete": not why, "reasons": why, "caps_hit": caps, "apps": len(uniq), "digest": digest, "authenticated": res["authenticated"],
+    (out / "summary.json").write_text(json.dumps({"complete": not why, "reasons": why, "caps_hit": caps, "skipped": c.dropped, "apps": len(uniq), "digest": digest, "authenticated": res["authenticated"],
                                                   "requests": NREQ, "seconds": res["seconds"]}) + "\n")
     print(md.split("## Unique")[0])   # the status header goes to the step summary
 

@@ -142,3 +142,50 @@ for i in range(5): c.push("opk", f"https://d.example/{i}.opk", {}, 0)
 c.run()
 assert order[:3] == ["page", "page", "pkg"] and order.count("pkg") == 5 and order.index("pkg") < 4, order
 print("queue fairness OK")
+
+# ---- prioritization: junk never queued, software indexes first, per-host + budget limits, coverage-limited is visible ----------
+for u in ("https://www.facebook.com/sharer/sharer.php?u=x", "https://twitter.com/intent/tweet?text=x", "https://shop.example.com/cart",
+          "https://www.amazon.com/dp/B0", "https://wa.me/?text=x", "https://store.example.com/products/funkey-s", "https://example.com/login", "https://example.com/account/settings"):
+    assert C.classify(u)[0] is None, u
+assert C.classify("https://wiki.example.org/wiki/Third-party_apps")[0] == "page" and C.classify("https://rgnano.com/applications/")[0] == "page"
+assert C.pscore("Third-party OPK list", "https://w.org/wiki/Third-party_apps") > C.pscore("Home", "https://w.org/") == 0
+c = C.Crawl()
+for u, a in (("https://a.org/about", ""), ("https://a.org/games", "Games"), ("https://a.org/opk-downloads", "OPK downloads")):
+    c.push("page", u, {"score": C.pscore(a, u)}, 0)
+assert [k for _, k, _, _ in c.pq][0] == "https://a.org/opk-downloads"                      # best score served first
+c = C.Crawl(); C.fetch = lambda url, rng=None, limit=0: (404, {}, b"", url)
+for i in range(C.PER_HOST + 3): c.do_page(f"https://same.org/p{i}", {"score": 9}, 1)
+assert len(c.pages) == C.PER_HOST and c.dropped["per-host limit"] == 3                       # repeated pages from one domain are capped
+c = C.Crawl()
+for i in range(int(C.MAX_PAGES * C.LOW_PAGE_SHARE)): c.do_page(f"https://h{i}.org/", {"score": 1}, 1)
+n = len(c.pages); c.do_page("https://low.org/", {"score": 1}, 1); c.do_page("https://good.org/opk", {"score": 5}, 1)
+assert len(c.pages) == n + 1 and "https://good.org/opk" in c.pages and "https://low.org/" not in c.pages   # reserve for promising pages
+assert any("coverage-limited" in w and "NOT exhaustive" in w for w in C.assess([], 0, [], [], {"repo cap": 4}))
+assert C.assess([], 0, [], [], {"per-host limit": 4}) == []
+C.fetch = real_fetch
+print("prioritization tests OK")
+
+# ---- reach fixes: unquoted hrefs, GitLab blob -> raw, family-only pages follow promising links only ------------------------------
+L = C.links_of('<a href=../add_roms/ class=md-nav__link>Add ROMs</a> <a href="/q">Q</a> <a href=https://x.org/a.opk>dl</a>',
+               "https://doc.example.org/manual/software/add_opk/")
+assert L == {"https://doc.example.org/manual/software/add_roms/": "Add ROMs", "https://doc.example.org/q": "Q", "https://x.org/a.opk": "dl"}, L
+assert C.classify("https://gitlab.com/u/rel/-/blob/master/opk/x.opk") == ("opk", "https://gitlab.com/u/rel/-/raw/master/opk/x.opk")
+assert C.classify("https://gitlab.com/u/rel/-/blob/master/x.zip") == ("zip", "https://gitlab.com/u/rel/-/raw/master/x.zip")
+assert C.classify("https://example.org/-/blob/x.opk")[1] == "https://example.org/-/blob/x.opk"   # only gitlab.com is rewritten
+FAM = ('<p>FunKey S docs</p><a href="https://w.example.org/wiki/List_of_third-party_OPK_applications">third-party OPK applications</a>'
+       '<a href="https://w.example.org/wiki/Teardown">teardown</a><a href="https://github.com/o/r">r</a><a href="https://d.example.org/g.opk">g</a>')
+C.fetch = lambda url, rng=None, limit=0: (200, {"Content-Type": "text/html"}, FAM.encode(), url)
+c = C.Crawl(); c.do_page("https://doc.example.org/x", {"score": 5}, 0)
+q = {(k, key) for k, key, _, _ in list(c.q) + list(c.pq)}
+assert c.pages["https://doc.example.org/x"]["family"] and not c.pages["https://doc.example.org/x"]["relevant"]
+assert ("page", "https://w.example.org/wiki/List_of_third-party_OPK_applications") in q                  # promising link followed
+assert not any("Teardown" in key for _, key in q) and ("repo", "o/r") not in q                            # weak links / repos not followed
+assert ("opk", "https://d.example.org/g.opk") in q                                                       # packages always
+C.fetch = lambda url, rng=None, limit=0: (200, {"Content-Type": "text/html"}, b'<p>cooking</p><a href="https://w.example.org/opk-downloads">OPK downloads</a>', url)
+c = C.Crawl(); c.do_page("https://doc.example.org/y", {"score": 5}, 0); assert not len(c.pq)            # unrelated page still follows nothing
+C.fetch = real_fetch
+C.fetch = lambda url, rng=None, limit=0: (403, {}, b"", url)
+assert C.probe_opk("https://gitlab.com/u/r/-/raw/master/x.opk")[0] is None                              # login wall is not a magic mismatch
+assert C.judge({**pk("x.opk", magic=None), "status": 403}, FakeCrawl) == ("unverified", "download not reachable (HTTP 403)")
+C.fetch = real_fetch
+print("reach fix tests OK")
