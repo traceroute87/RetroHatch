@@ -417,11 +417,11 @@ def walk(x, out):
     return out
 
 
-def load_leads(path):
+def load_leads(path, field="last_seen"):
     try: d = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, ValueError): return {}
     if not isinstance(d, dict): return {}
-    ok = lambda u, v: isinstance(u, str) and u.startswith(("http://", "https://")) and isinstance(v, dict) and isinstance(v.get("last_seen"), str) and re.fullmatch(r"\d{4}-\d\d-\d\d", v["last_seen"])
+    ok = lambda u, v: isinstance(u, str) and u.startswith(("http://", "https://")) and isinstance(v, dict) and isinstance(v.get(field), str) and re.fullmatch(r"\d{4}-\d\d-\d\d", v[field])
     return {u: v for u, v in d.items() if ok(u, v)}   # a corrupt cache entry is dropped, never trusted; survivors still go through classify/check()/fetch like fresh results
 
 
@@ -505,6 +505,14 @@ def judge(p, c):
     return "installable", "squashfs magic verified" + (" inside ZIP" if p["kind"] == "zip" else "")
 
 
+def inaccessible(pages):
+    """Hosts that refused this runner (401/403/451). Recorded, never retried through another endpoint, proxy or disguise."""
+    out = {}
+    for pg in pages:
+        if pg["status"] in (401, 403, 451): out.setdefault(urllib.parse.urlsplit(pg["url"]).netloc.lower(), []).append([pg["url"], pg["status"]])
+    return out
+
+
 def assess(notes, queue_left, stop, fails, dropped=None):
     """Reasons this run must NOT be treated as authoritative (empty list = complete)."""
     why = list(notes)
@@ -533,8 +541,81 @@ def report(res, c):
     bad = [p for p in res["packages"] if p.get("judgement") == "false-positive"]
     L += ["", "## Excluded", ""] + [f"- {p['name']}: {p['reason']} <{p['url']}>" for p in bad] + ([] if bad else ["None."])
     L += ["", "## Optional channels (a failure here never makes the run incomplete)", ""] + [f"- {k}: {v}" for k, v in res.get("optional_channels", {}).items()]
+    pl = res.get("package_leads")
+    if pl: L += ["", "## Package lead store (candidates only, separate from catalog/)", "",
+                 f"- {pl['stored_before']} stored before, {pl['stored_after']} after; {pl['verified']} verified this run ({pl['new']} new), "
+                 f"{pl['changed']} CHANGED (size/contents differ; review), {pl['unreachable']} unreachable but kept, {pl['rejected']} rejected, {pl['stale']} newly stale; "
+                 f"{pl['rechecked']} stored URLs rechecked this run (max {RECHECK_MAX})"]
+    blk = res.get("inaccessible_sources") or {}
+    L += ["", "## Inaccessible sources (refused this runner; content unknown, not evidence of absence)", ""] + [f"- {h}: HTTP {u[0][1]} on {len(u)} page(s), e.g. {u[0][0]}" for h, u in sorted(blk.items())] + ([] if blk else ["None."])
     L += ["", "## Relevant sites reached", ""] + [f"- {h}: {u[0]}" for h, u in sorted(res["relevant_sites"].items())]
     return "\n".join(L) + "\n"
+
+
+# ---- package lead store: verified download URLs kept between runs, separate from catalog/ -----------------------------------
+PKG_MAX, RECHECK_MAX = 400, 60   # stored entries; request budget for re-probing stored URLs per run (rotating, least recently checked first)
+# state: verified | unreachable (last check failed) | stale (not verified for CACHE_DAYS) | changed (size/contents differ from what
+# was verified) | rejected (answered with a non-SquashFS body). Nothing is deleted on age; rejected entries stay as tombstones so a
+# committed snapshot cannot resurrect them.
+
+
+def seed_packages(c, store):
+    """Re-queue stored URLs at depth 0, least recently checked first, within RECHECK_MAX requests (OPK = 1 Range read, ZIP = 3 +
+    one per member, max 12). Each is fetched like any discovered link (check(), Range probe, judge()), so a source page that later
+    blocks us (403) does not hide packages it once linked to. -> number of URLs queued."""
+    cost, due = 0, []
+    for url in sorted((u for u, v in store.items() if v.get("state") != "rejected"), key=lambda u: (store[u].get("last_checked") or "", u)):
+        w = 1 if store[url]["kind"] == "opk" else 3 + min(12, len(store[url].get("members") or []))
+        if cost + w > RECHECK_MAX: break
+        cost += w; due.append(url)
+    for url in due:
+        v = store[url]
+        c.push(v["kind"], url, {"from": "package-lead-store", "anchor": "previously verified " + v["last_verified"], "repo": v.get("repo"),
+                                "first_found_via": (v.get("via") or [{}])[0].get("from")}, 0)
+    return len(due)
+
+
+def update_packages(store, pkgs, today):
+    """-> counts. Verified packages are added/refreshed; a different size or ZIP member set marks the entry "changed" (previous
+    values kept); unreachable ones are kept and marked; a non-SquashFS body marks "rejected"; long-unverified ones turn "stale"."""
+    n = {"verified": 0, "new": 0, "changed": 0, "unreachable": 0, "rejected": 0, "stale": 0}
+    seen_zip = {}
+    for p in pkgs:
+        if p["kind"] == "zip-container": continue
+        url, kind = (p["url"], "opk") if p["kind"] == "direct" else (p["container"], "zip")
+        old = store.get(url)
+        if p.get("judgement") == "installable":
+            n["verified"] += 1; n["new"] += old is None
+            rec = store.setdefault(url, {"kind": kind, "first_seen": today, "via": [], "members": []})
+            if kind == "zip":
+                seen_zip.setdefault(url, set()).add(p["name"])
+            elif rec.get("size") not in (None, p["size"]) or rec.get("state") == "rejected":
+                rec["previous"] = {"size": rec.get("size"), "last_verified": rec.get("last_verified"), "state": rec.get("state")}
+                rec["state"] = "changed"; n["changed"] += 1
+            rec.update(name=p["name"] if kind == "opk" else url.rsplit("/", 1)[-1], size=p["size"] if kind == "opk" else rec.get("size"), host=p["host"],
+                       repo=p.get("repo"), last_verified=today, last_checked=today, last_status="ok")
+            rec["state"] = "changed" if rec.get("state") == "changed" else "verified"   # "changed" stays until a human reviews it
+            for v in p["via"]:
+                if v.get("from") != "package-lead-store" and v not in rec["via"]: rec["via"] = (rec["via"] + [v])[:3]   # original provenance only
+        elif old and p.get("magic_squashfs") is False and p.get("status") in (200, 206):
+            old.update(state="rejected", last_checked=today, last_status=f"HTTP {p.get('status')}, not SquashFS"); n["rejected"] += 1
+        elif old and p.get("magic_squashfs") is None:
+            old.update(last_checked=today, last_status=f"HTTP {p.get('status')}"); n["unreachable"] += 1
+            if old.get("state") in (None, "verified"): old["state"] = "unreachable"
+    for url, names in seen_zip.items():
+        rec, names = store[url], sorted(names)
+        if rec["members"] and set(names) != set(rec["members"]):
+            rec["previous"] = {"members": rec["members"], "last_verified": rec.get("last_verified")}
+            rec["state"] = "changed"; n["changed"] += 1
+        rec["members"] = names[:50]
+    for v in store.values():
+        if v.get("state") in (None, "verified", "unreachable") and (date.fromisoformat(today) - date.fromisoformat(v["last_verified"])).days > CACHE_DAYS:
+            v["state"] = "stale"; n["stale"] += 1   # kept, never deleted for age
+    while len(store) > PKG_MAX:   # storage bound only: evict the longest-unverified non-tombstone
+        live = [u for u in store if store[u].get("state") != "rejected"]
+        if not live: break
+        del store[min(live, key=lambda u: store[u]["last_verified"])]
+    return n
 
 
 def main():
@@ -544,12 +625,18 @@ def main():
     ap.add_argument("--max-req", type=int); ap.add_argument("--deadline", type=int)
     ap.add_argument("--no-freeserp", action="store_true", help="skip the optional FreeSerp web-search seeds")
     ap.add_argument("--lead-cache", default=None, help="JSON file of FreeSerp leads kept between runs")
+    ap.add_argument("--package-leads", default=None, help="JSON store of verified download URLs, revalidated and updated each run")
+    ap.add_argument("--package-seed", default=None, help="read-only JSON store merged in first (e.g. a committed snapshot)")
     a = ap.parse_args()
     global MAX_REQ, DEADLINE_S
     MAX_REQ, DEADLINE_S = a.max_req or MAX_REQ, a.deadline or DEADLINE_S
     c = Crawl()
     notes, optional = [], {}
+    store, rechecked = {}, 0
+    for f in (a.package_seed, a.package_leads):
+        if f: store.update({u: v for u, v in load_leads(f, "last_verified").items() if v.get("kind") in ("opk", "zip")})   # load_leads drops malformed entries
     try:
+        rechecked = seed_packages(c, store)
         notes = ([] if a.no_github_seed else seed(c)) + seed_multi(c)
         optional["freeserp"] = {"status": "disabled"} if a.no_freeserp else seed_freeserp(c, a.lead_cache)
         c.run()
@@ -575,9 +662,14 @@ def main():
            "unique_installable_apps": uniq,
            "packages": [p for p in c.pkgs.values()],
            "repos": list(c.repos.values()), "pages": list(c.pages.values()), "owners": list(c.owners.values()),
-           "relevant_sites": sites, "skipped": c.dropped, "failures": FAILS[:60], "optional_channels": optional}
+           "relevant_sites": sites, "inaccessible_sources": inaccessible(c.pages.values()), "skipped": c.dropped, "failures": FAILS[:60], "optional_channels": optional}
     res.update(complete=not why, incomplete_reasons=why, caps_hit=caps)
+    res["package_leads"] = {"stored_before": len(store), "rechecked": rechecked, **update_packages(store, c.pkgs.values(), res["as_of"]), "stored_after": len(store)}
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    if a.package_leads:
+        Path(a.package_leads).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.package_leads).write_text(json.dumps(store, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    (out / "package-leads.json").write_text(json.dumps(store, indent=1, sort_keys=True) + "\n", encoding="utf-8")   # candidates only, never catalog/
     (out / "discovery-results.json").write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     if a.lead_cache and Path(a.lead_cache).is_file(): (out / "freeserp-leads.json").write_bytes(Path(a.lead_cache).read_bytes())   # artifact carries the cache the next run will restore
     md = report(res, c)

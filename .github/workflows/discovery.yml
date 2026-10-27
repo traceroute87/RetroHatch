@@ -51,12 +51,12 @@ jobs:
         if: always()
         continue-on-error: true
         timeout-minutes: 16
-        run: python3 -I discovery/crawl.py --out out-crawl --max-req 1200 --deadline 780 --lead-cache .cache/leads/freeserp.json | tee -a "$GITHUB_STEP_SUMMARY"
+        run: python3 -I discovery/crawl.py --out out-crawl --max-req 1200 --deadline 780 --lead-cache .cache/leads/freeserp.json --package-leads .cache/leads/packages.json --package-seed discovery/package-leads.json | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: crawl-discovery, path: out-crawl, if-no-files-found: ignore}
       - name: Save FreeSerp lead cache
-        if: always() && hashFiles('.cache/leads/freeserp.json') != ''
+        if: always() && hashFiles('.cache/leads/*.json') != ''
         uses: actions/cache/save@v4
         with:
           path: .cache/leads

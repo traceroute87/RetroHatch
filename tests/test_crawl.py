@@ -216,3 +216,57 @@ for u in ("https://www.reddit.com/r/RGNano/comments/abc/opk_list/", "https://www
           "https://getpocket.com/explore/item/homebrew", "https://example.org/submit-your-opk/", "https://example.org/save-states/"):
     assert C.classify(u)[0] == "page", u                                                                 # discussions and software pages kept
 print("lead starvation tests OK")
+
+# ---- sources that refuse the runner are reported as inaccessible, not silently dropped -----------------------------------------
+B = C.inaccessible([{"url": "https://wiki.example.org/wiki/Apps", "status": 403}, {"url": "https://wiki.example.org/wiki/Main", "status": 403},
+                    {"url": "https://ok.example/", "status": 200}, {"url": "https://gone.example/", "status": 404}])
+assert B == {"wiki.example.org": [["https://wiki.example.org/wiki/Apps", 403], ["https://wiki.example.org/wiki/Main", 403]]}, B
+print("inaccessible source tests OK")
+
+# ---- package lead store: verified URLs persist, blocked != gone, provenance kept, separate from catalog ------------------------
+src = {"from": "https://wiki.example.org/wiki/List", "anchor": "Pico"}
+U = "https://files.example/Pico.opk"
+P = lambda **k: {"kind": "direct", "name": "Pico.opk", "url": U, "container": None, "size": 458752,
+                 "host": "files.example", "repo": None, "via": [src], "judgement": "installable", "magic_squashfs": True, "status": 206, **k}
+store = {}
+assert C.update_packages(store, [P()], "2026-10-27")["new"] == 1
+assert store[U]["kind"] == "opk" and store[U]["size"] == 458752 and store[U]["via"] == [src] and store[U]["state"] == "verified"
+c = C.Crawl(); C.seed_packages(c, store)                                                            # next run: re-queued directly
+k, key, via, d = c.q[0]; assert (k, key, d) == ("opk", U, 0) and via["first_found_via"] == src["from"]
+assert C.update_packages(store, [P(judgement="unverified", magic_squashfs=None, status=403, via=[via])], "2026-11-03")["unreachable"] == 1
+assert store[U]["state"] == "unreachable" and store[U]["last_status"] == "HTTP 403" and store[U]["via"] == [src]   # blocked: kept
+C.update_packages(store, [P(via=[via])], "2026-11-10"); assert store[U]["via"] == [src] and store[U]["state"] == "verified"   # store hop is not provenance
+# 1. never deleted for age: turns stale, keeps everything
+C.update_packages(store, [], "2027-03-01"); assert store[U]["state"] == "stale" and store[U]["size"] == 458752 and store[U]["via"] == [src]
+# 3. size change is flagged, previous values kept, and the flag sticks after later verifications
+r = C.update_packages(store, [P(size=999424)], "2027-03-02"); assert r["changed"] == 1 and store[U]["state"] == "changed"
+assert store[U]["previous"]["size"] == 458752 and store[U]["size"] == 999424
+C.update_packages(store, [P(size=999424)], "2027-03-03"); assert store[U]["state"] == "changed"
+zipm = lambda n: P(kind="zip", name=n, url="https://files.example/g.zip", container="https://files.example/g.zip")
+zs = {}; C.update_packages(zs, [zipm("A.opk"), zipm("B.opk")], "2026-10-27"); assert zs["https://files.example/g.zip"]["members"] == ["A.opk", "B.opk"]
+C.update_packages(zs, [zipm("A.opk"), zipm("B.opk")], "2026-10-28"); assert zs["https://files.example/g.zip"]["state"] == "verified"
+C.update_packages(zs, [zipm("C.opk")], "2026-10-29"); z = zs["https://files.example/g.zip"]
+assert z["state"] == "changed" and z["previous"]["members"] == ["A.opk", "B.opk"] and z["members"] == ["C.opk"]      # ZIP contents changed
+# rejected = tombstone: kept, never rechecked, and a snapshot (seed) cannot resurrect it because the cache entry wins the merge
+rs = {U: dict(store[U])}
+assert C.update_packages(rs, [P(judgement="false-positive", magic_squashfs=False, status=200)], "2027-03-04")["rejected"] == 1
+assert rs[U]["state"] == "rejected" and rs[U]["via"] == [src]
+c = C.Crawl(); assert C.seed_packages(c, rs) == 0 and not len(c.q)
+d_ = tempfile.mkdtemp(); seedf, cachef = os.path.join(d_, "seed.json"), os.path.join(d_, "cache.json")
+json.dump({U: {**store[U], "state": "verified"}, "https://files.example/New.opk": {"kind": "opk", "last_verified": "2026-10-27", "via": []}}, open(seedf, "w"))
+json.dump(rs, open(cachef, "w"))
+merged = {}
+for f in (seedf, cachef): merged.update(C.load_leads(f, "last_verified"))                          # same order as main(): seed, then cache
+assert merged[U]["state"] == "rejected" and "https://files.example/New.opk" in merged
+# 2. rechecks are bounded and rotate: least recently checked first, every entry gets its turn
+big = {f"https://f.example/{i}.opk": {"kind": "opk", "last_verified": "2026-10-01", "last_checked": f"2026-10-{1 + i % 28:02d}"} for i in range(100)}
+c = C.Crawl(); assert C.seed_packages(c, big) == C.RECHECK_MAX and len(c.q) == C.RECHECK_MAX
+first = {key for _, key, _, _ in c.q}
+assert max(big[u]["last_checked"] for u in first) <= min(big[u]["last_checked"] for u in set(big) - first)   # stalest first
+for u in first: big[u]["last_checked"] = "2026-11-01"
+c = C.Crawl(); C.seed_packages(c, big); assert set(big) - first <= {key for _, key, _, _ in c.q}               # next run: the rest first
+zips = {f"https://z.example/{i}.zip": {"kind": "zip", "last_verified": "2026-10-01", "members": ["a.opk"] * 5} for i in range(30)}
+assert C.seed_packages(C.Crawl(), zips) == C.RECHECK_MAX // 8                                              # ZIPs cost 3 + members requests
+bad = os.path.join(tempfile.mkdtemp(), "pk.json"); open(bad, "w").write(json.dumps({"file:///x.opk": {"kind": "opk", "last_verified": "2026-10-27"}, "https://ok.example/a.opk": {"kind": "opk", "last_verified": "2026-10-27"}}))
+assert list(C.load_leads(bad, "last_verified")) == ["https://ok.example/a.opk"]                       # malformed / non-http entries dropped
+print("package lead store tests OK")

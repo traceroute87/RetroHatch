@@ -1,0 +1,740 @@
+{
+ "https://github.com/joyrider3774/blips_funkey/releases/latest/download/Blips.opk": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Blips.opk",
+  "repo": "joyrider3774/blips_funkey",
+  "size": 819200,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Link",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/blockdude_funkey/releases/latest/download/Blockdude.opk": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Blockdude.opk",
+  "repo": "joyrider3774/blockdude_funkey",
+  "size": 3407872,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Link",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/latest/download/Cglpsdl1.opk": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Cglpsdl1.opk",
+  "repo": "joyrider3774/crisp-game-lib-portable-funkey",
+  "size": 303104,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Link",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/checkers.-.Funkey-s.zip": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "checkers.opk"
+  ],
+  "name": "checkers.-.Funkey-s.zip",
+  "repo": "joyrider3774/funkey_sdl2_games",
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download for Funkey / RG-Nano",
+    "from": "https://codeberg.org/joyrider3774/funkey_sdl2_games"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/dynamate.-.Funkey-s.zip": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "dynamate.opk"
+  ],
+  "name": "dynamate.-.Funkey-s.zip",
+  "repo": "joyrider3774/funkey_sdl2_games",
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download for Funkey / RG-Nano",
+    "from": "https://codeberg.org/joyrider3774/funkey_sdl2_games"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/puztrix.-.Funkey-s.zip": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "puztrix.opk"
+  ],
+  "name": "puztrix.-.Funkey-s.zip",
+  "repo": "joyrider3774/funkey_sdl2_games",
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download for Funkey / RG-Nano",
+    "from": "https://codeberg.org/joyrider3774/funkey_sdl2_games"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/puzzleland.-.Funkey-s.zip": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "puzzleland.opk"
+  ],
+  "name": "puzzleland.-.Funkey-s.zip",
+  "repo": "joyrider3774/funkey_sdl2_games",
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download for Funkey / RG-Nano",
+    "from": "https://codeberg.org/joyrider3774/funkey_sdl2_games"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/retrotime.-.Funkey-s.zip": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "retrotime.opk"
+  ],
+  "name": "retrotime.-.Funkey-s.zip",
+  "repo": "joyrider3774/funkey_sdl2_games",
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download for Funkey / RG-Nano",
+    "from": "https://codeberg.org/joyrider3774/funkey_sdl2_games"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/waternet.-.Funkey-s.zip": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "waternet.opk"
+  ],
+  "name": "waternet.-.Funkey-s.zip",
+  "repo": "joyrider3774/funkey_sdl2_games",
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download for Funkey / RG-Nano",
+    "from": "https://codeberg.org/joyrider3774/funkey_sdl2_games"
+   }
+  ]
+ },
+ "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/worm.-.Funkey-s.zip": {
+  "first_seen": "2026-10-27",
+  "host": "github.com",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "worm.opk"
+  ],
+  "name": "worm.-.Funkey-s.zip",
+  "repo": "joyrider3774/funkey_sdl2_games",
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download for Funkey / RG-Nano",
+    "from": "https://codeberg.org/joyrider3774/funkey_sdl2_games"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/0/02/VBA_Next.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "VBA_Next.opk",
+  "repo": null,
+  "size": 552960,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "PicoDrive-V3.opk",
+  "repo": null,
+  "size": 458752,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/1/18/Fake08.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Fake08.opk",
+  "repo": null,
+  "size": 233472,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/1/1d/3DOh-V1.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "3DOh-V1.opk",
+  "repo": null,
+  "size": 53248,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/1/1d/MPlayer-V2.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "MPlayer-V2.opk",
+  "repo": null,
+  "size": 7847936,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/2/20/VBEmu.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "VBEmu.opk",
+  "repo": null,
+  "size": 434176,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/2/22/Smsplus_funkey-s.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Smsplus_funkey-s.opk",
+  "repo": null,
+  "size": 479232,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/2/28/Dinothawr-V2.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Dinothawr-V2.opk",
+  "repo": null,
+  "size": 7663616,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/3/30/SDL_Retro-V9.zip": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "zip",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [
+   "sdlretro_funkey-s.opk"
+  ],
+  "name": "SDL_Retro-V9.zip",
+  "repo": null,
+  "size": null,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/4/45/Mednafen_%28NES_only%29.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Mednafen_(NES_only).opk",
+  "repo": null,
+  "size": 4096,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/4/4c/Game_Music_Emu-V2.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Game_Music_Emu-V2.opk",
+  "repo": null,
+  "size": 1953792,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/5/5a/EasyRPG.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "EasyRPG.opk",
+  "repo": null,
+  "size": 21303296,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/6/65/PCSX_ReARMed_V2.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "PCSX_ReARMed_V2.opk",
+  "repo": null,
+  "size": 516096,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/7/7c/FinalBurnNeo-V1.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "FinalBurnNeo-V1.opk",
+  "repo": null,
+  "size": 10264576,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/9/93/Gambatte-V4.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Gambatte-V4.opk",
+  "repo": null,
+  "size": 1843200,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/9/9e/FinalBurnAlpha2012-V3.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "FinalBurnAlpha2012-V3.opk",
+  "repo": null,
+  "size": 5877760,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/a/ad/Commodore_64_funkey-s.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Commodore_64_funkey-s.opk",
+  "repo": null,
+  "size": 2891776,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/b/b1/Gnash-V2.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Gnash-V2.opk",
+  "repo": null,
+  "size": 8450048,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/b/bc/SwanEmu.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "SwanEmu.opk",
+  "repo": null,
+  "size": 466944,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/c/c3/Pocket_CDG-V1.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Pocket_CDG-V1.opk",
+  "repo": null,
+  "size": 1802240,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/c/c4/LameDS.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "LameDS.opk",
+  "repo": null,
+  "size": 487424,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/c/cb/ST.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "ST.opk",
+  "repo": null,
+  "size": 81920,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/d/d4/Piemu_funkey-s.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Piemu_funkey-s.opk",
+  "repo": null,
+  "size": 20480,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/d/d6/Pcfxemu_funkey-s.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Pcfxemu_funkey-s.opk",
+  "repo": null,
+  "size": 552960,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/d/de/MAME2000-V3.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "MAME2000-V3.opk",
+  "repo": null,
+  "size": 4677632,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/e/e6/SDL_Retro-V9.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "SDL_Retro-V9.opk",
+  "repo": null,
+  "size": 11096064,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/e/ec/DOSBox_Pure-V1.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "DOSBox_Pure-V1.opk",
+  "repo": null,
+  "size": 2744320,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ },
+ "https://static.miraheze.org/funkeywiki/f/fd/Pokemini_funkey.opk": {
+  "first_seen": "2026-10-27",
+  "host": "static.miraheze.org",
+  "kind": "opk",
+  "last_checked": "2026-10-27",
+  "last_status": "ok",
+  "last_verified": "2026-10-27",
+  "members": [],
+  "name": "Pokemini_funkey.opk",
+  "repo": null,
+  "size": 499712,
+  "state": "verified",
+  "via": [
+   {
+    "anchor": "Download",
+    "from": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+   }
+  ]
+ }
+}
