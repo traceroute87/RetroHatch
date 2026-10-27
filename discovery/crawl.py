@@ -25,6 +25,7 @@ NOISE = re.compile(r"[?&](action=(history|edit|info|submit|raw|purge)|oldid=|dif
 STRONG = re.compile(r"opk|third[ -_]?party|homebrew|applications?|software|emulators?|downloads?|releases?|collections?|catalog", re.I)   # software-index / download vocabulary
 JUNK_HOST = re.compile(r"(^|\.)(facebook|twitter|x|linkedin|pinterest|instagram|tiktok|youtube|youtu|whatsapp|wa|telegram|t|tumblr|amazon|ebay|aliexpress|alibaba|walmart|etsy|temu|banggood|paypal|patreon|ko-fi)\.(com|be|co|me|org|net|co\.uk|de)$", re.I)
 JUNK_PATH = re.compile(r"/(share|sharer|intent|login|log-in|signin|sign-in|signup|sign-up|register|account|my-account|cart|checkout|basket|wishlist|privacy|terms|cookies?|contact|about-us|careers|newsletter|subscribe|shop|store|products?|buy)(/|$|\.php)|[?&](share|replytocom|add-to-cart)=|^mailto:", re.I)
+JUNK_SHARE = re.compile(r"^((old\.)?reddit\.com/submit|share\.flipboard\.com/bookmarklet|getpocket\.com/save)(/|$|\?)", re.I)   # host-qualified share endpoints only
 IMG = re.compile(r"\.(png|jpe?g|gif|svg|webp|ico|css|js|mp4|webm|pdf)(\?|$)", re.I)
 LINK = re.compile(r'<a\s[^>]*?href=(?:["\']([^"\']+)["\']|([^\s"\'>]+))[^>]*>(.*?)</a>|\[([^\]]*)\]\(\s*<?(\S+?)>?\s*\)|(https?://[^\s<>"\')\]]+)', re.S | re.I)
 
@@ -179,7 +180,7 @@ def classify(u):
         if not re.fullmatch(r"[\w.-]+", seg[1]): return None, u
         return "repo", f"{seg[0]}/{re.sub(r'[.]git$', '', seg[1])}"
     if host.endswith(("githubusercontent.com", "github.com")): return None, u
-    if JUNK_HOST.search(host) or JUNK_PATH.search(low): return None, u   # social sharing, login/account, retail/marketing: never queued
+    if JUNK_HOST.search(host) or JUNK_PATH.search(low) or JUNK_SHARE.search(host + low): return None, u   # social sharing, login/account, retail/marketing: never queued
     return "page", u
 
 
@@ -191,11 +192,12 @@ def pscore(anchor, u):
 
 
 class PQ:
-    """Page queue, best score first (FIFO among equals). Same surface as the deque it replaces."""
+    """Page queue: seed leads (depth 0, independently found by a search) first, then best score first (FIFO among equals).
+    Seeds are bounded (FS_MAX_PAGES), so derived links cannot starve them and they cannot starve derived links."""
     def __init__(self): self.h, self.n = [], 0
-    def append(self, item): heapq.heappush(self.h, (-(item[2].get("score") or 0), self.n, item)); self.n += 1
-    def popleft(self): return heapq.heappop(self.h)[2]
-    def __iter__(self): return (x[2] for x in sorted(self.h))
+    def append(self, item): heapq.heappush(self.h, (item[3] > 0, -(item[2].get("score") or 0), self.n, item)); self.n += 1
+    def popleft(self): return heapq.heappop(self.h)[-1]
+    def __iter__(self): return (x[-1] for x in sorted(self.h))
     def __len__(self): return len(self.h)
 
 
@@ -436,18 +438,32 @@ def seed_freeserp(c, cache_path=None, today=None):
     today = today or date.today().isoformat()
     st_out = {"status": "ok", "requests": 0, "queries": 0, "results": 0, "new_leads": 0, "cached_leads": 0, "error": None}
     leads = load_leads(cache_path) if cache_path else {}
-    pages = [0]
+    cand = {}   # page url -> [score, hits, first-seen order, via]; admitted after all queries, best first (not first-come)
 
-    def feed(url, title, snippet, query, cached):
+    def feed(url, title, snippet, query, cached, hits=1):
         text = D.norm(" ".join([url, title, snippet]))
         kind, key = classify(url)
         via = {"from": "freeserp-search", "anchor": query + (" [cached lead]" if cached else ""), "title": title[:80]}
         if kind in ("opk", "zip", "repo"): c.push(kind, key, via, 0)
-        elif kind == "page" and (DRE.search(text) or FRE.search(text)) and pages[0] < FS_MAX_PAGES:
-            pages[0] += 1; c.push("page", key, {**via, "score": max(GOOD + 1, pscore(title, url))}, 0)
+        elif kind == "page" and (DRE.search(text) or FRE.search(text)):
+            cand.setdefault(key, [max(GOOD + 1, pscore(title, url)), 0, len(cand), {**via, "score": max(GOOD + 1, pscore(title, url))}])[1] += hits
+
+    def admit():
+        """FS_MAX_PAGES distinct pages, ranked by score then by how many queries found them. A URL hit by several queries
+        takes one slot, and leads from late queries compete with early ones on equal terms."""
+        for _, _, _, key, via in sorted((-sc, -n, i, k, v) for k, (sc, n, i, v) in cand.items())[:FS_MAX_PAGES]:
+            c.push("page", key, via, 0)
+        st_out["pages_admitted"], st_out["pages_not_admitted"] = min(len(cand), FS_MAX_PAGES), max(0, len(cand) - FS_MAX_PAGES)
 
     for url, v in leads.items():
-        feed(url, v.get("title", ""), "", (v.get("queries") or ["cache"])[0], True); st_out["cached_leads"] += 1
+        feed(url, v.get("title", ""), "", (v.get("queries") or ["cache"])[0], True, len(v.get("queries") or []) or 1); st_out["cached_leads"] += 1
+    try:
+        return _search(leads, st_out, feed, cache_path, today)
+    finally:
+        admit()   # every exit path, including FreeSerp down: cached leads still get admitted
+
+
+def _search(leads, st_out, feed, cache_path, today):
     terms = [t for t in PROF["direct"] + PROF["family"] if " " in t or t in PROF["family"]]   # "rg nano", "funkey os", "funkey s", "funkey"
     for suffix in ("opk download", "opk", "homebrew games", "emulators"):
         for t in terms:

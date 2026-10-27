@@ -189,3 +189,30 @@ assert C.probe_opk("https://gitlab.com/u/r/-/raw/master/x.opk")[0] is None      
 assert C.judge({**pk("x.opk", magic=None), "status": 403}, FakeCrawl) == ("unverified", "download not reachable (HTTP 403)")
 C.fetch = real_fetch
 print("reach fix tests OK")
+
+# ---- cached/search lead starvation: late-query leads get admitted, duplicates take one slot, seeds beat derived links -----------
+def fs_many(url, rng=None, limit=0):
+    q = urllib.parse.unquote_plus(url.split("q=")[1])
+    late = q.endswith("emulators")
+    res = [{"url": "https://dup.example/funkey", "title": "FunKey"}]                                    # same lead in every query
+    res += [{"url": f"https://p-{q.replace(' ', '-')}-{i}.example/funkey", "title": "FunKey"} for i in range(2)]
+    if late: res.append({"url": "https://docs.example/manual/software/add_roms/", "title": "Add New ROMs - FunKey docs"})
+    return 200, {}, json.dumps({"ok": True, "results": res}).encode(), url
+import urllib.parse
+C.fetch, sleep = fs_many, C.time.sleep; C.time.sleep = lambda s: None
+c = C.Crawl(); r = C.seed_freeserp(c, None, "2026-10-27")
+admitted = [key for _, key, _, _ in c.pq]
+assert len(admitted) == C.FS_MAX_PAGES and admitted.count("https://dup.example/funkey") == 1, admitted   # one slot per distinct URL
+assert "https://docs.example/manual/software/add_roms/" in admitted, admitted                       # late-query lead not starved
+assert r["pages_not_admitted"] == 1 + 2 * C.FS_MAX_REQ + 1 - C.FS_MAX_PAGES, r                          # what was left out is reported
+C.time.sleep, C.fetch = sleep, real_fetch
+q = C.PQ()
+q.append(("page", "https://derived.example/share?t=rg+nano", {"score": 12}, 3)); q.append(("page", "https://seed.example/docs", {"score": 4}, 0))
+assert q.popleft()[1] == "https://seed.example/docs"                                                     # independent seed before derived link
+for u in ("https://www.reddit.com/submit?url=https%3A%2F%2Fx.example%2Frg-nano", "https://old.reddit.com/submit?url=x",
+          "https://share.flipboard.com/bookmarklet/popout?v=2&title=RG+Nano", "https://getpocket.com/save?url=https%3A%2F%2Fx.example"):
+    assert C.classify(u)[0] is None, u                                                                   # share endpoints never queued
+for u in ("https://www.reddit.com/r/RGNano/comments/abc/opk_list/", "https://www.reddit.com/r/FunKey/", "https://flipboard.com/@x/funkey-apps",
+          "https://getpocket.com/explore/item/homebrew", "https://example.org/submit-your-opk/", "https://example.org/save-states/"):
+    assert C.classify(u)[0] == "page", u                                                                 # discussions and software pages kept
+print("lead starvation tests OK")
