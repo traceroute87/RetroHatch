@@ -10,7 +10,7 @@ permissions:
 jobs:
   discover:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
     env:
       GH_TOKEN: ${{ github.token }}
       GITHUB_TOKEN: ${{ github.token }}
@@ -33,3 +33,31 @@ jobs:
           N=$(gh issue list --label discovery --state open --json number --jq '.[0].number // empty')
           if [ -n "$N" ]; then gh issue edit "$N" --body-file out/issue-rg-nano.md   # edit, not comment: no notification spam
           else gh issue create --label discovery --title "Discovery: rg-nano candidates" --body-file out/issue-rg-nano.md; fi
+      # Link-following crawler: separate artifact only. It never files or edits the issue (discover.py still owns that) and
+      # cannot fail the workflow. An incomplete crawl labels itself INCOMPLETE, NOT AUTHORITATIVE in its report.
+      - name: Crawl tests
+        if: always()
+        continue-on-error: true
+        run: python3 tests/test_crawl.py
+      # restore + save split so the cache is written even when an earlier step failed (the combined action saves only on success)
+      - name: Restore FreeSerp lead cache
+        if: always()
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/leads
+          key: freeserp-leads-${{ github.run_id }}
+          restore-keys: freeserp-leads-
+      - name: Crawl discovery
+        if: always()
+        continue-on-error: true
+        timeout-minutes: 16
+        run: python3 -I discovery/crawl.py --out out-crawl --max-req 1200 --deadline 780 --lead-cache .cache/leads/freeserp.json | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: crawl-discovery, path: out-crawl, if-no-files-found: ignore}
+      - name: Save FreeSerp lead cache
+        if: always() && hashFiles('.cache/leads/freeserp.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/leads
+          key: freeserp-leads-${{ github.run_id }}
