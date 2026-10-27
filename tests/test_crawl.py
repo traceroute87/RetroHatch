@@ -273,7 +273,7 @@ print("package lead store tests OK")
 
 # ---- job summary statistics (reviewable without downloading the artifact) ---------------------------------------------------
 res = {"as_of": "2026-10-27", "unique_installable_apps": [{"host": "github.com"}, {"host": "static.miraheze.org"}, {"host": "static.miraheze.org"}],
-       "package_leads": {"rechecked": 7}, "inaccessible_sources": {"wiki.example.org": []},
+       "package_leads": {"rechecked": 7, "new": 1, "verified": 2}, "inaccessible_sources": {"wiki.example.org": []},
        "optional_channels": {"freeserp": {"status": "ok", "queries": 16, "requests": 16, "results": 160, "new_leads": 3, "cached_leads": 92, "error": None}}}
 store = {"https://a/x.opk": {"name": "x.opk", "first_seen": "2026-10-27", "last_verified": "2026-10-27", "state": "verified"},
          "https://a/y.opk": {"name": "y.opk", "first_seen": "2026-10-01", "last_verified": "2026-10-27", "state": "changed", "last_status": "ok"},
@@ -304,8 +304,10 @@ assert not GH.keys() - covered or day > 29                                      
 # per-run stats are separate from history: 1 external verified, 1 external unreachable, 1 GitHub queued but never fetched
 due = list(EXT)[:2] + list(GH)[:1]
 s2 = {u: {**v, "last_checked": "2026-10-27"} for u, v in st.items()}
-s2[due[0]].update(last_checked="2026-11-01", last_verified="2026-11-01"); s2[due[1]].update(last_checked="2026-11-01", last_status="HTTP 403")
-assert C.recheck_stats(s2, due, "2026-11-01") == {"github": {"queued": 1, "processed": 0, "verified": 0, "unreachable": 0},
+s2[due[0]].update(last_checked="2026-11-01", last_verified="2026-11-01", last_status="ok", checked_at=5000)
+s2[due[1]].update(last_checked="2026-11-01", last_status="HTTP 403", checked_at=5001)
+s2[due[2]].update(last_checked="2026-11-01", last_status="ok", checked_at=4000)          # checked by an EARLIER run the same day
+assert C.recheck_stats(s2, due, 4500) == {"github": {"queued": 1, "processed": 0, "verified": 0, "unreachable": 0},
                                                   "external": {"queued": 2, "processed": 2, "verified": 1, "unreachable": 1}}
 # a reachable ZIP with 18 members, 6 beyond the header limit: verified, 0 unreachable URLs, 6 unverified members, state untouched
 Z = "https://github.com/p/picoarch/releases/download/v1/picoarch.zip"
@@ -436,12 +438,12 @@ C.fetch = tree_fetch("# Pack\nApps for the RG Nano running FunKey OS.\n", ["Apps
 c = C.Crawl(); c.do_repo("someone/pack", {"from": "test"}, 0)
 r = c.repos["someone/pack"]
 q = [(k, key, via) for k, key, via, _ in c.q if via.get("anchor") == "repository file"]
-assert r["tree"]["commit"] == SHA and r["tree"]["packages"] == 62 and r["tree"]["queued"] == C.TREE_MAX == len(q) and r["tree"]["truncated"]   # bounded
+assert r["tree"]["commit"] == SHA and r["tree"]["packages"] == 61 and r["tree"]["queued"] == C.TREE_MAX == len(q) and r["tree"]["truncated"]   # bounded
 assert sum("/git/trees/" in u for u in calls) == 1 and sum(u.endswith("/commits/HEAD") for u in calls) == 1                         # 2 API requests
 k, u, via = next(x for x in q if "Game%20One.opk" in x[1])
 assert k == "opk" and u == f"https://raw.githubusercontent.com/someone/pack/{SHA}/Apps/Game%20One.opk" and C.classify(u) == ("opk", u)   # immutable URL
 assert via["repo"] == "someone/pack" and via["commit"] == SHA and via["path"] == "Apps/Game One.opk"                                # provenance
-assert not any("docs/x.md" in x[1] for x in q) and q[0][0] == "opk"                                                                # packages only, OPKs first
+assert not any("docs/x.md" in x[1] or ".zip" in x[1] for x in q) and all(x[0] == "opk" for x in q)                            # profile extensions only: no tree ZIPs
 c.add_pkg(k, u, via, 1); p = c.pkgs[u]
 assert p["repo"] == "someone/pack" and p["magic_squashfs"] is True and C.judge(p, c)[0] == "installable"                          # Nano repo: candidate
 # other-device repo: no tree request at all, and its OPK is never Nano-installable even with a valid SquashFS header
@@ -460,3 +462,93 @@ for desc in ("Repository of RG-350 and PocketGo 2 compatible Software", "Apps fo
 assert C.D.analyze({"full_name": "o/r", "name": "r", "html_url": "https://github.com/o/r", "description": "Game for the RG Nano", "topics": []}, None, None, C.PROF)[0] == "supports"
 C.fetch = real_fetch
 print("repository tree tests OK")
+
+# ---- large repository trees: progressive coverage across runs, changed files flagged, budgets, store limit, same-day stats ------
+FULL, N = "someone/wiki-mirror", 454
+blobs = {f"wiki/files/app{i:03d}.opk": f"{i:040x}" for i in range(N)}
+def mirror_fetch(sha):
+    def f(url, rng=None, limit=0):
+        if url.endswith("/commits/HEAD"): return 200, {}, json.dumps({"sha": sha}).encode(), url
+        if "/git/trees/" in url:
+            tree = [{"path": p_, "type": "blob", "sha": b_} for p_, b_ in blobs.items()] + [{"path": "wiki/files/pack.zip", "type": "blob", "sha": "f" * 40}]
+            return 200, {}, json.dumps({"truncated": False, "tree": tree}).encode(), url
+        return 404, {}, b"", url
+    return f
+def run_tree(store, salt, sha=SHA, budget=None):
+    C.fetch = mirror_fetch(sha)
+    c = C.Crawl(); c.tree_known, c.tree_salt = C.tree_known(store), salt
+    if budget is not None: c.tree_left = budget
+    r = {}; c.do_tree(FULL, r, 0)
+    q = [(key, via) for _, key, via, _ in c.q]
+    pk = [{"kind": "direct", "name": via["path"].rsplit("/", 1)[1], "url": key, "container": None, "size": 8192, "host": "raw.githubusercontent.com",
+           "repo": FULL, "via": [via], "judgement": "installable", "magic_squashfs": True, "status": 206} for key, via in q]
+    return r["tree"], q, pk
+store, covered, runs = {}, set(), 0
+while len(covered) < N and runs < 20:
+    t, q, pk = run_tree(store, f"run{runs}")
+    paths = {via["path"] for _, via in q}
+    assert len(q) == C.TREE_MAX or len(q) == N - len(covered), (runs, len(q))                       # 40 per run, last run the rest
+    assert not paths & covered, runs                                                                  # never the same files again
+    assert all(key.startswith(f"https://raw.githubusercontent.com/{FULL}/{SHA}/") and not key.endswith(".zip") for key, _ in q)   # pinned, OPK only
+    C.update_packages(store, pk, "2026-10-28", now=6000 + runs)
+    covered |= paths; runs += 1
+assert covered == set(blobs) and runs == -(-N // C.TREE_MAX) == 12 and len(store) == N, (runs, len(store))   # every path in 12 runs
+t, q, _ = run_tree(store, "run-x"); assert t["known"] == N and t["unseen"] == 0 and not q                   # nothing left: no wasted probes
+# a file changes in a later commit: re-queued first at the new commit URL, stored as "changed" with the previous URL
+SHA2, changed_path = "b" * 40, "wiki/files/app007.opk"
+old_url = next(u for u, v in store.items() if v["via"][0]["path"] == changed_path)
+blobs[changed_path] = "c" * 40
+t, q, pk = run_tree(store, "run-y", SHA2)
+assert t["changed"] == 1 and len(q) == 1 and q[0][1]["previous_url"] == old_url and q[0][0].startswith(f"https://raw.githubusercontent.com/{FULL}/{SHA2}/")
+r = C.update_packages(store, pk, "2026-10-29", now=7000); new_url = q[0][0]
+assert r["changed"] == 1 and store[new_url]["state"] == "changed" and store[new_url]["previous"]["url"] == old_url and old_url in store   # old kept for recheck
+c = C.Crawl(); C.seed_packages(c, store, "2026-10-30"); assert c.recheck                              # verified files still rotate through rechecks
+# run budget across repos: tree probes stop at TREE_RUN_MAX, then whole trees are skipped (counted)
+t, q, _ = run_tree({}, "b1", budget=25); assert len(q) == 25
+C.fetch = mirror_fetch(SHA); c = C.Crawl(); c.tree_left = 0; c.do_tree(FULL, {}, 0); assert c.dropped.get("tree budget") == 1 and not len(c.q)
+# store limit: room for large trees; over the limit, stale/unreachable go first, recently verified and tombstones stay
+assert C.PKG_MAX >= 2000
+lim = {f"https://x/{i}.opk": {"kind": "opk", "last_verified": "2026-10-01", "state": "verified"} for i in range(C.PKG_MAX - 1)}
+lim["https://x/stale.opk"] = {"kind": "opk", "last_verified": "2026-01-01", "state": "stale"}
+lim["https://x/gone.opk"] = {"kind": "opk", "last_verified": "2026-10-01", "state": "unreachable"}
+lim["https://x/rej.opk"] = {"kind": "opk", "last_verified": "2025-01-01", "state": "rejected"}
+C.update_packages(lim, [], "2026-10-02"); assert len(lim) == C.PKG_MAX and "https://x/stale.opk" not in lim and "https://x/gone.opk" not in lim and "https://x/rej.opk" in lim
+# same-day reporting: earlier runs that day are not "new"; this run's counts come from update_packages
+same = {f"https://h/{i}.opk": {"first_seen": "2026-10-27", "last_verified": "2026-10-27", "state": "verified"} for i in range(197)}
+md = C.stats_md({"as_of": "2026-10-27", "unique_installable_apps": [], "package_leads": {"new": 45, "verified": 193, "rechecked": 36}, "optional_channels": {}}, same)
+assert "| 45 / 148 / 4 |" in md, md
+C.fetch = real_fetch
+print("large tree coverage tests OK")
+
+# ---- changed file, then rediscovered at the same new blob: known, not re-queued; a third blob is a new change -------------------
+RP, PATH = "dev/one", "apps/app.opk"
+def one_file(sha, blob):
+    def f(url, rng=None, limit=0):
+        if url.endswith("/commits/HEAD"): return 200, {}, json.dumps({"sha": sha}).encode(), url
+        if "/git/trees/" in url: return 200, {}, json.dumps({"tree": [{"path": PATH, "type": "blob", "sha": blob}]}).encode(), url
+        return 404, {}, b"", url
+    return f
+def scan(store, sha, blob, now, budget=None):
+    store = json.loads(json.dumps(store, sort_keys=True))                                            # reloaded like the Actions cache
+    C.fetch = one_file(sha, blob); c = C.Crawl(); c.tree_known = C.tree_known(store)
+    if budget is not None: c.tree_left = budget
+    r = {}; c.do_tree(RP, r, 0)
+    pk = [{"kind": "direct", "name": "app.opk", "url": key, "container": None, "size": 4096, "host": "raw.githubusercontent.com", "repo": RP,
+           "via": [via], "judgement": "installable", "magic_squashfs": True, "status": 206} for _, key, via, _ in c.q]
+    n = C.update_packages(store, pk, "2026-10-28", now=now)
+    return store, r.get("tree", {}), [key for _, key, _, _ in c.q], n
+S1, S2, S3 = "f" * 40, "0" * 40, "8" * 40                                                              # newer commits sort FIRST
+st_, t, q, n = scan({}, S1, "1" * 40, 100); u1 = q[0]                                                   # 1. original verified
+assert t["unseen"] == 1 and n["new"] == 1 and st_[u1]["state"] == "verified"
+st_, t, q, n = scan(st_, S2, "2" * 40, 200); u2 = q[0]                                                  # 2-3. blob changes
+assert t["changed"] == 1 and n["changed"] == 1 and st_[u2]["state"] == "changed" and st_[u2]["previous"]["url"] == u1
+for i in range(3):                                                                                      # 4. same new blob, repeated runs
+    st_, t, q, n = scan(st_, S2, "2" * 40, 300 + i)
+    assert (t["known"], t["changed"], t["unseen"], q, n["changed"]) == (1, 0, 0, [], 0), (i, t, q)      # already discovered, not re-queued
+assert set(st_) == {u1, u2} and st_[u1]["via"][0]["blob"] == "1" * 40 and st_[u1]["via"][0]["commit"] == S1   # history + provenance intact
+assert st_[u2]["previous"]["url"] == u1 and st_[u2]["via"][0]["blob"] == "2" * 40
+st_, t, q, n = scan(st_, S3, "3" * 40, 400)                                                             # third, different blob
+assert t["changed"] == 1 and len(q) == 1 and st_[q[0]]["state"] == "changed" and st_[q[0]]["previous"]["url"] == u2   # points at the latest
+_, t, q, _ = scan(st_, S3, "4" * 40, 500, budget=0); assert q == [] and t == {}                         # budget still respected
+C.fetch = real_fetch
+print("changed-file rediscovery tests OK")

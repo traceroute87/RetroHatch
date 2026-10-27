@@ -16,7 +16,7 @@ import discover as D
 
 UA = "retrohatch-discovery/1 (+https://github.com/traceroute87/RetroHatch)"
 MAX_REQ, MAX_PAGES, MAX_REPOS, MAX_OWNERS, MAXD, DEADLINE_S, DELAY = 1500, 80, 160, 12, 4, 1500, 0.1
-PER_HOST, LOW_PAGE_SHARE, VERIFY_RESERVE, GOOD, TREE_MAX = 8, 0.6, 0.85, 3, 40   # pages per host; share of page budget open to low-score pages; request share after which only package checks run; "promising" score
+PER_HOST, LOW_PAGE_SHARE, VERIFY_RESERVE, GOOD, TREE_MAX, TREE_RUN_MAX = 8, 0.6, 0.85, 3, 40, 120   # TREE_RUN_MAX: tree package probes per run, all repos   # pages per host; share of page budget open to low-score pages; request share after which only package checks run; "promising" score
 RESERVED = {"topics", "orgs", "features", "sponsors", "about", "pricing", "marketplace", "login", "join", "settings",
             "collections", "explore", "enterprise", "search", "apps", "site", "customer-stories", "readme", "security", "trending"}
 FORGE_RESERVED = {"explore", "users", "user", "groups", "dashboard", "help", "api", "search", "projects", "admin", "snippets", "topics",
@@ -222,6 +222,8 @@ class Crawl:
         self.repos, self.pages, self.owners, self.pkgs, self.sites = {}, {}, {}, {}, {}
         self.known_src, self.known_ids = D.known_catalog()
         self.pending_meta, self.hosts, self.dropped = {}, {}, {}
+        self.tree_known = {}   # (repo lower, path) -> {"blob", "url"} of files already in the package store (set by main())
+        self.tree_left, self.tree_salt = TREE_RUN_MAX, str(T0)
 
     def drop(self, why): self.dropped[why] = self.dropped.get(why, 0) + 1
 
@@ -309,8 +311,12 @@ class Crawl:
         if r["verdict"] in ("supports", "family", "ambiguous"): self.do_tree(full, r, depth)
 
     def do_tree(self, full, r, depth):
-        """Packages stored in the repository's files, not only release assets. 2 API requests (commit, recursive tree), at most
-        TREE_MAX packages queued. URLs pin the commit SHA (immutable), and every package keeps the repo for judge()."""
+        """Packages stored in the repository's files, not only release assets. 2 API requests (commit, recursive tree). Only the
+        profile's package extensions (.opk for the Nano: tree ZIPs were 0/50 useful). Files already in the package store are skipped
+        unless their git blob changed (then re-queued, flagged with the previous URL); unseen files are taken in a per-run shuffled
+        order, so successive runs cover a large tree instead of the same first entries. At most TREE_MAX per repo and TREE_RUN_MAX
+        per run. URLs pin the commit SHA (immutable); identity is repo + path; every package keeps the repo for judge()."""
+        if self.tree_left <= 0: return self.drop("tree budget")
         st, js = api(f"/repos/{full}/commits/HEAD")
         sha = (js or {}).get("sha") if isinstance(js, dict) else None
         if not (isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{40}", sha)):
@@ -319,12 +325,23 @@ class Crawl:
         items = (js or {}).get("tree") if isinstance(js, dict) else None
         if not isinstance(items, list):
             r["tree"] = {"status": st, "commit": sha}; return
-        pk = [x["path"] for x in items if x.get("type") == "blob" and isinstance(x.get("path"), str) and x["path"].lower().endswith((".opk", ".zip"))]
-        r["tree"] = {"status": st, "commit": sha, "packages": len(pk), "queued": min(len(pk), TREE_MAX), "truncated": bool(js.get("truncated")) or len(pk) > TREE_MAX}
-        for path in sorted(pk, key=lambda x: (not x.lower().endswith(".opk"), x.lower()))[:TREE_MAX]:   # OPKs first: one request each
-            u = f"https://raw.githubusercontent.com/{full}/{sha}/" + urllib.parse.quote(path)
-            self.push("opk" if path.lower().endswith(".opk") else "zip", u,
-                      {"from": f"https://github.com/{full}/tree/{sha}", "anchor": "repository file", "path": path, "repo": full, "commit": sha}, depth + 1)
+        ext = tuple(e.lower() for e in PROF.get("package_ext") or [".opk"])
+        pk = [x for x in items if x.get("type") == "blob" and isinstance(x.get("path"), str) and x["path"].lower().endswith(ext)]
+        changed, unseen = [], []
+        for x in pk:
+            k = self.tree_known.get((full.lower(), x["path"]))
+            if k is None: unseen.append(x)
+            elif x.get("sha") and k["blobs"] and x["sha"] not in k["blobs"]: changed.append(x)
+        tie = lambda x: hashlib.sha256((self.tree_salt + full + x["path"]).encode()).hexdigest()
+        take = (changed + sorted(unseen, key=tie))[:min(TREE_MAX, self.tree_left)]
+        self.tree_left -= len(take)
+        r["tree"] = {"status": st, "commit": sha, "packages": len(pk), "known": len(pk) - len(unseen) - len(changed), "changed": len(changed),
+                     "unseen": len(unseen), "queued": len(take), "truncated": bool(js.get("truncated")) or len(changed) + len(unseen) > len(take)}
+        for x in take:
+            u = f"https://raw.githubusercontent.com/{full}/{sha}/" + urllib.parse.quote(x["path"])
+            v = {"from": f"https://github.com/{full}/tree/{sha}", "anchor": "repository file", "path": x["path"], "repo": full, "commit": sha, "blob": x.get("sha")}
+            if x in changed: v["previous_url"] = self.tree_known[(full.lower(), x["path"])]["url"]
+            self.push("opk" if x["path"].lower().endswith(".opk") else "zip", u, v, depth + 1)
 
     def do_forge(self, key, via, depth):
         """key = 'codeberg.org/owner/repo' or 'gitlab.com/<url-encoded path>|group/sub/project'. README and release assets via the
@@ -610,7 +627,7 @@ def report(res, c):
 
 
 # ---- package lead store: verified download URLs kept between runs, separate from catalog/ -----------------------------------
-PKG_MAX, RECHECK_MAX = 400, 60   # stored entries; request budget for re-probing stored URLs per run (rotating, least recently checked first)
+PKG_MAX, RECHECK_MAX = 2000, 60   # stored entries (~650 B each in the Actions cache); request budget for re-probing stored URLs per run (rotating, least recently checked first)
 # state: verified | unreachable (last check failed) | stale (not verified for CACHE_DAYS) | changed (size/contents differ from what
 # was verified) | rejected (answered with a non-SquashFS body). Nothing is deleted on age; rejected entries stay as tombstones so a
 # committed snapshot cannot resurrect them.
@@ -646,13 +663,28 @@ def seed_packages(c, store, today=None):
     return len(c.recheck)
 
 
-def recheck_stats(store, due, today):
-    """This run only (not historical states): of the stored URLs queued for recheck, how many were fetched, verified, unreachable."""
+def tree_known(store):
+    """(repo lower, path) -> {"blobs": every git blob already stored for that file, "url": its most recent URL}, so tree scans skip
+    known versions (store order is irrelevant: it is reloaded sorted by URL) and a changed file points back to its latest version."""
+    out = {}
+    recent = lambda u: (store[u].get("first_seen") or "", store[u].get("checked_at") or 0)
+    for url in sorted(store, key=recent):
+        for via in store[url].get("via") or []:
+            if via.get("path") and via.get("repo"):
+                k = out.setdefault((via["repo"].lower(), via["path"]), {"blobs": set(), "url": url})
+                k["url"] = url
+                if via.get("blob"): k["blobs"].add(via["blob"])
+    return out
+
+
+def recheck_stats(store, due, start):
+    """This run only (not historical states): of the stored URLs queued for recheck, how many were fetched, verified, unreachable.
+    "This run" = checked_at at or after the run's start time (dates alone cannot separate several runs on one day)."""
     out = {}
     for side in ("github", "external"):
         us = [u for u in due if ("github" in urllib.parse.urlsplit(u).netloc.lower()) == (side == "github")]
-        done = [u for u in us if u in store and store[u].get("last_checked") == today]
-        ok = [u for u in done if store[u].get("last_verified") == today]
+        done = [u for u in us if u in store and (store[u].get("checked_at") or 0) >= start]
+        ok = [u for u in done if store[u].get("last_status") == "ok"]
         out[side] = {"queued": len(us), "processed": len(done), "verified": len(ok), "unreachable": len(done) - len(ok)}
     return out
 
@@ -675,6 +707,9 @@ def update_packages(store, pkgs, today, now=None):
             ok.add(url)
             if old is None: new.add(url)
             rec = store.setdefault(url, {"kind": kind, "first_seen": today, "via": [], "members": []})
+            prev = next((v["previous_url"] for v in p["via"] if v.get("previous_url")), None)
+            if old is None and prev:   # same repo path, new git blob: a changed file, not silently a new or the same one
+                rec["state"], rec["previous"] = "changed", {"url": prev, "last_verified": (store.get(prev) or {}).get("last_verified")}; n["changed"] += 1
             if kind == "zip":
                 seen_zip.setdefault(url, set()).add(p["name"])
             elif rec.get("size") not in (None, p["size"]) or rec.get("state") == "rejected":
@@ -702,10 +737,10 @@ def update_packages(store, pkgs, today, now=None):
     for v in store.values():
         if v.get("state") in (None, "verified", "unreachable") and (date.fromisoformat(today) - date.fromisoformat(v["last_verified"])).days > CACHE_DAYS:
             v["state"] = "stale"; n["stale"] += 1   # kept, never deleted for age
-    while len(store) > PKG_MAX:   # storage bound only: evict the longest-unverified non-tombstone
-        live = [u for u in store if store[u].get("state") != "rejected"]
-        if not live: break
-        del store[min(live, key=lambda u: store[u]["last_verified"])]
+    if len(store) > PKG_MAX:   # storage bound only: stale, then unreachable, then oldest verified; tombstones never
+        order = {"stale": 0, "unreachable": 1}
+        live = sorted((u for u in store if store[u].get("state") != "rejected"), key=lambda u: (order.get(store[u].get("state"), 2), store[u]["last_verified"]))
+        for u in live[:len(store) - PKG_MAX]: del store[u]
     now = int(time.time() if now is None else now)
     for url in ok | down:
         if url in store: store[url]["checked_at"] = now
@@ -717,9 +752,8 @@ def stats_md(res, store):
     apps, today = res["unique_installable_apps"], res["as_of"]
     gh = sum("github" in (a.get("host") or "") for a in apps)
     st = collections.Counter(v.get("state") or "verified" for v in store.values())
-    new = sum(v.get("first_seen") == today for v in store.values())
-    fresh = sum(v.get("last_verified") == today for v in store.values())
     pl, fs = res.get("package_leads") or {}, (res.get("optional_channels") or {}).get("freeserp") or {}
+    new, fresh = pl.get("new", 0), pl.get("verified", 0)   # this run's own counts, not dates (several runs can share a date)
     L = ["## Crawl statistics", "", "| | |", "|---|---|",
          f"| Verified OPKs (unique) | {len(apps)} |", f"| GitHub-hosted / other hosts | {gh} / {len(apps) - gh} |",
          f"| Package lead store (historical states) | {len(store)} entries: " + ", ".join(f"{k} {v}" for k, v in sorted(st.items())) + " |",
@@ -758,6 +792,7 @@ def main():
     for f in (a.package_seed, a.package_leads):
         if f: store.update({u: v for u, v in load_leads(f, "last_verified").items() if v.get("kind") in ("opk", "zip")})   # load_leads drops malformed entries
     try:
+        c.tree_known = tree_known(store)
         rechecked = seed_packages(c, store)
         notes = ([] if a.no_github_seed else seed(c)) + seed_multi(c)
         optional["freeserp"] = {"status": "disabled"} if a.no_freeserp else seed_freeserp(c, a.lead_cache)
@@ -788,7 +823,7 @@ def main():
            "relevant_sites": sites, "inaccessible_sources": inaccessible(c.pages.values()), "skipped": c.dropped, "failures": FAILS[:60], "optional_channels": optional}
     res.update(complete=not why, incomplete_reasons=why, caps_hit=caps)
     res["package_leads"] = {"stored_before": len(store), "rechecked": rechecked, **update_packages(store, c.pkgs.values(), res["as_of"]), "stored_after": len(store)}
-    res["package_leads"]["recheck"] = recheck_stats(store, c.recheck, res["as_of"])
+    res["package_leads"]["recheck"] = recheck_stats(store, c.recheck, int(T0))
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     if a.package_leads:
         Path(a.package_leads).parent.mkdir(parents=True, exist_ok=True)
