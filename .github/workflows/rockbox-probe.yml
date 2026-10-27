@@ -1,0 +1,58 @@
+# TEMPORARY manual probe: is the documented RG Nano Rockbox dev build reachable from a GitHub runner, and does its ZIP hold an OPK?
+# Range reads only (1 byte for the size, the ZIP's central directory, ~800 bytes per OPK member header). Nothing downloaded in
+# full, nothing installed. Normal TLS verification; the crawler's own fetch()/check() (public hosts only) do the ZIP reads.
+name: rockbox-probe
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Range probe
+        shell: python3 -I {0}
+        run: |
+          import json, os, socket, ssl, sys, urllib.request, urllib.error
+          sys.path.insert(0, os.path.join(os.environ["GITHUB_WORKSPACE"], "discovery"))
+          import crawl as C
+          URL, HOST = "https://build.rockbox.org/data/rockbox-rgnano.zip", "build.rockbox.org"
+          out = {"url": URL}
+          try:   # 1. TLS with the default (verifying) context
+              ctx = ssl.create_default_context()
+              with socket.create_connection((HOST, 443), timeout=15) as s, ctx.wrap_socket(s, server_hostname=HOST) as t:
+                  c = t.getpeercert()
+                  out["tls"] = {"verified": True, "version": t.version(), "subject": dict(x[0] for x in c["subject"]).get("commonName"),
+                                "issuer": dict(x[0] for x in c["issuer"]).get("organizationName"), "notAfter": c["notAfter"]}
+          except Exception as e:
+              out["tls"] = {"verified": False, "error": f"{type(e).__name__}: {e}"[:200]}
+          hops = []
+          class Log(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  C.check(newurl); hops.append([code, newurl]); return super().redirect_request(req, fp, code, msg, headers, newurl)
+          try:   # 4. HTTP response for a 1-byte Range read
+              with urllib.request.build_opener(Log).open(urllib.request.Request(URL, headers={"User-Agent": C.UA, "Range": "bytes=0-0"}), timeout=20) as f:
+                  out["http"] = {"status": f.status, "final_url": f.geturl(), "redirects": hops, **{k: f.headers.get(k) for k in
+                                 ("Content-Range", "Content-Type", "Last-Modified", "ETag", "Server")}}
+          except urllib.error.HTTPError as e:
+              out["http"] = {"status": e.code, "redirects": hops, "server": e.headers.get("Server"), "body": e.read(300).decode("utf-8", "replace")}
+          except Exception as e:
+              out["http"] = {"status": 0, "error": f"{type(e).__name__}: {e}"[:200]}
+          if out["http"].get("status") in (200, 206):   # 2 + 3. central directory, then each OPK member's SquashFS magic
+              size, ents, note = C.list_zip(URL)
+              opks = [e for e in ents if e["name"].lower().endswith(".opk")]
+              out["zip"] = {"size": size, "entries": len(ents), "note": note, "top_level": sorted({e["name"].split("/")[0] for e in ents})[:20],
+                            "opks": [{"name": e["name"], "size": e["usize"], "compression": e["comp"], "squashfs": C.zip_member_is_opk(URL, e)} for e in opks[:12]]}
+          out["requests"], out["failures"] = C.NREQ, C.FAILS
+          print(json.dumps(out, indent=1))
+          z = out.get("zip") or {}
+          L = ["## Rockbox RG Nano build probe", "", f"- URL: {URL}", f"- TLS: {out['tls']}", f"- HTTP: {out['http']}",
+               f"- ZIP: {z.get('size')} bytes, {z.get('entries')} entries, note: {z.get('note') or 'none'}; top level: {z.get('top_level')}"]
+          L += [f"- OPK `{o['name']}`: {o['size']} bytes, compression {o['compression']}, SquashFS magic: {o['squashfs']}" for o in z.get("opks", [])] or ["- no OPK member found"]
+          L += [f"- requests: {out['requests']}; failures: {out['failures'] or 'none'}"]
+          open(os.environ["GITHUB_STEP_SUMMARY"], "a").write("\n".join(L) + "\n")
+          open("/tmp/rockbox-probe.json", "w").write(json.dumps(out, indent=1))
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: rockbox-probe, path: /tmp/rockbox-probe.json, if-no-files-found: ignore}
