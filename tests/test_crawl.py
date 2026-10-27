@@ -552,3 +552,67 @@ assert t["changed"] == 1 and len(q) == 1 and st_[q[0]]["state"] == "changed" and
 _, t, q, _ = scan(st_, S3, "4" * 40, 500, budget=0); assert q == [] and t == {}                         # budget still respected
 C.fetch = real_fetch
 print("changed-file rediscovery tests OK")
+
+# ---- tree-scan progress and persisted rejects: no redundant tree requests, no re-probing an unchanged bad file ------------------
+RS = "dev/pack"
+def repo_fetch(sha, files, calls):
+    def f(url, rng=None, limit=0):
+        calls.append(url)
+        if url.endswith("/commits/HEAD"): return 200, {}, json.dumps({"sha": sha}).encode(), url
+        if "/git/trees/" in url: return 200, {}, json.dumps({"tree": [{"path": p_, "type": "blob", "sha": b_} for p_, (b_, _) in files.items()]}).encode(), url
+        return 404, {}, b"", url
+    return f
+def outcome(files, path, rng_status):   # what probing a queued file returns: (status, first bytes)
+    return rng_status.get(path, (206, files[path][1]))
+def scan_run(state, sha, files, calls, rng_status={}, per_repo=None):
+    store, scans = state
+    store, scans = json.loads(json.dumps(store, sort_keys=True)), json.loads(json.dumps(scans))      # persisted between runs
+    C.fetch = repo_fetch(sha, files, calls)
+    c = C.Crawl(); c.tree_known, c.tree_scans = C.tree_known(store), scans
+    r = {}; c.do_tree(RS, r, 0)
+    pk = []
+    for _, key, via, _ in c.q:
+        st_, body = outcome(files, via["path"], rng_status)
+        pk.append({"kind": "direct", "name": via["path"].rsplit("/", 1)[1], "url": key, "container": None, "size": 4096, "host": "raw.githubusercontent.com",
+                   "repo": RS, "via": [via], "status": st_, "magic_squashfs": (body == b"hsqs") if st_ in (200, 206) else None})
+    for p_ in pk: p_["judgement"] = C.judge(p_, c)[0]
+    C.update_packages(store, pk, "2026-10-29", now=int(time.time()))
+    return (store, c.tree_scans), r.get("tree", {}), [via["path"] for _, _, via, _ in c.q]
+import time
+A1, A2, A3 = "1" * 40, "2" * 40, "3" * 40
+files = {f"apps/a{i}.opk": (f"{i + 1:040x}", b"hsqs") for i in range(50)}                            # 50 files: needs 2 runs at 40/run
+files["apps/broken.opk"] = ("e" * 40, b"<htm")                                                       # committed HTML error page
+state, calls = ({}, {}), []
+state, t, q = scan_run(state, A1, files, calls)                                                      # run 1: 40 of 51
+assert len(q) == 40 and not state[1][RS.lower()]["complete"]
+calls.clear(); state, t, q = scan_run(state, A1, files, calls)                                       # run 2: unfinished repo continues
+assert len(q) == 11 and sum("/git/trees/" in u for u in calls) == 1
+assert any(v.get("state") == "rejected" and v["via"][0]["path"] == "apps/broken.opk" and v["via"][0]["blob"] == "e" * 40 for v in state[0].values())   # rejected, with identity
+assert not state[1][RS.lower()]["complete"]                                                          # this run still queued paths
+calls.clear(); state, t, q = scan_run(state, A1, files, calls)                                       # run 3: everything known -> complete
+assert q == [] and t["known"] == 51 and state[1][RS.lower()]["complete"]                             # broken.opk NOT probed again
+calls.clear(); state, t, q = scan_run(state, A1, files, calls)                                       # run 4: unchanged + complete
+assert t.get("skipped") and q == [] and not any("/git/trees/" in u for u in calls) and sum(u.endswith("/commits/HEAD") for u in calls) == 1   # 1 request, no tree
+files["apps/broken.opk"] = ("f" * 40, b"hsqs")                                                       # corrected replacement, new commit
+calls.clear(); state, t, q = scan_run(state, A2, files, calls)
+assert sum("/git/trees/" in u for u in calls) == 1 and q == ["apps/broken.opk"] and t["changed"] == 1   # changed commit inspected, fix examined
+fixed = [v for v in state[0].values() if v["via"][0]["path"] == "apps/broken.opk" and v["via"][0]["blob"] == "f" * 40]
+assert fixed and fixed[0]["state"] == "changed" and fixed[0]["previous"]["url"]                      # verified, flagged for review, history kept
+# transient failures stay retryable: a 403 / timeout is not stored and the repo is not marked complete
+files["apps/flaky.opk"] = ("9" * 40, b"hsqs")
+for st_ in (403, 0):
+    calls.clear(); state, t, q = scan_run(state, A3, files, calls, {"apps/flaky.opk": (st_, b"")})
+    assert q == ["apps/flaky.opk"] and not state[1][RS.lower()]["complete"], (st_, q)                 # queued again every run
+    assert not any(v["via"][0]["path"] == "apps/flaky.opk" for v in state[0].values())
+calls.clear(); state, t, q = scan_run(state, A3, files, calls)                                       # recovers -> stored
+assert q == ["apps/flaky.opk"] and any(v["via"][0]["path"] == "apps/flaky.opk" and v["state"] == "verified" for v in state[0].values())
+# bounds and loading
+many = {f"https://raw.githubusercontent.com/{RS}/{A1}/x{i}.opk": {"kind": "opk", "state": "rejected", "never_verified": True, "first_seen": f"2026-10-{1 + i % 28:02d}",
+        "last_checked": "2026-10-29", "via": []} for i in range(C.REJECT_MAX + 7)}
+many["https://x/tomb.opk"] = {"kind": "opk", "state": "rejected", "first_seen": "2025-01-01", "last_checked": "2025-01-01", "last_verified": "2025-01-01", "via": []}
+C.update_packages(many, [], "2026-10-29"); assert sum(v.get("never_verified", False) for v in many.values()) == C.REJECT_MAX and "https://x/tomb.opk" in many
+sp = os.path.join(tempfile.mkdtemp(), "tree-scans.json")
+json.dump({"dev/pack": {"repo": "dev/pack", "commit": A1, "complete": True, "scanned": "2026-10-29"}, "bad": {"repo": "x"}, "other/r": {"repo": "Other/R", "commit": "zz", "complete": True, "scanned": "x"}}, open(sp, "w"))
+assert list(C.load_scans(sp)) == ["dev/pack"]                                                        # malformed scan records dropped
+C.fetch = real_fetch
+print("tree scan efficiency tests OK")

@@ -224,6 +224,7 @@ class Crawl:
         self.pending_meta, self.hosts, self.dropped = {}, {}, {}
         self.tree_known = {}   # (repo lower, path) -> {"blob", "url"} of files already in the package store (set by main())
         self.tree_left, self.tree_salt = TREE_RUN_MAX, str(T0)
+        self.tree_scans = {}   # repo lower -> {"repo", "commit", "complete", "scanned", "packages"}, kept between runs (set by main())
 
     def drop(self, why): self.dropped[why] = self.dropped.get(why, 0) + 1
 
@@ -321,6 +322,9 @@ class Crawl:
         sha = (js or {}).get("sha") if isinstance(js, dict) else None
         if not (isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{40}", sha)):
             r["tree"] = {"status": st}; return
+        prev = self.tree_scans.get(full.lower()) or {}
+        if prev.get("commit") == sha and prev.get("complete"):   # same commit, every package path already stored or rejected: nothing new
+            r["tree"] = {"status": st, "commit": sha, "skipped": "unchanged commit, fully enumerated"}; return
         st, js = api(f"/repos/{full}/git/trees/{sha}?recursive=1")
         items = (js or {}).get("tree") if isinstance(js, dict) else None
         if not isinstance(items, list):
@@ -335,6 +339,9 @@ class Crawl:
         tie = lambda x: hashlib.sha256((self.tree_salt + full + x["path"]).encode()).hexdigest()
         take = (changed + sorted(unseen, key=tie))[:min(TREE_MAX, self.tree_left)]
         self.tree_left -= len(take)
+        # complete only when nothing is left to look at: an unfinished, changed or transiently failing path keeps the repo scanned
+        self.tree_scans[full.lower()] = {"repo": full, "commit": sha, "complete": not (changed or unseen or js.get("truncated")),
+                                         "scanned": date.today().isoformat(), "packages": len(pk)}
         r["tree"] = {"status": st, "commit": sha, "packages": len(pk), "known": len(pk) - len(unseen) - len(changed), "changed": len(changed),
                      "unseen": len(unseen), "queued": len(take), "truncated": bool(js.get("truncated")) or len(changed) + len(unseen) > len(take)}
         for x in take:
@@ -627,7 +634,7 @@ def report(res, c):
 
 
 # ---- package lead store: verified download URLs kept between runs, separate from catalog/ -----------------------------------
-PKG_MAX, RECHECK_MAX = 2000, 60   # stored entries (~650 B each in the Actions cache); request budget for re-probing stored URLs per run (rotating, least recently checked first)
+PKG_MAX, RECHECK_MAX, REJECT_MAX, SCAN_MAX = 2000, 60, 500, 2000   # stored entries (~650 B each in the Actions cache); request budget for re-probing stored URLs per run (rotating, least recently checked first)
 # state: verified | unreachable (last check failed) | stale (not verified for CACHE_DAYS) | changed (size/contents differ from what
 # was verified) | rejected (answered with a non-SquashFS body). Nothing is deleted on age; rejected entries stay as tombstones so a
 # committed snapshot cannot resurrect them.
@@ -661,6 +668,15 @@ def seed_packages(c, store, today=None):
         c.push(v["kind"], url, {"from": "package-lead-store", "anchor": "previously verified " + v["last_verified"], "repo": v.get("repo"),
                                 "first_found_via": (v.get("via") or [{}])[0].get("from")}, 0)
     return len(c.recheck)
+
+
+def load_scans(path):
+    """Tree-scan progress kept between runs; malformed entries are dropped (a dropped entry only costs a rescan)."""
+    try: d = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError): return {}
+    ok = lambda v: isinstance(v, dict) and isinstance(v.get("repo"), str) and isinstance(v.get("commit"), str) and re.fullmatch(r"[0-9a-f]{40}", v["commit"]) \
+        and isinstance(v.get("complete"), bool) and isinstance(v.get("scanned"), str)
+    return {k: v for k, v in d.items() if ok(v) and k == v["repo"].lower()} if isinstance(d, dict) else {}
 
 
 def tree_known(store):
@@ -722,12 +738,21 @@ def update_packages(store, pkgs, today, now=None):
                 if v.get("from") != "package-lead-store" and v not in rec["via"]: rec["via"] = (rec["via"] + [v])[:3]   # original provenance only
         elif old and p.get("magic_squashfs") is False and p.get("status") in (200, 206):
             old.update(state="rejected", last_checked=today, last_status=f"HTTP {p.get('status')}, not SquashFS"); n["rejected"] += 1
+        elif p.get("magic_squashfs") is False and p.get("status") in (200, 206) and any(v.get("path") and v.get("repo") for v in p["via"]):
+            # a repository file that answered with something that is not SquashFS (e.g. a committed HTML error page): remember it with
+            # its repo/path/blob so tree scans skip the same blob; a new blob is examined again. Transient failures are not stored.
+            store[url] = {"kind": kind, "state": "rejected", "never_verified": True, "first_seen": today, "last_checked": today, "name": p["name"],
+                          "size": p.get("size"), "host": p["host"], "repo": p.get("repo"), "members": [],
+                          "last_status": f"HTTP {p.get('status')}, not SquashFS", "via": [v for v in p["via"] if v.get("from") != "package-lead-store"][:3]}
+            down.add(url); n["rejected"] += 1
         elif p.get("magic_squashfs") is None and kind == "zip":
             n["unverified_members"] += 1   # member header not read (member limit/unreadable); says nothing about the URL
         elif old and p.get("magic_squashfs") is None:
             down.add(url); old.update(last_checked=today, last_status=f"HTTP {p.get('status')}")
     for url in down - ok:
         if store[url].get("state") in (None, "verified"): store[url]["state"] = "unreachable"
+    nv = sorted((u for u, v in store.items() if v.get("never_verified") and v.get("state") == "rejected"), key=lambda u: store[u]["first_seen"])
+    for u in nv[:max(0, len(nv) - REJECT_MAX)]: del store[u]   # bound for never-verified rejects; tombstones of verified files stay
     for url, names in seen_zip.items():
         rec, names = store[url], sorted(names)
         if rec["members"] and set(names) != set(rec["members"]):
@@ -744,7 +769,7 @@ def update_packages(store, pkgs, today, now=None):
     now = int(time.time() if now is None else now)
     for url in ok | down:
         if url in store: store[url]["checked_at"] = now
-    return {"verified": len(ok), "new": len(new), "unreachable": len(down - ok), **n}
+    return {"verified": len(ok), "new": len(new), "unreachable": len(down - ok - {u for u in store if store[u].get("state") == "rejected"}), **n}
 
 
 def stats_md(res, store):
@@ -790,7 +815,9 @@ def main():
     store, rechecked = {}, 0
     c.recheck = []
     for f in (a.package_seed, a.package_leads):
-        if f: store.update({u: v for u, v in load_leads(f, "last_verified").items() if v.get("kind") in ("opk", "zip")})   # load_leads drops malformed entries
+        if f: store.update({u: v for u, v in load_leads(f, "last_checked").items() if v.get("kind") in ("opk", "zip")})   # load_leads drops malformed entries
+    scans_path = Path(a.package_leads).with_name("tree-scans.json") if a.package_leads else None
+    c.tree_scans = load_scans(scans_path) if scans_path else {}
     try:
         c.tree_known = tree_known(store)
         rechecked = seed_packages(c, store)
@@ -829,6 +856,9 @@ def main():
         Path(a.package_leads).parent.mkdir(parents=True, exist_ok=True)
         Path(a.package_leads).write_text(json.dumps(store, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     (out / "package-leads.json").write_text(json.dumps(store, indent=1, sort_keys=True) + "\n", encoding="utf-8")   # candidates only, never catalog/
+    scans = dict(sorted(c.tree_scans.items(), key=lambda kv: kv[1]["scanned"], reverse=True)[:SCAN_MAX])
+    for f in [scans_path, out / "tree-scans.json"] if scans_path else [out / "tree-scans.json"]:
+        f.write_text(json.dumps(scans, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     (out / "discovery-results.json").write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     if a.lead_cache and Path(a.lead_cache).is_file(): (out / "freeserp-leads.json").write_bytes(Path(a.lead_cache).read_bytes())   # artifact carries the cache the next run will restore
     md = report(res, c)
