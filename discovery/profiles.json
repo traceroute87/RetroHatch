@@ -18,6 +18,16 @@
       "funkey s",
       "funkey"
     ],
+    "search_suffixes": [
+      "opk download",
+      "opk",
+      "homebrew games",
+      "emulators",
+      "software",
+      "applications",
+      "ports",
+      "apps"
+    ],
     "package_ext": [
       ".opk"
     ],
@@ -35,7 +45,10 @@
       "gkd",
       "playdate",
       "rg350",
-      "gcw0"
+      "rg 350",
+      "gcw0",
+      "gcw zero",
+      "pocketgo"
     ]
   }
 }

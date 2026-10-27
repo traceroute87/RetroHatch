@@ -107,7 +107,7 @@ assert r2["status"] == "unavailable" and r2["error"] == "HTTP 429" and r2["cache
 assert any(k == "opk" for k, *_ in list(c2.q))
 # HTTP 200 with a fallback engine is NOT a successful search
 C.fetch = lambda url, rng=None, limit=0: (200, {}, b'{"ok":true,"results":[],"engine_fallback":true,"engine_error":"engine_unavailable"}', url)
-r3 = C.seed_freeserp(C.Crawl(), None); assert r3["status"] == "degraded" and r3["requests"] == 1, r3
+r3 = C.seed_freeserp(C.Crawl(), None); assert r3["status"] == "degraded" and r3["requests"] == 2 and r3["retried"], r3   # one retry, then stop
 # network error / bad JSON: still no exception
 C.fetch = lambda url, rng=None, limit=0: (0, {}, b"", url); assert C.seed_freeserp(C.Crawl(), None)["status"] == "unavailable"
 C.fetch = lambda url, rng=None, limit=0: (200, {}, b"<html>", url); assert C.seed_freeserp(C.Crawl(), None)["status"] == "unavailable"
@@ -351,3 +351,112 @@ for i in range(1, 6):                                                           
     assert not order[i] & before or len(before | order[i]) == len(st), i
 assert all(u in done for u in ZIPS) and len(done) == len(st), (len(done), len(st))                  # ZIPs and cheap OPKs all covered
 print("same-date rotation tests OK")
+
+# ---- forge projects found by link: GitLab/Codeberg URLs go through the forge API, GitLab README is read, its build link verified ----
+assert C.classify("https://gitlab.com/someone/player") == ("forge", "gitlab.com/someone%2Fplayer|someone/player")
+assert C.classify("https://gitlab.com/grp/sub/player/-/tree/main") == ("forge", "gitlab.com/grp%2Fsub%2Fplayer|grp/sub/player")   # subgroups
+assert C.classify("https://gitlab.com/a/b.git")[1] == "gitlab.com/a%2Fb|a/b" and C.classify("https://gitlab.com/explore/projects")[0] == "page"
+assert C.classify("https://codeberg.org/o/r/src/branch/main/README.md") == ("forge", "codeberg.org/o/r")
+assert C.classify("https://gitlab.com/a/b/-/raw/main/x.opk")[0] == "opk" and C.classify("https://github.com/a/b") == ("repo", "a/b")   # unchanged
+zbuf = io.BytesIO()
+with zipfile.ZipFile(zbuf, "w") as z:
+    z.writestr(zipfile.ZipInfo("player/player.opk"), b"hsqs" + b"p" * 300, zipfile.ZIP_DEFLATED)
+    z.writestr("player/readme.txt", b"x")
+ZD, ZURL = zbuf.getvalue(), "https://builds.example.org/data/player-rgnano.zip"
+README = ("# Player\nBuilds for the Anbernic RG Nano, requires the community FunKey OS fork.\n"
+          f"- To install [download the dev build]({ZURL}) and copy the .opk to Applications.\n")
+def forge_fetch(readme):
+    def f(url, rng=None, limit=0):
+        if url == "https://forum.example.org/t/1": return 200, {"Content-Type": "text/html"}, b'<p>RG Nano port</p><a href="https://gitlab.com/someone/player">source</a>', url
+        if url == "https://gitlab.com/api/v4/projects/someone%2Fplayer/repository/files/README.md/raw?ref=HEAD": return 200, {}, readme.encode(), url
+        if url.startswith("https://gitlab.com/api/v4/projects/someone%2Fplayer/releases"): return 200, {}, b"[]", url
+        if url == ZURL and rng:
+            a, b = map(int, rng.removeprefix("bytes=").split("-"))
+            return 206, {"Content-Range": f"bytes {a}-{min(b, len(ZD) - 1)}/{len(ZD)}"}, ZD[a:b + 1], url
+        return 404, {}, b"", url
+    return f
+C.fetch, C.MAX_REQ = forge_fetch(README), 10**6
+c = C.Crawl(); c.push("page", "https://forum.example.org/t/1", {"from": "test", "score": 5}, 0); c.run()
+r = c.repos["gitlab.com/someone%2fplayer|someone/player"]
+assert r["readme_status"] == 200 and r["verdict"] != "none" and r["verdict_basis"].startswith("readme claim"), r       # metadata was empty
+opk = [p for p in c.pkgs.values() if p["kind"] == "zip"][0]
+assert opk["name"] == "player.opk" and opk["magic_squashfs"] is True and C.judge(opk, c)[0] == "installable"           # verified, not approved
+assert opk["via"][0]["from"] == "https://gitlab.com/someone/player"                                                      # provenance: the README
+C.fetch = forge_fetch("# Player\nA music player.\n")                                                                     # control
+c2 = C.Crawl(); c2.do_forge("gitlab.com/someone%2Fplayer|someone/player", {"from": "test"}, 0)
+assert c2.repos["gitlab.com/someone%2fplayer|someone/player"]["verdict"] == "none" and not len(c2.pq)                    # no device claim: nothing followed
+C.fetch = real_fetch
+print("forge reach tests OK")
+
+# ---- search categories from the profile, rotated within FS_MAX_REQ; one FreeSerp retry; diverse harvest slots ------------------
+qa, qb = C.fs_queries("2026-10-27"), C.fs_queries("2026-10-28")
+allq = {f"{t} {s}" for s in C.PROF["search_suffixes"] for t in ("rg nano", "funkey os", "funkey s", "funkey")}
+assert len(qa) == len(qb) == C.FS_MAX_REQ and set(qa) | set(qb) == allq, (len(allq), sorted(allq - set(qa) - set(qb)))   # 2 days cover all
+assert {"software", "applications", "ports"} <= set(C.PROF["search_suffixes"])
+saved = C.PROF.pop("search_suffixes"); assert C.fs_queries("2026-10-27")[0] == "rg nano opk download" and len(C.fs_queries("2026-10-27")) == 16
+C.PROF["search_suffixes"] = saved                                                                       # profile without categories: old queries
+sleep_, C.time.sleep = C.time.sleep, (lambda s: None)
+OKJ = json.dumps({"ok": True, "results": [{"url": "https://w.example/rg-nano-apps", "title": "RG Nano apps"}]}).encode()
+BAD = b'{"ok":true,"results":[],"engine_fallback":true,"engine_error":"engine_unavailable"}'
+def seq(*bodies):
+    it = iter(bodies)
+    def f(url, rng=None, limit=0): return 200, {}, next(it, OKJ), url
+    return f
+C.fetch = seq(BAD, OKJ)                                                                                 # degraded once, then fine
+r = C.seed_freeserp(C.Crawl(), None, "2026-10-27")
+assert r["status"] == "ok" and r["retried"] and r["requests"] == C.FS_MAX_REQ and r["queries"] == C.FS_MAX_REQ - 1, r   # retry costs a query slot
+C.fetch = seq(BAD, OKJ, BAD)                                                                            # only one retry per run
+r = C.seed_freeserp(C.Crawl(), None, "2026-10-27"); assert r["status"] == "degraded" and r["requests"] == 3 and r["queries"] == 1, r
+C.time.sleep = sleep_
+# harvest: six near-identical high-scoring links take at most 2 slots; distinct links keep theirs
+assert C.link_template("https://t.example/download.php?themeid=3860") == C.link_template("https://t.example/download.php?themeid=3861")
+assert C.link_template("https://w.example/wiki/Apps") != C.link_template("https://w.example/wiki/Ports")
+H = "<p>RG Nano</p>" + "".join(f'<a href="https://themes.example.org/download.php?themeid={3860 + i}">download RG Nano theme</a>' for i in range(6)) + \
+    '<a href="https://www.example.org/download/rg-nano">RG Nano download builds</a><a href="https://www.example.org/manual/rg-nano">RG Nano manual</a>'
+c = C.Crawl(); c.harvest(H, "https://themes.example.org/index.php?target=rgnano", {}, 0, True)
+pushed = [key for _, key, _, _ in c.pq]
+assert sum("themeid" in u for u in pushed) == 2 and "https://www.example.org/download/rg-nano" in pushed and "https://www.example.org/manual/rg-nano" in pushed, pushed
+C.fetch = real_fetch
+print("search category / retry / diversity tests OK")
+
+# ---- repository tree discovery: pinned commit URLs, repo provenance, wrong-device exclusion, bounded ---------------------------
+SHA = "a" * 40
+def tree_fetch(desc_readme, paths, calls):
+    def f(url, rng=None, limit=0):
+        calls.append(url)
+        if url.endswith("/README.md"): return 200, {}, desc_readme.encode(), url
+        if url.endswith("/releases/latest"): return 404, {}, b"", url
+        if url.endswith("/commits/HEAD"): return 200, {}, json.dumps({"sha": SHA}).encode(), url
+        if "/git/trees/" in url: return 200, {}, json.dumps({"sha": "t", "truncated": False, "tree": [{"path": p_, "type": "blob"} for p_ in paths] + [{"path": "Apps", "type": "tree"}]}).encode(), url
+        if "raw.githubusercontent.com" in url and rng: return 206, {"Content-Range": "bytes 0-3/8192"}, b"hsqs", url
+        return 404, {}, b"", url
+    return f
+calls = []
+C.fetch = tree_fetch("# Pack\nApps for the RG Nano running FunKey OS.\n", ["Apps/Game One.opk", "Apps/b.zip", "docs/x.md"] + [f"More/m{i}.opk" for i in range(60)], calls)
+c = C.Crawl(); c.do_repo("someone/pack", {"from": "test"}, 0)
+r = c.repos["someone/pack"]
+q = [(k, key, via) for k, key, via, _ in c.q if via.get("anchor") == "repository file"]
+assert r["tree"]["commit"] == SHA and r["tree"]["packages"] == 62 and r["tree"]["queued"] == C.TREE_MAX == len(q) and r["tree"]["truncated"]   # bounded
+assert sum("/git/trees/" in u for u in calls) == 1 and sum(u.endswith("/commits/HEAD") for u in calls) == 1                         # 2 API requests
+k, u, via = next(x for x in q if "Game%20One.opk" in x[1])
+assert k == "opk" and u == f"https://raw.githubusercontent.com/someone/pack/{SHA}/Apps/Game%20One.opk" and C.classify(u) == ("opk", u)   # immutable URL
+assert via["repo"] == "someone/pack" and via["commit"] == SHA and via["path"] == "Apps/Game One.opk"                                # provenance
+assert not any("docs/x.md" in x[1] for x in q) and q[0][0] == "opk"                                                                # packages only, OPKs first
+c.add_pkg(k, u, via, 1); p = c.pkgs[u]
+assert p["repo"] == "someone/pack" and p["magic_squashfs"] is True and C.judge(p, c)[0] == "installable"                          # Nano repo: candidate
+# other-device repo: no tree request at all, and its OPK is never Nano-installable even with a valid SquashFS header
+calls.clear()
+C.fetch = tree_fetch("# Pack\nRepository of RG350 and GCW0 compatible software for OpenDingux.\n", ["Apps/x.opk"], calls)
+c = C.Crawl(); c.do_repo("other/rg350pack", {"from": "test"}, 0)
+assert c.repos["other/rg350pack"]["verdict"] in ("other_device", "none") and not any("/git/trees/" in u for u in calls) and "tree" not in c.repos["other/rg350pack"]
+c.repos["other/rg350pack"]["verdict"] = "other_device"
+raw = f"https://raw.githubusercontent.com/other/rg350pack/{SHA}/Apps/x.opk"
+c.add_pkg("opk", raw, {"from": "https://example.org/list"}, 1); p = c.pkgs[raw]                                                  # no repo in via:
+assert p["repo"] == "other/rg350pack" and p["magic_squashfs"] is True and C.judge(p, c) == ("false-positive", "repo evidence: other_device")   # inferred from raw URL
+c.add_pkg("opk", "https://files.example/y.opk", {"from": "https://github.com/other/rg350pack/blob/HEAD/README.md"}, 1)          # README link: repo from via
+assert c.pkgs["https://files.example/y.opk"]["repo"] == "other/rg350pack" and C.judge(c.pkgs["https://files.example/y.opk"], c)[0] == "false-positive"
+for desc in ("Repository of RG-350 and PocketGo 2 compatible Software", "Apps for the GCW Zero"):                          # spelling variants
+    assert C.D.analyze({"full_name": "o/r", "name": "r", "html_url": "https://github.com/o/r", "description": desc, "topics": []}, None, None, C.PROF)[0] == "other_device", desc
+assert C.D.analyze({"full_name": "o/r", "name": "r", "html_url": "https://github.com/o/r", "description": "Game for the RG Nano", "topics": []}, None, None, C.PROF)[0] == "supports"
+C.fetch = real_fetch
+print("repository tree tests OK")

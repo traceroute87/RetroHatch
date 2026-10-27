@@ -16,9 +16,11 @@ import discover as D
 
 UA = "retrohatch-discovery/1 (+https://github.com/traceroute87/RetroHatch)"
 MAX_REQ, MAX_PAGES, MAX_REPOS, MAX_OWNERS, MAXD, DEADLINE_S, DELAY = 1500, 80, 160, 12, 4, 1500, 0.1
-PER_HOST, LOW_PAGE_SHARE, VERIFY_RESERVE, GOOD = 8, 0.6, 0.85, 3   # pages per host; share of page budget open to low-score pages; request share after which only package checks run; "promising" score
+PER_HOST, LOW_PAGE_SHARE, VERIFY_RESERVE, GOOD, TREE_MAX = 8, 0.6, 0.85, 3, 40   # pages per host; share of page budget open to low-score pages; request share after which only package checks run; "promising" score
 RESERVED = {"topics", "orgs", "features", "sponsors", "about", "pricing", "marketplace", "login", "join", "settings",
             "collections", "explore", "enterprise", "search", "apps", "site", "customer-stories", "readme", "security", "trending"}
+FORGE_RESERVED = {"explore", "users", "user", "groups", "dashboard", "help", "api", "search", "projects", "admin", "snippets", "topics",
+                  "org", "repo", "assets", "-", "login", "sign_in", "users_sign_in", "notifications"}   # gitlab.com / codeberg.org non-project paths
 EXCLUDE = re.compile(r"theme|firmware|bootloader|kernel|skin|wallpaper|bios|toolchain", re.I)
 HINT = re.compile(r"opk|funkey|rg[ -_]?nano|third[ -_]party|applications?|apps\b|games?|homebrew|collection|download|release|wiki|ports?", re.I)
 NOISE = re.compile(r"[?&](action=(history|edit|info|submit|raw|purge)|oldid=|diff=|veaction=|printable=|curid=)|/Special:|/Talk:|/User:", re.I)   # wiki history/edit/special pages
@@ -180,8 +182,21 @@ def classify(u):
         if not re.fullmatch(r"[\w.-]+", seg[1]): return None, u
         return "repo", f"{seg[0]}/{re.sub(r'[.]git$', '', seg[1])}"
     if host.endswith(("githubusercontent.com", "github.com")): return None, u
+    if host in ("gitlab.com", "codeberg.org") and len(seg) >= 2 and seg[0].lower() not in FORGE_RESERVED:
+        proj = seg[:seg.index("-")] if "-" in seg else seg          # GitLab: "/-/" ends the (sub)group/project path
+        if host == "codeberg.org": proj = proj[:2]                  # Codeberg: owner/repo, the rest is a file view
+        full = "/".join(urllib.parse.unquote(x) for x in proj).removesuffix(".git")
+        if len(proj) < 2 or not all(re.fullmatch(r"[\w.-]+", x) for x in full.split("/")): return None, u
+        return "forge", (f"codeberg.org/{full}" if host == "codeberg.org" else f"gitlab.com/{urllib.parse.quote(full, safe='')}|{full}")
     if JUNK_HOST.search(host) or JUNK_PATH.search(low) or JUNK_SHARE.search(host + low): return None, u   # social sharing, login/account, retail/marketing: never queued
     return "page", u
+
+
+def link_template(u):
+    """URL pattern for harvest diversity: host + path with digit runs collapsed + query keys (values dropped).
+    download.php?themeid=3860 and ?themeid=3861 share one pattern; /wiki/Apps and /wiki/Ports do not."""
+    p = urllib.parse.urlsplit(u)
+    return p.netloc.lower() + re.sub(r"\d+", "#", p.path) + "?" + "&".join(sorted(k for k, _ in urllib.parse.parse_qsl(p.query, keep_blank_values=True)))
 
 
 def pscore(anchor, u):
@@ -230,13 +245,18 @@ class Crawl:
             kind, key = classify(u)
             v = {"from": base, "anchor": anchor}
             if kind in ("opk", "zip"): self.push(kind, key, v, depth + 1)
-            elif kind == "repo" and relevant is True: self.push(kind, key, v, depth + 1)
+            elif kind in ("repo", "forge") and relevant is True: self.push(kind, key, v, depth + 1)
             elif kind == "page" and relevant and depth < MAXD:
                 if "shields.io" in u: continue   # badge images are not pages
                 s = pscore(anchor, u)
                 if s and (relevant is True or s >= GOOD): scored.append((-s, u, {**v, "score": s}))
-        for _, u, v in sorted(scored)[:6]:
+        per, picked = {}, 0
+        for _, u, v in sorted(scored):   # best first, at most 2 links per URL pattern, so 6 near-identical links cannot take every slot
+            t = link_template(u)
+            if per.get(t, 0) >= 2: continue
+            per[t] = per.get(t, 0) + 1; picked += 1
             self.push("page", u, v, depth + 1)
+            if picked == 6: break
 
     def do_page(self, url, via, depth):
         host = urllib.parse.urlsplit(url).netloc.lower().removeprefix("www.")
@@ -286,19 +306,42 @@ class Crawl:
                 elif href.lower().endswith(".zip"): self.push("zip", u, {"from": r["url"] + "/releases/tag/" + tm.group(1), "anchor": "release asset", "repo": full}, depth + 1)
             if r["verdict"] in ("supports", "family") and "/" in full:   # a device-relevant author: look at their other repos too
                 self.push("owner", full.split("/")[0], {"from": r["url"], "anchor": "owner of relevant repo"}, depth + 1)
+        if r["verdict"] in ("supports", "family", "ambiguous"): self.do_tree(full, r, depth)
+
+    def do_tree(self, full, r, depth):
+        """Packages stored in the repository's files, not only release assets. 2 API requests (commit, recursive tree), at most
+        TREE_MAX packages queued. URLs pin the commit SHA (immutable), and every package keeps the repo for judge()."""
+        st, js = api(f"/repos/{full}/commits/HEAD")
+        sha = (js or {}).get("sha") if isinstance(js, dict) else None
+        if not (isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{40}", sha)):
+            r["tree"] = {"status": st}; return
+        st, js = api(f"/repos/{full}/git/trees/{sha}?recursive=1")
+        items = (js or {}).get("tree") if isinstance(js, dict) else None
+        if not isinstance(items, list):
+            r["tree"] = {"status": st, "commit": sha}; return
+        pk = [x["path"] for x in items if x.get("type") == "blob" and isinstance(x.get("path"), str) and x["path"].lower().endswith((".opk", ".zip"))]
+        r["tree"] = {"status": st, "commit": sha, "packages": len(pk), "queued": min(len(pk), TREE_MAX), "truncated": bool(js.get("truncated")) or len(pk) > TREE_MAX}
+        for path in sorted(pk, key=lambda x: (not x.lower().endswith(".opk"), x.lower()))[:TREE_MAX]:   # OPKs first: one request each
+            u = f"https://raw.githubusercontent.com/{full}/{sha}/" + urllib.parse.quote(path)
+            self.push("opk" if path.lower().endswith(".opk") else "zip", u,
+                      {"from": f"https://github.com/{full}/tree/{sha}", "anchor": "repository file", "path": path, "repo": full, "commit": sha}, depth + 1)
 
     def do_forge(self, key, via, depth):
-        """key = 'codeberg.org/owner/repo' or 'gitlab.com/<id>|owner/repo'. Release assets via the forge's own API."""
+        """key = 'codeberg.org/owner/repo' or 'gitlab.com/<url-encoded path>|group/sub/project'. README and release assets via the
+        forge's own API. A README device claim is candidate evidence for following its links, never proof of compatibility."""
+        if len(self.repos) >= MAX_REPOS: return self.drop("repo cap")
         host, rest = key.split("/", 1)
         pid, full = (rest.split("|", 1) if host == "gitlab.com" else (None, rest))
         url = f"https://{host}/{full}"
         r = self.repos[key.lower()] = {"repo": key, "url": url, "via": [via], "meta": self.pending_meta.get(key.lower(), {}), "packages": [], "in_catalog": False}
         m = {"full_name": full, "name": full.split("/")[-1], "html_url": url, "description": r["meta"].get("description"), "topics": r["meta"].get("topics") or []}
         text = ""
-        if host == "codeberg.org":
-            st, _, b, _ = fetch(f"https://codeberg.org/api/v1/repos/{full}/raw/README.md")
-            text = b.decode("utf-8", "replace")[:60000] if st == 200 else ""
+        st, _, b, _ = fetch(f"https://codeberg.org/api/v1/repos/{full}/raw/README.md" if host == "codeberg.org" else
+                            f"https://gitlab.com/api/v4/projects/{pid}/repository/files/README.md/raw?ref=HEAD")
+        text = b.decode("utf-8", "replace")[:60000] if st == 200 else ""
+        r["readme_status"] = st
         r["verdict"], r["evidence"] = D.analyze(m, None, (text, url) if text else None, PROF)
+        r["verdict_basis"] = "readme claim (candidate evidence)" if text else "metadata"
         if text: self.harvest(text, url, via, depth, r["verdict"] in ("supports", "ambiguous", "family", "conflicting"))
         if r["verdict"] in ("none", "other_device", "incompatible"): return
         if host == "codeberg.org":
@@ -329,7 +372,8 @@ class Crawl:
                 self.push("opk" if n.lower().endswith(".opk") else "zip", u, {"from": rec["url"], "anchor": "archive.org file", "repo": rec["repo"]}, depth + 1)
 
     def add_pkg(self, kind, url, via, depth):
-        repo = via.get("repo") or (re.match(r"https://github\.com/([\w.-]+/[\w.-]+)/", url) or [None, None])[1]
+        gh = lambda s: (re.match(r"https://(?:github\.com|raw\.githubusercontent\.com)/([\w.-]+/[\w.-]+)/", s or "") or [None, None])[1]
+        repo = via.get("repo") or gh(url) or gh(via.get("from"))   # raw URLs and README links keep the repo, so judge() sees its verdict
         host = urllib.parse.urlsplit(url).netloc.lower()
         if kind == "opk":
             ok, size, st = probe_opk(url)
@@ -390,7 +434,7 @@ def seed_multi(c):
             js = J(b)
             for x in (js.get("data") if isinstance(js, dict) else js) or []:
                 full = x.get("full_name") or x.get("path_with_namespace")
-                key = f"{host}/{full}" if host == "codeberg.org" else f"{host}/{x['id']}|{full}"
+                key = f"{host}/{full}" if host == "codeberg.org" else f"{host}/{urllib.parse.quote(full, safe='')}|{full}"   # same key as a link to it
                 c.pending_meta[key.lower()] = {"description": x.get("description"), "topics": x.get("topics") or x.get("tag_list") or []}
                 c.push("forge", key, {"from": f"{host}-search", "anchor": t}, 0)
     for qq in ('"rg nano"', "funkey", "rgnano", '"funkey s" opk'):
@@ -444,7 +488,7 @@ def seed_freeserp(c, cache_path=None, today=None):
         text = D.norm(" ".join([url, title, snippet]))
         kind, key = classify(url)
         via = {"from": "freeserp-search", "anchor": query + (" [cached lead]" if cached else ""), "title": title[:80]}
-        if kind in ("opk", "zip", "repo"): c.push(kind, key, via, 0)
+        if kind in ("opk", "zip", "repo", "forge"): c.push(kind, key, via, 0)
         elif kind == "page" and (DRE.search(text) or FRE.search(text)):
             cand.setdefault(key, [max(GOOD + 1, pscore(title, url)), 0, len(cand), {**via, "score": max(GOOD + 1, pscore(title, url))}])[1] += hits
 
@@ -463,30 +507,43 @@ def seed_freeserp(c, cache_path=None, today=None):
         admit()   # every exit path, including FreeSerp down: cached leads still get admitted
 
 
-def _search(leads, st_out, feed, cache_path, today):
+def fs_queries(today):
+    """Device terms x profile search categories (software, applications, ports, ... not only games). When there are more queries
+    than FS_MAX_REQ, a different window is used each day so every category is searched over consecutive runs."""
     terms = [t for t in PROF["direct"] + PROF["family"] if " " in t or t in PROF["family"]]   # "rg nano", "funkey os", "funkey s", "funkey"
-    for suffix in ("opk download", "opk", "homebrew games", "emulators"):
-        for t in terms:
-            if st_out["requests"] >= FS_MAX_REQ: break
-            q = f"{t} {suffix}"
+    qs = [f"{t} {sfx}" for sfx in PROF.get("search_suffixes") or ("opk download", "opk", "homebrew games", "emulators") for t in terms]
+    if len(qs) <= FS_MAX_REQ: return qs
+    k = date.fromisoformat(today).toordinal() * FS_MAX_REQ % len(qs)
+    return (qs[k:] + qs[:k])[:FS_MAX_REQ]
+
+
+def _search(leads, st_out, feed, cache_path, today):
+    retried = False
+    for q in fs_queries(today):
+        js = None
+        while st_out["requests"] < FS_MAX_REQ:
             st_out["requests"] += 1
             st, _, b, _ = fetch(FS_URL + urllib.parse.quote_plus(q))
             js = J(b) if st == 200 and b else None
             if st != 200 or not isinstance(js, dict):
-                st_out.update(status="unavailable", error=f"HTTP {st}" + ("" if st == 200 else "") + (" (not JSON)" if st == 200 else "")); return st_out
-            if js.get("engine_error") or js.get("engine_fallback") or js.get("ok") is False:
-                st_out.update(status="degraded", error=str(js.get("engine_error") or "engine_fallback")[:80]); return st_out   # HTTP 200 but no real search happened
-            st_out["queries"] += 1
-            for h in walk(js.get("results"), []):
-                u, title = h["url"].split("#")[0], str(h.get("title") or "")
-                st_out["results"] += 1
-                new = u not in leads
-                rec = leads.setdefault(u, {"first_seen": today, "queries": [], "title": title[:100]})
-                rec["last_seen"] = today
-                if q not in rec["queries"]: rec["queries"] = (rec["queries"] + [q])[:5]
-                st_out["new_leads"] += new
-                feed(u, title, str(h.get("snippet") or h.get("description") or ""), q, False)
-            time.sleep(0.4)
+                st_out.update(status="unavailable", error=f"HTTP {st}" + (" (not JSON)" if st == 200 else "")); return st_out
+            if not (js.get("engine_error") or js.get("engine_fallback") or js.get("ok") is False): break   # a real search happened
+            if retried or st_out["requests"] >= FS_MAX_REQ:   # HTTP 200 but no real search happened, even after the one retry
+                st_out.update(status="degraded", error=str(js.get("engine_error") or "engine_fallback")[:80]); return st_out
+            retried, st_out["retried"], js = True, q, None   # one delayed retry per run, inside FS_MAX_REQ and the fetch() limits
+            time.sleep(2)
+        if js is None: break   # request budget spent
+        st_out["queries"] += 1
+        for h in walk(js.get("results"), []):
+            u, title = h["url"].split("#")[0], str(h.get("title") or "")
+            st_out["results"] += 1
+            new = u not in leads
+            rec = leads.setdefault(u, {"first_seen": today, "queries": [], "title": title[:100]})
+            rec["last_seen"] = today
+            if q not in rec["queries"]: rec["queries"] = (rec["queries"] + [q])[:5]
+            st_out["new_leads"] += new
+            feed(u, title, str(h.get("snippet") or h.get("description") or ""), q, False)
+        time.sleep(0.4)
     if cache_path and st_out["results"]: save_leads(cache_path, leads, today)
     return st_out
 
@@ -712,6 +769,7 @@ def main():
         if p["kind"] == "zip-container": continue
         verdict, why = judge(p, c)
         p["judgement"], p["reason"] = verdict, why
+        if why in ("named for another device", "repo evidence: other_device"): p["other_device_evidence"] = why   # kept for future profiles, never installable here
         if verdict == "installable":
             key = (p["name"].lower(), p["size"])
             a_ = apps.setdefault(key, {**p, "also_via": [], "license": ((c.repos.get((p["repo"] or "").lower()) or {}).get("meta") or {}).get("license")})
