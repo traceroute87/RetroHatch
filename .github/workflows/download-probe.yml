@@ -1,0 +1,55 @@
+# TEMPORARY manual probe: can a GitHub runner reach static.miraheze.org OPK files directly (without the wiki)?
+# Range reads only (first 4 bytes per file, then 1 byte for the size). Nothing downloaded in full, nothing installed.
+name: download-probe
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Range probe
+        shell: python3 -I {0}
+        run: |
+          import json, socket, ssl, urllib.request, urllib.error, urllib.parse
+          UA = "retrohatch-discovery/1 (+https://github.com/traceroute87/RetroHatch)"
+          URLS = [("https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk", 458752),
+                  ("https://static.miraheze.org/funkeywiki/9/93/Gambatte-V4.opk", 1843200),
+                  ("https://static.miraheze.org/funkeywiki/e/ec/DOSBox_Pure-V1.opk", 2744320)]
+          hops = []
+          class Log(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  hops.append([code, newurl]); return super().redirect_request(req, fp, code, msg, headers, newurl)
+          op = urllib.request.build_opener(Log)
+          def cert(host):
+              ctx = ssl.create_default_context()
+              with socket.create_connection((host, 443), timeout=15) as s, ctx.wrap_socket(s, server_hostname=host) as t:
+                  c = t.getpeercert()
+                  return {"verified": True, "tls": t.version(), "subject": dict(x[0] for x in c["subject"]).get("commonName"),
+                          "issuer": dict(x[0] for x in c["issuer"]).get("organizationName"), "notAfter": c["notAfter"]}
+          out = {"certs": {}, "files": []}
+          for h in ("static.miraheze.org", "static.wikitide.net"):   # wikitide.net is the observed 301 target
+              try: out["certs"][h] = cert(h)
+              except Exception as e: out["certs"][h] = {"verified": False, "error": f"{type(e).__name__}: {e}"[:160]}
+          for url, size in URLS:
+              hops.clear()
+              r = {"url": url, "expected_size": size}
+              try:
+                  with op.open(urllib.request.Request(url, headers={"User-Agent": UA, "Range": "bytes=0-3"}), timeout=20) as f:
+                      b = f.read(4)
+                      cr = f.headers.get("Content-Range") or ""
+                      total = int(cr.rsplit("/", 1)[1]) if "/" in cr and cr.rsplit("/", 1)[1].isdigit() else None
+                      r.update(status=f.status, final_url=f.geturl(), redirects=list(hops), content_range=cr, total_size=total,
+                               size_matches=total == size, magic=b.hex(), squashfs=b == b"hsqs", server=f.headers.get("Server"),
+                               content_type=f.headers.get("Content-Type"))
+              except urllib.error.HTTPError as e:
+                  r.update(status=e.code, redirects=list(hops), server=e.headers.get("Server"), body=e.read(300).decode("utf-8", "replace"))
+              except Exception as e:
+                  r.update(status=0, error=f"{type(e).__name__}: {e}"[:160])
+              out["files"].append(r)
+          print(json.dumps(out, indent=1))
+          open("/tmp/probe.json", "w").write(json.dumps(out, indent=1))
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: download-probe, path: /tmp/probe.json, if-no-files-found: ignore}
