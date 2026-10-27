@@ -284,3 +284,70 @@ for want in ("| Verified OPKs (unique) | 3 |", "| GitHub-hosted / other hosts | 
     assert want in md, (want, md)
 print("job summary tests OK")
 
+
+# ---- recheck coverage: equal dates must not starve external hosts; per-run counts; ZIP members vs unreachable URLs ---------------
+GH = {f"https://github.com/o{i}/r/releases/download/v1/a{i}.opk": {"kind": "opk", "last_verified": "2026-10-27", "last_checked": "2026-10-27"} for i in range(120)}
+EXT = {f"https://static.miraheze.org/funkeywiki/{i}/x{i}.opk": {"kind": "opk", "last_verified": "2026-10-27", "last_checked": "2026-10-27"} for i in range(28)}
+ZIPS = {f"https://github.com/z{i}/r/releases/download/v1/p.zip": {"kind": "zip", "last_verified": "2026-10-27", "last_checked": "2026-10-27", "members": ["m.opk"] * 18} for i in range(4)}
+st = {**GH, **EXT, **ZIPS}
+cost = lambda us: sum(1 if st[u]["kind"] == "opk" else 3 + min(12, len(st[u]["members"])) for u in us)
+c = C.Crawl(); C.seed_packages(c, st, "2026-10-28")
+ext = [u for u in c.recheck if "miraheze" in u]
+assert cost(c.recheck) <= C.RECHECK_MAX and len(ext) >= 20, (cost(c.recheck), len(ext))        # same date: hosts take turns, budget kept
+covered, day = set(), 28
+while EXT.keys() - covered and day < 40:                                                           # every external lead gets rechecked
+    c = C.Crawl(); C.seed_packages(c, st, f"2026-10-{day}")
+    for u in c.recheck: st[u]["last_checked"] = f"2026-10-{day}"
+    covered |= set(c.recheck); day += 1
+assert not EXT.keys() - covered and day <= 30, day
+assert not GH.keys() - covered or day > 29                                                         # ...and GitHub ones keep rotating
+# per-run stats are separate from history: 1 external verified, 1 external unreachable, 1 GitHub queued but never fetched
+due = list(EXT)[:2] + list(GH)[:1]
+s2 = {u: {**v, "last_checked": "2026-10-27"} for u, v in st.items()}
+s2[due[0]].update(last_checked="2026-11-01", last_verified="2026-11-01"); s2[due[1]].update(last_checked="2026-11-01", last_status="HTTP 403")
+assert C.recheck_stats(s2, due, "2026-11-01") == {"github": {"queued": 1, "processed": 0, "verified": 0, "unreachable": 0},
+                                                  "external": {"queued": 2, "processed": 2, "verified": 1, "unreachable": 1}}
+# a reachable ZIP with 18 members, 6 beyond the header limit: verified, 0 unreachable URLs, 6 unverified members, state untouched
+Z = "https://github.com/p/picoarch/releases/download/v1/picoarch.zip"
+zs = {Z: {"kind": "zip", "first_seen": "2026-10-01", "last_verified": "2026-10-01", "via": [], "members": [f"m{i}.opk" for i in range(12)], "state": "verified"}}
+mem = lambda i, magic: {"kind": "zip", "name": f"m{i}.opk", "url": Z, "container": Z, "size": 1, "host": "github.com", "repo": "p/picoarch", "via": [src],
+                        "judgement": "installable" if magic else "unverified", "magic_squashfs": magic}
+cont = {"kind": "zip-container", "url": Z, "note": "", "host": "github.com"}
+r = C.update_packages(zs, [cont] + [mem(i, True) for i in range(12)] + [mem(i, None) for i in range(12, 18)], "2026-11-01")
+assert (r["verified"], r["unreachable"], r["unverified_members"]) == (1, 0, 6) and zs[Z]["state"] == "verified", (r, zs[Z]["state"])
+# the same ZIP when its directory cannot be read: one unreachable URL, members not counted
+r = C.update_packages(zs, [{**cont, "note": "zip size probe HTTP 403"}], "2026-11-02")
+assert (r["verified"], r["unreachable"], r["unverified_members"]) == (0, 1, 0) and zs[Z]["state"] == "unreachable" and zs[Z]["last_status"] == "zip size probe HTTP 403"
+print("recheck coverage tests OK")
+
+# ---- same-date runs: state persisted between runs must move the rotation on (checked_at), not repeat the same 60 requests -------
+def fixture():
+    mk = lambda kind, **k: {"kind": kind, "first_seen": "2026-10-27", "last_verified": "2026-10-27", "last_checked": "2026-10-27", "via": [], **k}
+    return {**{f"https://github.com/o{i}/r/releases/download/v1/a{i}.opk": mk("opk", size=1) for i in range(120)},
+            **{f"https://static.miraheze.org/funkeywiki/{i}/x{i}.opk": mk("opk", size=1) for i in range(28)},
+            **{f"https://github.com/z{i}/r/releases/download/v1/p.zip": mk("zip", members=[f"m{j}.opk" for j in range(18)]) for i in range(4)}}
+def results(st, urls):   # what the crawl reports for each re-probed URL: every one reachable and verified
+    out = []
+    for u in urls:
+        h = urllib.parse.urlsplit(u).netloc
+        if st[u]["kind"] == "opk":
+            out.append({"kind": "direct", "name": u.rsplit("/", 1)[1], "url": u, "container": None, "size": 1, "host": h, "repo": None, "via": [], "judgement": "installable", "magic_squashfs": True})
+        else:
+            out.append({"kind": "zip-container", "url": u, "note": "", "host": h})
+            out += [{"kind": "zip", "name": m, "url": u, "container": u, "size": 1, "host": h, "repo": None, "via": [], "judgement": "installable" if k < 12 else "unverified",
+                     "magic_squashfs": True if k < 12 else None} for k, m in enumerate(st[u]["members"])]
+    return out
+st, done, order = fixture(), set(), []
+for run in range(6):                                                                                 # six runs, all on 2026-10-27
+    c = C.Crawl(); C.seed_packages(c, st, "2026-10-27")
+    assert cost(c.recheck) <= C.RECHECK_MAX, run                                                     # budget every run
+    order.append(set(c.recheck))
+    C.update_packages(st, results(st, c.recheck), "2026-10-27", now=1000 + run)                     # persisted state between runs
+    done |= set(c.recheck)
+assert not order[0] & order[1], len(order[0] & order[1])                                            # run 2 does not repeat run 1
+assert not EXT.keys() - order[0] and any("github.com/o" in u for u in order[1])                     # external done in run 1; skipped GitHub next
+for i in range(1, 6):                                                                                 # a run repeats URLs only once it
+    before = set().union(*order[:i])                                                                  # has taken every unchecked one
+    assert not order[i] & before or len(before | order[i]) == len(st), i
+assert all(u in done for u in ZIPS) and len(done) == len(st), (len(done), len(st))                  # ZIPs and cheap OPKs all covered
+print("same-date rotation tests OK")

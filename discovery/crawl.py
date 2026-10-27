@@ -544,7 +544,7 @@ def report(res, c):
     pl = res.get("package_leads")
     if pl: L += ["", "## Package lead store (candidates only, separate from catalog/)", "",
                  f"- {pl['stored_before']} stored before, {pl['stored_after']} after; {pl['verified']} verified this run ({pl['new']} new), "
-                 f"{pl['changed']} CHANGED (size/contents differ; review), {pl['unreachable']} unreachable but kept, {pl['rejected']} rejected, {pl['stale']} newly stale; "
+                 f"{pl['changed']} CHANGED (size/contents differ; review), {pl['unreachable']} unreachable download URLs (kept), {pl.get('unverified_members', 0)} unverified ZIP members, {pl['rejected']} rejected, {pl['stale']} newly stale; "
                  f"{pl['rechecked']} stored URLs rechecked this run (max {RECHECK_MAX})"]
     blk = res.get("inaccessible_sources") or {}
     L += ["", "## Inaccessible sources (refused this runner; content unknown, not evidence of absence)", ""] + [f"- {h}: HTTP {u[0][1]} on {len(u)} page(s), e.g. {u[0][0]}" for h, u in sorted(blk.items())] + ([] if blk else ["None."])
@@ -559,33 +559,64 @@ PKG_MAX, RECHECK_MAX = 400, 60   # stored entries; request budget for re-probing
 # committed snapshot cannot resurrect them.
 
 
-def seed_packages(c, store):
-    """Re-queue stored URLs at depth 0, least recently checked first, within RECHECK_MAX requests (OPK = 1 Range read, ZIP = 3 +
-    one per member, max 12). Each is fetched like any discovered link (check(), Range probe, judge()), so a source page that later
-    blocks us (403) does not hide packages it once linked to. -> number of URLs queued."""
-    cost, due = 0, []
-    for url in sorted((u for u, v in store.items() if v.get("state") != "rejected"), key=lambda u: (store[u].get("last_checked") or "", u)):
+def recheck_order(store, today):
+    """Stored URLs to re-probe, fairest first: least recently checked; within one date, hosts take turns (one URL per host per
+    round), and the order inside a host is shuffled per day. Without this, equal dates fell back to URL order, so github.com
+    always beat every other host and external leads were never rechecked. checked_at (seconds) separates runs on the same date."""
+    tie = lambda u: hashlib.sha256((today + u).encode()).hexdigest()
+    when = lambda u: (store[u].get("last_checked") or "", store[u].get("checked_at") or 0)
+    live = sorted((u for u, v in store.items() if v.get("state") != "rejected"), key=lambda u: (when(u), tie(u)))
+    rank, per = {}, {}
+    for u in live:
+        k = (when(u), urllib.parse.urlsplit(u).netloc.lower())
+        rank[u] = per[k] = per.get(k, -1) + 1
+    return sorted(live, key=lambda u: (when(u), rank[u], tie(u)))
+
+
+def seed_packages(c, store, today=None):
+    """Re-queue stored URLs at depth 0 in recheck_order(), within RECHECK_MAX requests (OPK = 1 Range read, ZIP = 3 + one per
+    member, max 12). Each is fetched like any discovered link (check(), Range probe, judge()), so a source page that later
+    blocks us (403) does not hide packages it once linked to. -> number of URLs queued (the list is kept in c.recheck)."""
+    cost, c.recheck = 0, []
+    for url in recheck_order(store, today or date.today().isoformat()):
         w = 1 if store[url]["kind"] == "opk" else 3 + min(12, len(store[url].get("members") or []))
-        if cost + w > RECHECK_MAX: break
-        cost += w; due.append(url)
-    for url in due:
+        if cost + w > RECHECK_MAX: continue   # a cheaper entry may still fit; a skipped one keeps its old date and leads next run
+        cost += w; c.recheck.append(url)
+    for url in c.recheck:
         v = store[url]
         c.push(v["kind"], url, {"from": "package-lead-store", "anchor": "previously verified " + v["last_verified"], "repo": v.get("repo"),
                                 "first_found_via": (v.get("via") or [{}])[0].get("from")}, 0)
-    return len(due)
+    return len(c.recheck)
 
 
-def update_packages(store, pkgs, today):
-    """-> counts. Verified packages are added/refreshed; a different size or ZIP member set marks the entry "changed" (previous
-    values kept); unreachable ones are kept and marked; a non-SquashFS body marks "rejected"; long-unverified ones turn "stale"."""
-    n = {"verified": 0, "new": 0, "changed": 0, "unreachable": 0, "rejected": 0, "stale": 0}
+def recheck_stats(store, due, today):
+    """This run only (not historical states): of the stored URLs queued for recheck, how many were fetched, verified, unreachable."""
+    out = {}
+    for side in ("github", "external"):
+        us = [u for u in due if ("github" in urllib.parse.urlsplit(u).netloc.lower()) == (side == "github")]
+        done = [u for u in us if u in store and store[u].get("last_checked") == today]
+        ok = [u for u in done if store[u].get("last_verified") == today]
+        out[side] = {"queued": len(us), "processed": len(done), "verified": len(ok), "unreachable": len(done) - len(ok)}
+    return out
+
+
+def update_packages(store, pkgs, today, now=None):
+    """-> per-run counts (distinct URLs). Verified packages are added/refreshed; a different size or ZIP member set marks the entry
+    "changed" (previous values kept); an unreachable download URL is kept and marked; a non-SquashFS body marks "rejected";
+    long-unverified ones turn "stale". A ZIP member whose header was not read is "unverified", not an unreachable URL."""
+    n = {"changed": 0, "rejected": 0, "stale": 0, "unverified_members": 0}
+    ok, new, down = set(), set(), set()
     seen_zip = {}
     for p in pkgs:
-        if p["kind"] == "zip-container": continue
+        if p["kind"] == "zip-container":   # the ZIP's own reachability: its directory could not be listed
+            old = store.get(p["url"])
+            if old and p.get("note"): down.add(p["url"]); old.update(last_checked=today, last_status=p["note"][:60])
+            continue
         url, kind = (p["url"], "opk") if p["kind"] == "direct" else (p["container"], "zip")
         old = store.get(url)
         if p.get("judgement") == "installable":
-            n["verified"] += 1; n["new"] += old is None
+            ok.add(url)
+            if old is None: new.add(url)
             rec = store.setdefault(url, {"kind": kind, "first_seen": today, "via": [], "members": []})
             if kind == "zip":
                 seen_zip.setdefault(url, set()).add(p["name"])
@@ -599,9 +630,12 @@ def update_packages(store, pkgs, today):
                 if v.get("from") != "package-lead-store" and v not in rec["via"]: rec["via"] = (rec["via"] + [v])[:3]   # original provenance only
         elif old and p.get("magic_squashfs") is False and p.get("status") in (200, 206):
             old.update(state="rejected", last_checked=today, last_status=f"HTTP {p.get('status')}, not SquashFS"); n["rejected"] += 1
+        elif p.get("magic_squashfs") is None and kind == "zip":
+            n["unverified_members"] += 1   # member header not read (member limit/unreadable); says nothing about the URL
         elif old and p.get("magic_squashfs") is None:
-            old.update(last_checked=today, last_status=f"HTTP {p.get('status')}"); n["unreachable"] += 1
-            if old.get("state") in (None, "verified"): old["state"] = "unreachable"
+            down.add(url); old.update(last_checked=today, last_status=f"HTTP {p.get('status')}")
+    for url in down - ok:
+        if store[url].get("state") in (None, "verified"): store[url]["state"] = "unreachable"
     for url, names in seen_zip.items():
         rec, names = store[url], sorted(names)
         if rec["members"] and set(names) != set(rec["members"]):
@@ -615,7 +649,10 @@ def update_packages(store, pkgs, today):
         live = [u for u in store if store[u].get("state") != "rejected"]
         if not live: break
         del store[min(live, key=lambda u: store[u]["last_verified"])]
-    return n
+    now = int(time.time() if now is None else now)
+    for url in ok | down:
+        if url in store: store[url]["checked_at"] = now
+    return {"verified": len(ok), "new": len(new), "unreachable": len(down - ok), **n}
 
 
 def stats_md(res, store):
@@ -628,9 +665,12 @@ def stats_md(res, store):
     pl, fs = res.get("package_leads") or {}, (res.get("optional_channels") or {}).get("freeserp") or {}
     L = ["## Crawl statistics", "", "| | |", "|---|---|",
          f"| Verified OPKs (unique) | {len(apps)} |", f"| GitHub-hosted / other hosts | {gh} / {len(apps) - gh} |",
-         f"| Package lead store | {len(store)} entries: " + ", ".join(f"{k} {v}" for k, v in sorted(st.items())) + " |",
+         f"| Package lead store (historical states) | {len(store)} entries: " + ", ".join(f"{k} {v}" for k, v in sorted(st.items())) + " |",
          f"| New this run / re-verified / retained (not verified this run) | {new} / {fresh - new} / {len(store) - fresh} |",
-         f"| Stored URLs rechecked this run | {pl.get('rechecked', 0)} (budget {RECHECK_MAX} requests) |",
+         f"| Stored URLs rechecked this run | {pl.get('rechecked', 0)} queued (budget {RECHECK_MAX} requests) |"] + [
+         f"| Recheck this run, {side} | {r['queued']} queued, {r['processed']} fetched, {r['verified']} verified, {r['unreachable']} unreachable |"
+         for side, r in (pl.get("recheck") or {}).items()] + [
+         f"| This run: verified URLs / unreachable download URLs / unverified ZIP members | {pl.get('verified', 0)} / {pl.get('unreachable', 0)} / {pl.get('unverified_members', 0)} |",
          f"| FreeSerp | {fs.get('status', 'n/a')}: {fs.get('queries', 0)}/{fs.get('requests', 0)} queries ok, {fs.get('results', 0)} results, "
          f"{fs.get('new_leads', 0)} new leads, {fs.get('cached_leads', 0)} cached{', error ' + str(fs['error']) if fs.get('error') else ''} |",
          f"| Inaccessible sources | {', '.join(sorted(res.get('inaccessible_sources') or {})) or 'none'} |", ""]
@@ -657,6 +697,7 @@ def main():
     c = Crawl()
     notes, optional = [], {}
     store, rechecked = {}, 0
+    c.recheck = []
     for f in (a.package_seed, a.package_leads):
         if f: store.update({u: v for u, v in load_leads(f, "last_verified").items() if v.get("kind") in ("opk", "zip")})   # load_leads drops malformed entries
     try:
@@ -689,6 +730,7 @@ def main():
            "relevant_sites": sites, "inaccessible_sources": inaccessible(c.pages.values()), "skipped": c.dropped, "failures": FAILS[:60], "optional_channels": optional}
     res.update(complete=not why, incomplete_reasons=why, caps_hit=caps)
     res["package_leads"] = {"stored_before": len(store), "rechecked": rechecked, **update_packages(store, c.pkgs.values(), res["as_of"]), "stored_after": len(store)}
+    res["package_leads"]["recheck"] = recheck_stats(store, c.recheck, res["as_of"])
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     if a.package_leads:
         Path(a.package_leads).parent.mkdir(parents=True, exist_ok=True)
