@@ -9,11 +9,16 @@ on:
         description: "Optional: up to 10 GitHub/GitLab/Codeberg repository URLs (space or comma separated). Unapproved leads, reported separately."
         required: false
         default: ""
+      submitted_only:
+        description: "Submitted leads only"
+        type: boolean
+        default: false
 permissions:
   contents: read
   issues: write
 jobs:
   discover:
+    if: ${{ !inputs.submitted_only }}   # inputs is empty on scheduled runs, so they always take this job
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
@@ -68,3 +73,23 @@ jobs:
         with:
           path: .cache/leads
           key: freeserp-leads-${{ github.run_id }}
+  # Submitted leads only: just the supplied repositories (no search, FreeSerp, owner/page crawling or stored-URL rechecks), small
+  # request budget, no caches restored or saved, no issue touched. Report in the job summary + artifact; nothing is approved or published.
+  submitted:
+    if: ${{ inputs.submitted_only }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tests/test_crawl.py
+      - name: Submitted-only discovery
+        shell: bash   # pipefail: no valid repository URL must fail the job, not be hidden by tee
+        env:
+          SUBMITTED_LEADS: ${{ inputs.lead_urls }}   # via env only, never interpolated into the script
+        run: python3 -I discovery/crawl.py --submitted-only --out out-submitted --submitted="$SUBMITTED_LEADS" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: submitted-discovery, path: out-submitted, if-no-files-found: ignore}

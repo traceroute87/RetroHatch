@@ -225,11 +225,14 @@ class Crawl:
         self.tree_known = {}   # (repo lower, path) -> {"blob", "url"} of files already in the package store (set by main())
         self.tree_left, self.tree_salt = TREE_RUN_MAX, str(T0)
         self.tree_scans = {}   # repo lower -> {"repo", "commit", "complete", "scanned", "packages"}, kept between runs (set by main())
+        self.scope, self.out_of_scope = None, 0   # submitted-only mode: the only repos/forge projects that may be queued (set by submitted_only())
         self.releases, self.deferred = {}, set()   # repo lower -> {"tag", "assets": {file name: tagged URL}} resolved THIS run; latest URLs requeued once
 
     def drop(self, why): self.dropped[why] = self.dropped.get(why, 0) + 1
 
     def push(self, kind, key, via, depth):
+        if self.scope is not None and kind not in ("opk", "zip") and (kind, key.lower()) not in self.scope:
+            self.out_of_scope += 1; return   # submitted-only: no pages, owners or other repos; deliberate, so not counted as budget exhaustion
         k = (kind, key.lower() if kind != "page" else key)
         if k in self.seen: 
             self._via(kind, key, via)
@@ -295,6 +298,7 @@ class Crawl:
                                         "in_catalog": D.norm_url(f"https://github.com/{full}") in self.known_src or full.split("/")[1].lower() in self.known_ids}
         if r["in_catalog"]: return
         st, _, b, _ = fetch(f"https://raw.githubusercontent.com/{full}/HEAD/README.md")
+        r["readme_status"] = st
         text = b.decode("utf-8", "replace")[:60000] if st == 200 else ""
         m = {"full_name": full, "name": full.split("/")[1], "html_url": r["url"], "description": r["meta"].get("description"), "topics": r["meta"].get("topics") or []}
         r["verdict"], r["evidence"] = D.analyze(m, None, (text, r["url"] + "#readme") if text else None, PROF)
@@ -854,6 +858,7 @@ def stats_md(res, store):
 
 # ---- submitted leads: maintainer-provided repository URLs (workflow input), crawled like any other repo, reported apart --------
 SUBMITTED, SUBMIT_MAX = "submitted-lead", 10
+SUBMITTED_MAX_REQ, SUBMITTED_DEADLINE_S = 250, 300   # submitted-only budget: hard ceilings, --max-req/--deadline can only lower them
 FORGE_KIND = {"github.com": "repo", "gitlab.com": "forge", "codeberg.org": "forge"}
 
 
@@ -917,6 +922,63 @@ def unique_apps(c):
     return sorted(apps.values(), key=lambda x: (x["repo"] or x["host"], x["name"].lower()))
 
 
+def submitted_report(res):
+    ok = res["complete"]
+    L = [f"# Submitted-only discovery: {'COMPLETE' if ok else 'INCOMPLETE, NOT AUTHORITATIVE'}", ""]
+    L += [f"- incomplete because: {w}" for w in res["incomplete_reasons"]]
+    L += [f"As of {res['as_of']}; {'authenticated' if res['authenticated'] else 'UNAUTHENTICATED'}; {res['requests']} requests in {res['seconds']} s "
+          f"(limits {res['limits']['max_requests']} requests, {res['limits']['deadline_s']} s); {res['out_of_scope']} out-of-scope links not followed.",
+          "**Candidates only: nothing here is approved, tested, installed or written to catalog/. Package lead stores and caches were not read or changed.**", ""]
+    for s in res["leads"]:
+        L += [f"## {s['url']}", f"- {'reached' if s['reached'] else 'NOT reached'}; verdict {s['verdict']}; README HTTP {s['readme_status']}; "
+              f"release {s['release'] or 'none'}" + ("; already in catalog" if s["in_catalog"] else "")]
+        pk = s["packages"]
+        L += [f"- {len([p for p in pk if p['kind'] != 'zip-container'])} package(s) found, "
+              f"{len([p for p in pk if p.get('judgement') == 'installable'])} installable (squashfs magic verified)"]
+        for p in pk:
+            if p["kind"] == "direct": L.append(f"  - OPK {p['name']}: {p['judgement']} ({p['reason']}) <{p['url']}>")
+            elif p["kind"] == "zip-container":
+                L.append(f"  - ZIP <{p['url']}>: {p.get('entries', 0)} entries, {p.get('opks', 0)} OPK(s) inside" + (f"; {p['note']}" if p.get("note") else ""))
+                L += [f"    - {m['path']}: {m['judgement']} ({m['reason']})" for m in pk if m["kind"] == "zip" and m.get("container") == p["url"]]
+        L.append("")
+    L += ["## Rejected inputs", ""] + [f"- {r['url']}: {r['reason']}" for r in res["rejected"]] + ([] if res["rejected"] else ["None."])
+    L += ["", "## Failed requests", ""] + [f"- {u}: {st}" for u, st in res["failures"]] + ([] if res["failures"] else ["None."])
+    return "\n".join(L) + "\n"
+
+
+def submitted_only(a):
+    """Targeted run for --submitted: only the supplied repositories, their README, releases, repository files and the package links
+    they contain. No seed searches, FreeSerp, owner or page crawling, no other repositories, no stored-URL rechecks, and no read or
+    write of any persistent cache (package leads, tree scans, lead cache): history and provenance stay exactly as they were."""
+    global MAX_REQ, DEADLINE_S
+    MAX_REQ, DEADLINE_S = min(a.max_req or SUBMITTED_MAX_REQ, SUBMITTED_MAX_REQ), min(a.deadline or SUBMITTED_DEADLINE_S, SUBMITTED_DEADLINE_S)
+    leads, rejected = submitted_leads(a.submitted)
+    for u, why in rejected: print(f"rejected {u}: {why}", file=sys.stderr)
+    if not leads: sys.exit("submitted-only: no valid GitHub, GitLab or Codeberg repository URL supplied")
+    c, notes = Crawl(), []
+    c.scope = {(kind, key.lower()) for kind, key, _ in leads}
+    for kind, key, url in leads: c.push(kind, key, {"from": SUBMITTED, "anchor": url}, 0)
+    try: c.run()
+    except Exception as e:   # a crash must still leave a report that says INCOMPLETE
+        notes.append(f"crawl error: {type(e).__name__}: {e}"[:200])
+    sub = mark_submitted(c, leads)
+    unique_apps(c)   # judges every package in place; its autonomous app list is deliberately unused
+    fields = ("url", "name", "kind", "size", "judgement", "reason", "container", "path", "magic_squashfs", "status", "note", "entries", "opks")
+    for s in sub:
+        s["in_catalog"] = bool((c.repos.get(s["key"].lower()) or {}).get("in_catalog"))
+        s["packages"] = [{k: p.get(k) for k in fields} for p in s["packages"]]
+    res = {"as_of": date.today().isoformat(), "authenticated": bool(os.environ.get("GITHUB_TOKEN")), "requests": NREQ, "seconds": round(time.time() - T0),
+           "limits": {"max_requests": MAX_REQ, "deadline_s": DEADLINE_S}, "out_of_scope": c.out_of_scope, "leads": sub,
+           "rejected": [{"url": u, "reason": r} for u, r in rejected], "failures": FAILS[:60]}
+    res["incomplete_reasons"] = assess(notes, len(c.q) + len(c.pq), STOP, FAILS, c.dropped)
+    res["complete"] = not res["incomplete_reasons"]
+    out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    (out / "submitted-results.json").write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    md = submitted_report(res)
+    (out / "submitted-results.md").write_text(md, encoding="utf-8")
+    print(md)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", default=str(D.ROOT / "build" / "discovery"))
@@ -927,7 +989,9 @@ def main():
     ap.add_argument("--package-leads", default=None, help="JSON store of verified download URLs, revalidated and updated each run")
     ap.add_argument("--package-seed", default=None, help="read-only JSON store merged in first (e.g. a committed snapshot)")
     ap.add_argument("--submitted", default="", help=f"up to {SUBMIT_MAX} GitHub/GitLab/Codeberg repository URLs (unapproved leads, reported separately)")
+    ap.add_argument("--submitted-only", action="store_true", help="inspect only the --submitted repositories (small budget, no general discovery, caches untouched)")
     a = ap.parse_args()
+    if a.submitted_only: return submitted_only(a)
     global MAX_REQ, DEADLINE_S
     MAX_REQ, DEADLINE_S = a.max_req or MAX_REQ, a.deadline or DEADLINE_S
     c = Crawl()

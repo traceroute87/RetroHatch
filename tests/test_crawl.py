@@ -726,3 +726,83 @@ c, sub, apps = sub_run("", "https://user:pw@gitlab.com/someone/player http://git
 assert sub == [] and not c.pkgs and not c.repos and not c.pages and C.NREQ == n0   # nothing queued, no request made
 C.fetch = real_fetch
 print("submitted lead tests OK")
+
+# ---- submitted-only mode: only the supplied repositories, never general discovery or historical rechecks, caches untouched ----------
+import contextlib, json, tempfile, time, urllib.parse
+SO_README = (f"# Game\nPorted for the Anbernic RG Nano.\n- [zip build]({ZURL})\n- [other repo](https://github.com/other/repo)\n"
+             "- [author](https://github.com/otherowner)\n- [apps wiki](https://wiki.example.org/wiki/OPK_Applications)\n")
+so_calls = []
+def so_fetch(url, rng=None, limit=0):
+    if C.NREQ >= C.MAX_REQ:   # same budget accounting as the real fetch()
+        if not C.STOP: C.STOP.append("request cap")
+        return -1, {}, b"", url
+    C.NREQ += 1; so_calls.append(url)
+    if url == "https://raw.githubusercontent.com/sub/game/HEAD/README.md": return 200, {}, SO_README.encode(), url
+    if url == "https://github.com/sub/game/releases/latest": return 200, {}, b"", "https://github.com/sub/game/releases/tag/v1"
+    if url == "https://github.com/sub/game/releases/expanded_assets/v1": return 200, {}, b'<a href="/sub/game/releases/download/v1/game.opk">x</a>', url
+    if url == "https://github.com/sub/game/releases/download/v1/game.opk": return 206, {"Content-Range": "bytes 0-3/999"}, b"hsqs", url
+    if url == "https://gitlab.com/api/v4/projects/someone%2Fplayer/repository/files/README.md/raw?ref=HEAD": return 200, {}, b"# Player\nBuilt for the RG Nano.\n", url
+    if url == ZURL and rng:
+        a, b = map(int, rng.removeprefix("bytes=").split("-"))
+        return 206, {"Content-Range": f"bytes {a}-{min(b, len(ZD) - 1)}/{len(ZD)}"}, ZD[a:b + 1], url
+    return 404, {}, b"", url
+def so_main(*args):
+    so_calls.clear(); C.NREQ, C.T0 = 0, time.time(); C.FAILS.clear(); C.STOP.clear()
+    buf = io.StringIO(); old = sys.argv; sys.argv = ["crawl.py", "--submitted-only", *args]
+    try:
+        with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(io.StringIO()): C.main()
+    finally: sys.argv = old
+    return buf.getvalue()
+saved = C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed, C.seed_multi, C.seed_freeserp, C.seed_packages
+def forbidden(*a, **k): raise AssertionError("general discovery or historical recheck started in submitted-only mode")
+C.fetch, C.DELAY = so_fetch, 0
+C.seed = C.seed_multi = C.seed_freeserp = C.seed_packages = forbidden
+with tempfile.TemporaryDirectory() as td:
+    td = Path(td); (td / "cache").mkdir()
+    keep = {"packages.json": json.dumps({"https://old.example.org/old.opk": {"kind": "opk", "state": "verified", "first_seen": "2026-01-01", "last_verified": "2026-01-01",
+                                                                            "last_checked": "2026-01-01", "via": [{"from": "https://old.example.org/"}], "members": []}}),
+            "freeserp.json": json.dumps({"https://x.example.org/p": {"last_seen": "2026-01-01", "queries": ["q"]}}), "seed.json": "{}"}
+    for n, t in keep.items(): (td / "cache" / n).write_text(t, encoding="utf-8")
+    def untouched(): return all((td / "cache" / n).read_text(encoding="utf-8") == t for n, t in keep.items()) and sorted(p.name for p in (td / "cache").iterdir()) == sorted(keep)
+    caches = ["--package-leads", str(td / "cache/packages.json"), "--package-seed", str(td / "cache/seed.json"), "--lead-cache", str(td / "cache/freeserp.json")]
+    md = so_main("--out", str(td / "o"), "--max-req", "99999", "--deadline", "99999", *caches,
+                 "--submitted=https://github.com/sub/game https://gitlab.com/someone/player https://example.org/x")
+    res = json.loads((td / "o/submitted-results.json").read_text(encoding="utf-8"))
+    # budget: ceilings, not defaults; never the 1200-request crawl
+    assert C.MAX_REQ == C.SUBMITTED_MAX_REQ < 1200 and C.DEADLINE_S == C.SUBMITTED_DEADLINE_S and res["limits"]["max_requests"] == C.SUBMITTED_MAX_REQ
+    # nothing but the submitted repos and the package links they carry was requested
+    hosts = {urllib.parse.urlsplit(u).netloc for u in so_calls}
+    assert hosts <= {"raw.githubusercontent.com", "github.com", "api.github.com", "gitlab.com", "builds.example.org"}, hosts
+    assert not [u for u in so_calls if any(x in u for x in ("freeserp", "/search", "advancedsearch", "tab=repositories", "other/repo", "otherowner", "wiki.example.org", "old.example.org", "codeberg.org"))], so_calls
+    assert 0 < res["requests"] <= C.SUBMITTED_MAX_REQ and res["requests"] == len(so_calls)
+    assert res["out_of_scope"] >= 3 and res["complete"], (res["out_of_scope"], res["incomplete_reasons"])   # skipped on purpose: not "incomplete"
+    # per-lead report: README status, packages, OPK inside the ZIP, verification
+    gh, gl = res["leads"]
+    assert gh["reached"] and gh["readme_status"] == 200 and gh["release"] == "v1" and gl["reached"] and gl["readme_status"] == 200
+    byk = {p["kind"]: p for p in gh["packages"]}
+    assert byk["direct"]["name"] == "game.opk" and byk["direct"]["judgement"] == "installable"
+    assert byk["zip-container"]["opks"] == 1 and byk["zip"]["path"] == "player/player.opk" and byk["zip"]["magic_squashfs"] is True and byk["zip"]["judgement"] == "installable"
+    assert res["rejected"] == [{"url": "https://example.org/x", "reason": "unsupported host"}]
+    for s in (f"{res['requests']} requests in", "README HTTP 200", "player/player.opk: installable", "OPK game.opk: installable", "Rejected inputs", "not read or changed", "nothing here is approved"):
+        assert s in md or s in (td / "o/submitted-results.md").read_text(encoding="utf-8"), s
+    # separate from autonomous statistics; no catalog/, no persistent store or cache written or changed (history and provenance kept)
+    assert sorted(p.name for p in (td / "o").iterdir()) == ["submitted-results.json", "submitted-results.md"] and untouched()
+    # a cut-short run says so
+    so_main("--out", str(td / "o2"), "--max-req", "3", *caches, "--submitted=https://github.com/sub/game")
+    r2 = json.loads((td / "o2/submitted-results.json").read_text(encoding="utf-8"))
+    assert not r2["complete"] and any("not processed" in w or "request cap" in w for w in r2["incomplete_reasons"]) and r2["requests"] == 3 and untouched()
+    # no valid URL: fails before any request, writes nothing
+    for bad in ("", "https://example.org/x http://github.com/a/b"):
+        try: so_main("--out", str(td / "o3"), *caches, f"--submitted={bad}"); raise AssertionError("must exit")
+        except SystemExit as e: assert "no valid" in str(e)
+        assert not so_calls and C.NREQ == 0 and not (td / "o3").exists() and untouched()
+C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed, C.seed_multi, C.seed_freeserp, C.seed_packages = saved
+# the scope exists only in submitted-only mode: a normal crawl still queues pages, owners and other repos
+assert C.Crawl().scope is None
+c = C.Crawl(); c.push("page", "https://wiki.example.org/wiki/Apps", {"from": "t"}, 0); c.push("owner", "someone", {"from": "t"}, 0); c.push("repo", "a/b", {"from": "t"}, 0)
+assert len(c.pq) == 1 and len(c.q) == 2 and c.out_of_scope == 0
+c = C.Crawl(); c.scope = {("repo", "sub/game")}
+for k_, v_ in (("page", "https://w.org/p"), ("owner", "o"), ("repo", "a/b"), ("forge", "codeberg.org/a/b"), ("ia", "ident"), ("repo", "sub/game"), ("opk", "https://x.org/a.opk"), ("zip", "https://x.org/a.zip")):
+    c.push(k_, v_, {"from": "t"}, 0)
+assert c.out_of_scope == 5 and [(k_, v_) for k_, v_, _, _ in c.q] == [("repo", "sub/game"), ("opk", "https://x.org/a.opk"), ("zip", "https://x.org/a.zip")] and not len(c.pq)
+print("submitted-only tests OK")
