@@ -50,7 +50,7 @@ static void load_app(rh_model *m, const rj *j, const char *target)
 	memset(a, 0, sizeof *a);
 	CP(a->id, rj_str(j, "id", "")); CP(a->name, rj_str(j, "name", ""));
 	CP(a->desc, rj_str(j, "description", "")); CP(a->developer, rj_str(j, "developer", ""));
-	CP(a->license, rj_str(j, "license", "")); CP(a->source, rj_str(j, "source", ""));
+	CP(a->license, rj_str(j, "license", "")); CP(a->source, rj_str(j, "source", "")); CP(a->category, rj_str(j, "category", ""));
 	CP(a->status, "unavailable");
 	arts = rj_get(j, "artifacts");
 	art = arts ? arts->kid : NULL;
@@ -157,6 +157,8 @@ void rh_model_load(rh_model *m, const char *dir, const char *state_dir)
 {
 	char path[512], target[24] = "rg-nano"; DIR *d; struct dirent *e; rj *j;
 	memset(m, 0, sizeof *m);
+	snprintf(path, sizeof path, "%s/DEV_FIXTURE", dir);
+	m->dev_fixture = !access(path, F_OK);
 	snprintf(path, sizeof path, "%s/devices", dir);
 	if ((d = opendir(path))) {
 		while ((e = readdir(d)) && m->n_devs < 8)

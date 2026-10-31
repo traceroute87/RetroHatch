@@ -6,6 +6,7 @@
 #include <string.h>
 #include <SDL/SDL.h>
 #include "../ui/rh_ui.h"
+#include "../platforms/nano/rh_install.h"
 
 #define HOME_ROW_SEL_Y 128   /* inside the first home row (y 123..143) */
 static int fails, checks;
@@ -193,6 +194,85 @@ static void scenario(const char *root, const char *assets, const char *name)
 	rh_ui_free();
 }
 
+/* ---- first usable slice: Browse -> App Details -> Install Preview -> Back (read-only; DEV fixtures labeled) ---- */
+static int count_px(int x0, int y0, int x1, int y1, unsigned c)
+{
+	int x, y, n = 0;
+	for (y = y0; y < y1; y++) for (x = x0; x < x1; x++) n += px(x, y) == c;
+	return n;
+}
+
+static void open_app(const rh_model *m, const char *id)   /* Home -> Discover -> Details of id */
+{
+	int want = app_idx(m, id), i;
+	keys("a");
+	for (i = 0; i < want; i++) keys("d");
+	keys("a");
+}
+
+static void preview(const char *root, const char *assets)
+{
+	static rh_model m, real; char cat[512], st[512]; rh_ui_view v; int i;
+	char t[96], why[64];
+	/* the installer's own name checks decide the target; nothing is invented */
+	CHECK(rh_plan_target("fx-app-1", "1.2.3", "fx1_funkey-s.opk", t, sizeof t, why, sizeof why) && !strcmp(t, "/mnt/Applications/fx1_funkey-s.opk"));
+	CHECK(!rh_plan_target("fx-app-1", "1.2.3", "", t, sizeof t, why, sizeof why) && !strcmp(why, "No install file name in catalog"));
+	CHECK(!rh_plan_target("fx-app-1", "1.2.3", "../x.opk", t, sizeof t, why, sizeof why) && !strcmp(why, "Install file name not allowed"));
+	CHECK(!rh_plan_target("fx-app-1", "1.2.3", "retrohatch.opk", t, sizeof t, why, sizeof why));   /* protected name */
+	CHECK(!rh_plan_target("Bad Id", "1.2.3", "a.opk", t, sizeof t, why, sizeof why) && !rh_plan_target("a", "1 2", "a.opk", t, sizeof t, why, sizeof why));
+
+	/* the shipped catalog is never a fixture; the fixture catalog always says so */
+	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root);
+	rh_model_load(&real, cat, st);
+	CHECK(!real.dev_fixture);
+	for (i = 0; i < real.n_apps; i++) CHECK(strncmp(real.apps[i].id, "fx-", 3) != 0);
+	snprintf(cat, sizeof cat, "%s/tests/ui_fixture/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/state", root);
+	rh_model_load(&m, cat, st);
+	CHECK(m.dev_fixture && !strcmp(m.apps[app_idx(&m, "fx-app-1")].category, "application"));
+	CHECK(rh_ui_init(assets, &m) == 0);
+
+	/* without a planner (DEV/ops tests) the bar stays inert, exactly as before */
+	rh_ui_set_planner(NULL);
+	open_app(&m, "fx-app-3"); v = V();
+	CHECK(v.screen == RH_S_DETAILS && v.action == RH_ACT_INSTALL_SOON); keys("a"); CHECK(V().screen == RH_S_DETAILS && V().depth == 2);
+	keys("bb");
+	rh_ui_set_planner(rh_plan_target);
+
+	/* Browse: DEV title, installed status, long name */
+	keys("a"); shot("slice_1_browse"); CHECK(V().screen == RH_S_DISCOVER);
+	CHECK(count_px(156, 6, 190, 26, 0xFFF0D2) > 10);         /* "[DEV]" tag: title text reaches past where plain "Discover" ends (x 150) */
+	keys("b");
+	/* Details of an installed app with an update pending -> Update Preview */
+	open_app(&m, "fx-app-1"); v = V();
+	CHECK(v.screen == RH_S_DETAILS && v.action == RH_ACT_UPDATE); shot("slice_2_details_update");
+	CHECK(px(226, 195) == 0xE9A23B);                         /* the bar is focusable now */
+	CHECK(count_px(10, 80, 230, 130, 0xE87555) > 20);        /* "DEV FIXTURE. Not an approved app." banner on the page */
+	keys("a"); v = V(); CHECK(v.screen == RH_S_CONFIRM && v.depth == 3); shot("slice_3_update_preview");
+	keys("d"); CHECK(V().screen == RH_S_CONFIRM);            /* no second action to take */
+	keys("a"); v = V(); CHECK(v.screen == RH_S_DETAILS && v.depth == 2 && v.action == RH_ACT_UPDATE);   /* Back */
+	keys("bb");
+	/* New install, long name */
+	open_app(&m, "fx-app-3"); CHECK(V().action == RH_ACT_INSTALL_SOON); shot("slice_4_details_long_name");
+	keys("a"); CHECK(V().screen == RH_S_CONFIRM); shot("slice_5_install_preview");
+	keys("b"); CHECK(V().screen == RH_S_DETAILS); keys("bb");
+	/* Missing install file name: preview says the target is unknown */
+	open_app(&m, "fx-app-4"); keys("a"); CHECK(V().screen == RH_S_CONFIRM); shot("slice_6_preview_no_target");
+	keys("bbb");
+	/* Installed, current: nothing to preview */
+	open_app(&m, "fx-app-2"); CHECK(V().action == RH_ACT_INSTALLED); keys("a"); CHECK(V().screen == RH_S_DETAILS);
+	rh_ui_free();
+
+	/* Empty catalog */
+	snprintf(cat, sizeof cat, "%s/tests/ui_fixture/no-such-catalog", root);
+	rh_model_load(&m, cat, st);
+	CHECK(m.n_apps == 0 && !m.dev_fixture && rh_ui_init(assets, &m) == 0);
+	keys("a"); CHECK(V().screen == RH_S_DISCOVER && V().count == 0); shot("slice_7_empty_catalog");
+	keys("a"); CHECK(V().screen == RH_S_DISCOVER);
+	CHECK(count_px(156, 6, 190, 26, 0xFFF0D2) == 0);          /* real (non-fixture) catalogs carry no DEV tag */
+	rh_ui_free();
+	rh_ui_set_planner(NULL);
+}
+
 int main(int argc, char **argv)
 {
 	char assets[512];
@@ -204,6 +284,7 @@ int main(int argc, char **argv)
 	versions();
 	real_catalog(argv[1], assets);
 	fixture(argv[1], assets);
+	preview(argv[1], assets);
 	scenario(argv[1], assets, "populated"); scenario(argv[1], assets, "noupdates"); scenario(argv[1], assets, "empty");
 	SDL_Quit();
 	printf("%d checks, %d failed\n", checks, fails);

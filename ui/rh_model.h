@@ -7,7 +7,7 @@
 #define RH_MAX_APPS 32
 
 typedef struct {
-	char id[40], name[48], desc[96], developer[48], license[32], source[128];
+	char id[40], name[48], desc[96], developer[48], license[32], source[128], category[24];
 	char status[16];      /* artifact status: "available" | "unavailable" */
 	char reason[300];     /* catalog's unavailable_reason, verbatim */
 	char version[24], compat[16], device[24], firmware[32];
@@ -31,6 +31,7 @@ typedef struct {
 	struct { char id[40], version[24]; int app; } inst[RH_MAX_APPS]; int n_inst;
 	int upd[RH_MAX_APPS];     int n_upd;   /* indexes into inst[]: catalog has a different available version */
 	rh_devinfo di;
+	int dev_fixture;          /* local catalog dir holds a DEV_FIXTURE marker: entries are test fixtures, not approved apps */
 	/* signed catalog (DEV): where the entries came from and whether the signature held. source == "" = local files */
 	struct { char source[16]; unsigned serial; char generated[11], expires[11]; int ok; char status[96]; } cat;
 } rh_model;

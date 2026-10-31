@@ -14,8 +14,8 @@ SDLP ?= $(HOME)/sdlhost/inst
 UI_SRC = ../ui/rh_ui.c ../ui/rh_gfx.c ../ui/rh_model.c ../ui/rh_json.c
 UI_LIBS = -L$(SDLP)/lib -lSDL_image -lSDL -lpng16 -lz -lm -lpthread -ldl
 
-ui_nav_test: ui_nav_test.c $(UI_SRC) ../ui/*.h
-	$(CC) -std=gnu99 -Wall -Wextra -Wno-format-truncation -O1 -g -fsanitize=address,undefined -I$(SDLP)/include -o $@ ui_nav_test.c $(UI_SRC) $(UI_LIBS)
+ui_nav_test: ui_nav_test.c $(UI_SRC) ../platforms/nano/rh_install.c ../ui/*.h
+	$(CC) -std=gnu99 -Wall -Wextra -Wno-format-truncation -O1 -g -fsanitize=address,undefined -I$(SDLP)/include -o $@ ui_nav_test.c $(UI_SRC) ../platforms/nano/rh_install.c ../core/sha256.c $(UI_LIBS)
 
 ui-test: ui_nav_test
 	./ui_nav_test .. $(SHOTS)

@@ -10,6 +10,7 @@
 #include <string.h>
 #include <SDL/SDL.h>
 #include "rh_ui.h"
+#include "../platforms/nano/rh_install.h"
 #ifdef RH_DEV                       /* RetroHatchDev.opk only: install flow for RH Probe, DEV state dir only */
 #include <stdlib.h>
 #include "rh_ops.h"
@@ -96,6 +97,7 @@ int main(int argc, char **argv)
 #ifdef RH_DEV
 	g_scr = scr;
 #endif
+	rh_ui_set_planner(rh_plan_target);   /* read-only Install Preview (production); DEV has real ops, which take precedence */
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_WM_SetCaption("RetroHatch", "RetroHatch");
 	if (rh_ui_init(assets, &m)) { fprintf(stderr, "retrohatch: cannot load assets from '%s'\n", assets); SDL_Quit(); return 1; }

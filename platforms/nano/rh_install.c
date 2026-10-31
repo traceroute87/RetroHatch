@@ -93,6 +93,16 @@ static int ok_dest(const char *s)
 	return 1;
 }
 
+/* Same name checks and the same <apps dir>/<dest_name> join that rh_install() uses (set_dest), with no file access. */
+int rh_plan_target(const char *app_id, const char *version, const char *dest_name, char *target, size_t n, char *why, size_t wn)
+{
+	if (!dest_name || !dest_name[0]) { snprintf(why, wn, "No install file name in catalog"); return 0; }
+	if (!ok_id(app_id) || !ok_ver(version)) { snprintf(why, wn, "App id or version not valid"); return 0; }
+	if (!ok_dest(dest_name)) { snprintf(why, wn, "Install file name not allowed"); return 0; }
+	if (snprintf(target, n, "%s/%s", RH_NANO_APPS_DIR, dest_name) >= (int)n) { snprintf(why, wn, "Path too long"); return 0; }
+	return 1;
+}
+
 /* ---- small file helpers ---- */
 
 static void sync_dir(const char *dir)

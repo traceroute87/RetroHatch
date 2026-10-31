@@ -15,6 +15,7 @@
    "status": "available",
    "version": "1.2.3",
    "size": 1468006,
+   "install": {"dest_name": "fx3_funkey-s.opk"},
    "compatibility": {
     "level": "verified"
    }

@@ -26,6 +26,8 @@ static SDL_Surface *ic[IC_N], *img_header, *img_home, *img_logo;
 static rh_font *f_body, *f_title;
 static const rh_model *M;
 static const rh_ui_ops *OPS;
+static rh_plan_fn PLAN;
+static int preview;   /* the open RH_S_CONFIRM screen is a read-only Install/Update Preview */
 static char blocked_why[40], res_msg[96];
 static int res_rc, pending, cur_op;   /* cur_op: 0 install, 1 update, 2 uninstall, 3 download, 4 refresh catalog */
 static uint64_t prog_done, prog_total;
@@ -165,6 +167,7 @@ static int details(SDL_Surface *d, int y0, const rh_app *a)
 		gfx_text(d, f_body, gfx_ellipsize(f_body, b, 170, e, sizeof e), 56, y + 22, C_TXT2);
 	}
 	y += 48;
+	if (M->dev_fixture) paragraph(d, 10, &y, 220, "DEV FIXTURE. Not an approved app.", C_ERR, 0);
 	if (a->desc[0]) { paragraph(d, 10, &y, 220, a->desc, C_TXT, 0); y += 4; }
 	if (!a->verified) {
 		char why[96];   /* short status here; the catalog's full reason follows the facts card */
@@ -179,9 +182,10 @@ static int details(SDL_Surface *d, int y0, const rh_app *a)
 		y += h + 6;
 	}
 	snprintf(r[n].l, sizeof r[n].l, "Version"); snprintf(r[n++].v, sizeof r[0].v, "%s", a->version[0] ? a->version : "Not published");
+	snprintf(r[n].l, sizeof r[n].l, "Category"); snprintf(r[n++].v, sizeof r[0].v, "%c%s", a->category[0] >= 'a' && a->category[0] <= 'z' ? a->category[0] - 32 : a->category[0] ? a->category[0] : 'U', a->category[0] ? a->category + 1 : "nknown");
 	snprintf(r[n].l, sizeof r[n].l, "Device"); snprintf(r[n++].v, sizeof r[0].v, "%s", rh_model_dev_name(M, a->device));
 	snprintf(r[n].l, sizeof r[n].l, "Firmware"); snprintf(r[n++].v, sizeof r[0].v, "%s", or_unknown(a->firmware));
-	snprintf(r[n].l, sizeof r[n].l, "Tested"); snprintf(r[n++].v, sizeof r[0].v, "%c%s", a->compat[0] ? a->compat[0] & ~32 : 'U', a->compat[0] ? a->compat + 1 : "nknown");
+	snprintf(r[n].l, sizeof r[n].l, "Compat"); snprintf(r[n++].v, sizeof r[0].v, "%c%s", a->compat[0] ? a->compat[0] & ~32 : 'U', a->compat[0] ? a->compat + 1 : "nknown");
 	snprintf(r[n].l, sizeof r[n].l, "License"); snprintf(r[n++].v, sizeof r[0].v, "%s", or_unknown(a->license));
 	snprintf(r[n].l, sizeof r[n].l, "Size"); fmt_size(r[n++].v, sizeof r[0].v, a->size);
 	snprintf(r[n].l, sizeof r[n].l, "Source"); snprintf(r[n++].v, sizeof r[0].v, "%s", strncmp(a->source, "https://", 8) ? or_unknown(a->source) : a->source + 8);
@@ -273,8 +277,27 @@ static const char *inst_ver(int ai)
 	return "";
 }
 
+/* Read-only plan for a production build: what an install would do and where, from the installer's own name checks. Nothing runs. */
+static void draw_preview(SDL_Surface *d)
+{
+	const rh_app *a = &M->apps[CUR.app];
+	kv r[3]; char b[96], t[96], why[48] = "";
+	const char *ver = a->version[0] ? a->version : "Unknown";
+	gfx_text_c(d, f_title, gfx_ellipsize(f_title, a->name, 210, b, sizeof b), 120, 37, C_TXT);
+	gfx_text_c(d, f_body, M->dev_fixture ? "DEV FIXTURE. Preview only." : "Preview only. No changes.", 120, 55, M->dev_fixture ? C_ERR : C_TXT2);
+	snprintf(r[0].l, sizeof r[0].l, "Action");
+	if (cur_op) snprintf(r[0].v, sizeof r[0].v, "Update %s > %s", inst_ver(CUR.app)[0] ? inst_ver(CUR.app) : "Unknown", ver);   /* the font has no arrow glyph */
+	else snprintf(r[0].v, sizeof r[0].v, "Install %s", ver);
+	snprintf(r[1].l, sizeof r[1].l, "Target");
+	if (PLAN && PLAN(a->id, a->version, a->dest_name, t, sizeof t, why, sizeof why)) snprintf(r[1].v, sizeof r[1].v, "%s", t);
+	else snprintf(r[1].v, sizeof r[1].v, "Unknown. %s", why[0] ? why : "No plan");
+	snprintf(r[2].l, sizeof r[2].l, "Size"); fmt_size(r[2].v, sizeof r[2].v, a->size);
+	kv_card(d, 74, r, 3, C_TXT);
+}
+
 static void draw_confirm(SDL_Surface *d)
 {
+	if (preview) { draw_preview(d); return; }
 	const rh_app *a = &M->apps[CUR.app];
 	kv r[3]; char b[96]; int y0 = CONT_B - 47;
 	gfx_text_c(d, f_title, gfx_ellipsize(f_title, a->name, 210, b, sizeof b), 120, 37, C_TXT);
@@ -372,6 +395,12 @@ static rh_action app_action(int ai)
 }
 
 void rh_ui_set_ops(const rh_ui_ops *ops) { OPS = ops; }
+void rh_ui_set_planner(rh_plan_fn plan) { PLAN = plan; }
+static int act_preview(rh_action a) { return PLAN && (a == RH_ACT_INSTALL_SOON || a == RH_ACT_UPDATE); }   /* production bars that open the preview */
+static int act_focus(rh_action a)
+{
+	return a == RH_ACT_INSTALL || a == RH_ACT_UPDATE_NOW || a == RH_ACT_UNINSTALL || a == RH_ACT_DOWNLOAD || act_preview(a);
+}
 int rh_ui_busy(void) { return CUR.s == RH_S_WORKING; }
 
 int rh_ui_run_pending(void)
@@ -430,6 +459,7 @@ void rh_ui_key(rh_key k)
 	int n = list_n();
 	if (CUR.s == RH_S_WORKING) return;                          /* install running: no input */
 	if (k == RH_K_B) { if (depth) depth--; return; }
+	if (CUR.s == RH_S_CONFIRM && preview) { if (k == RH_K_A && depth) depth--; return; }   /* nothing to confirm: A/B go back */
 	if (CUR.s == RH_S_CONFIRM) {
 		if (k == RH_K_UP || k == RH_K_DOWN) CUR.sel = k == RH_K_DOWN;
 		else if (k == RH_K_A) { if (CUR.sel == 0) depth--; else { CUR.s = RH_S_WORKING; pending = 1; } }
@@ -460,6 +490,8 @@ void rh_ui_key(rh_key k)
 		break;
 	case RH_S_DETAILS:
 		{ rh_action act = app_action(CUR.app);
+		  if (act_preview(act)) { preview = 1; cur_op = act == RH_ACT_UPDATE; go(RH_S_CONFIRM, 0, CUR.app); break; }
+		  preview = 0;
 		  if (act == RH_ACT_INSTALL || act == RH_ACT_UPDATE_NOW || act == RH_ACT_UNINSTALL || act == RH_ACT_DOWNLOAD) {
 			cur_op = act == RH_ACT_DOWNLOAD ? 3 : act == RH_ACT_UNINSTALL ? 2 : act == RH_ACT_UPDATE_NOW; go(RH_S_CONFIRM, 0, CUR.app); } }   /* every other bar is inert */
 		break;
@@ -491,7 +523,8 @@ static const char *screen_title(void)
 	case RH_S_UPDATES: return "Updates";
 	case RH_S_SETTINGS: return "Settings";
 	case RH_S_INFO: return INFO_TITLE[CUR.info];
-	case RH_S_CONFIRM: case RH_S_RESULT: return cur_op == 4 ? "Catalog" : cur_op == 3 ? "Download" : cur_op == 2 ? "Uninstall" : cur_op ? "Update" : "Install";
+	case RH_S_CONFIRM: if (preview) return cur_op ? "Update Preview" : "Install Preview";   /* fall through */
+	case RH_S_RESULT: return cur_op == 4 ? "Catalog" : cur_op == 3 ? "Download" : cur_op == 2 ? "Uninstall" : cur_op ? "Update" : "Install";
 	case RH_S_WORKING: return cur_op == 4 ? "Refreshing" : cur_op == 3 ? "Downloading" : cur_op == 2 ? "Removing" : cur_op ? "Updating" : "Installing";
 	default: return "";
 	}
@@ -531,10 +564,11 @@ static void draw_action(SDL_Surface *d, rh_action act)
 	rh_rgb ic_c = act == RH_ACT_INSTALLED ? C_GREEN : act == RH_ACT_UPDATE ? C_ACC : act == RH_ACT_INSTALL_SOON ? C_TXT2 : C_DIS;
 	rh_rgb tx_c = act == RH_ACT_INSTALL_SOON ? C_TXT2 : act == RH_ACT_UNAVAILABLE ? C_DIS : C_TXT;
 	int cy = CONT_B - CTA_H;
-	if (act == RH_ACT_INSTALL || act == RH_ACT_UPDATE_NOW || act == RH_ACT_UNINSTALL || act == RH_ACT_DOWNLOAD) {   /* DEV: the only focusable bar -> selected-row style */
+	if (act_focus(act)) {   /* DEV actions and the production preview: the only focusable bar -> selected-row style */
+		int dl = act == RH_ACT_INSTALL || act == RH_ACT_DOWNLOAD || act == RH_ACT_INSTALL_SOON, rf = act == RH_ACT_UPDATE_NOW || act == RH_ACT_UPDATE;
 		gfx_rfill(d, 8, cy, 224, CTA_H, 4, C_ACC);
-		icon(d, act == RH_ACT_INSTALL || act == RH_ACT_DOWNLOAD ? IC_DOWNLOAD : act == RH_ACT_UPDATE_NOW ? IC_REFRESH : IC_TRASH, 26, cy + CTA_H / 2, C_ONACC);
-		gfx_text(d, f_title, act == RH_ACT_INSTALL ? "Install" : act == RH_ACT_DOWNLOAD ? "Download" : act == RH_ACT_UPDATE_NOW ? "Update" : "Uninstall", 44, cy + (CTA_H - gfx_font_h(f_title)) / 2, C_ONACC);
+		icon(d, dl ? IC_DOWNLOAD : rf ? IC_REFRESH : IC_TRASH, 26, cy + CTA_H / 2, C_ONACC);
+		gfx_text(d, f_title, act == RH_ACT_INSTALL ? "Install" : act == RH_ACT_DOWNLOAD ? "Download" : act == RH_ACT_UPDATE_NOW ? "Update" : act == RH_ACT_INSTALL_SOON ? "Preview install" : act == RH_ACT_UPDATE ? "Preview update" : "Uninstall", 44, cy + (CTA_H - gfx_font_h(f_title)) / 2, C_ONACC);
 		icon(d, IC_CHEV, 218, cy + CTA_H / 2, C_ONACC);
 		return;
 	}
@@ -551,7 +585,11 @@ static void draw_content(SDL_Surface *d)
 		for (i = 0; i < M->n_apps; i++) {
 			const rh_app *a = &M->apps[i];
 			y = CONT_Y + i * LIST_P - CUR.scroll;
-			if (y + LIST_RH > CONT_Y && y < CONT_B) list_row(d, y, i == CUR.sel, a->name, a->desc[0] ? a->desc : "No description");
+			if (y + LIST_RH > CONT_Y && y < CONT_B) {
+				char sub[160];   /* installed status comes from RetroHatch's own record; absent record = nothing claimed */
+				snprintf(sub, sizeof sub, "%s%s", inst_ver(i)[0] ? "Installed. " : "", a->desc[0] ? a->desc : "No description");
+				list_row(d, y, i == CUR.sel, a->name, sub);
+			}
 		}
 		if (!M->n_apps) empty_state(d, IC_GRID_L, "No catalog entries", "No app files were found in the local catalog.");
 		break;
@@ -611,9 +649,13 @@ void rh_ui_draw(SDL_Surface *scr)
 		if (has_cta()) draw_action(scr, app_action(CUR.app));
 		gfx_img(scr, img_header, 0, 0);
 		gfx_fill(scr, 0, HDR_H, W, 1, C_LINE);
-		gfx_text_c(scr, f_title, screen_title(), W / 2, (HDR_H - gfx_font_h(f_title)) / 2, C_TXT);
+		{
+			char t[48]; int dev = M->dev_fixture && (CUR.s == RH_S_DISCOVER || CUR.s == RH_S_DETAILS || CUR.s == RH_S_INSTALLED || CUR.s == RH_S_UPDATES || CUR.s == RH_S_CONFIRM);
+			snprintf(t, sizeof t, "%s%s", screen_title(), dev ? " [DEV]" : "");   /* fixture entries are never shown as real apps */
+			gfx_text_c(scr, f_title, t, W / 2, (HDR_H - gfx_font_h(f_title)) / 2, C_TXT);
+		}
 	}
-	a_ok = CUR.s == RH_S_HOME || CUR.s == RH_S_CONFIRM || CUR.s == RH_S_RESULT || (CUR.s == RH_S_DETAILS && (app_action(CUR.app) == RH_ACT_INSTALL || app_action(CUR.app) == RH_ACT_UPDATE_NOW || app_action(CUR.app) == RH_ACT_UNINSTALL || app_action(CUR.app) == RH_ACT_DOWNLOAD)) || (CUR.s == RH_S_INFO && CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) || (is_list() && list_n() && (CUR.s == RH_S_SETTINGS || row_app(CUR.sel) >= 0));
+	a_ok = CUR.s == RH_S_HOME || CUR.s == RH_S_CONFIRM || CUR.s == RH_S_RESULT || (CUR.s == RH_S_DETAILS && act_focus(app_action(CUR.app))) || (CUR.s == RH_S_INFO && CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) || (is_list() && list_n() && (CUR.s == RH_S_SETTINGS || row_app(CUR.sel) >= 0));
 	gfx_fill(scr, 8, HINT_Y - 2, 224, 1, C_LINE);
 	hint(scr, 22, "A", a_ok ? C_GREEN : C_DIS, "Select", a_ok ? C_TXT : C_DIS);
 	hint(scr, 178, "B", depth && CUR.s != RH_S_WORKING ? C_ACC : C_DIS, "Back", depth && CUR.s != RH_S_WORKING ? C_TXT : C_DIS);

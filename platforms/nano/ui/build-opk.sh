@@ -17,7 +17,7 @@ EXTRA=""; DEFS=""; LIBS=""; ICON=retrohatch
 MC="$ROOT/vendor/monocypher"
 if [ "${TEST:-0}" = 1 ]; then NAME=RetroHatchTest; RUN=run-test.sh; DESK=retrohatchtest
 elif [ "${DEV:-0}" = 1 ]; then NAME=RetroHatchDev; RUN=run.sh; DESK=retrohatchdev; ICON=retrohatchdev
-	EXTRA="$ROOT/ui/rh_ops.c $ROOT/ui/rh_source.c $ROOT/platforms/nano/rh_install.c $ROOT/core/sha256.c $ROOT/core/rh_net.c $ROOT/core/rh_catalog.c $ROOT/core/rh_catalog_state.c $MC/monocypher.c $MC/monocypher-ed25519.c"
+	EXTRA="$ROOT/ui/rh_ops.c $ROOT/ui/rh_source.c $ROOT/core/rh_net.c $ROOT/core/rh_catalog.c $ROOT/core/rh_catalog_state.c $MC/monocypher.c $MC/monocypher-ed25519.c"
 	DEFS="-DRH_DEV -I$HERE"   # trusted_keys_dev.h: the DEV signing key's PUBLIC half only
 	LIBS="$SYSROOT/usr/lib/libmbedtls.a $SYSROOT/usr/lib/libmbedx509.a $SYSROOT/usr/lib/libmbedcrypto.a"
 	DEVCAT=${DEVCAT:-$ROOT/build/dev-catalog/bundled.pkg}   # signed with the DEV key: python tools/make_dev_catalog.py --key ...
@@ -29,7 +29,8 @@ rm -rf "$PKG"; mkdir -p "$PKG/assets" "$PKG/catalog/apps" "$PKG/catalog/devices"
 "$CC" -std=gnu99 -Os -Wall -Wextra -Wno-format-truncation -D_GNU_SOURCE=1 -D_REENTRANT $DEFS \
 	-I"$SYSROOT/usr/include/SDL" \
 	-o "$PKG/retrohatch" \
-	"$ROOT/ui/rh_ui_main.c" "$ROOT/ui/rh_ui.c" "$ROOT/ui/rh_gfx.c" "$ROOT/ui/rh_model.c" "$ROOT/ui/rh_json.c" $EXTRA \
+	"$ROOT/ui/rh_ui_main.c" "$ROOT/ui/rh_ui.c" "$ROOT/ui/rh_gfx.c" "$ROOT/ui/rh_model.c" "$ROOT/ui/rh_json.c" \
+	"$ROOT/platforms/nano/rh_install.c" "$ROOT/core/sha256.c" $EXTRA \
 	-lSDL_image -lSDL $LIBS -lm -lpthread
 "$STRIP" "$PKG/retrohatch"
 

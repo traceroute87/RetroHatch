@@ -2,6 +2,7 @@
  * Reads an rh_model; knows nothing about installing. */
 #ifndef RH_UI_H
 #define RH_UI_H
+#include <stddef.h>
 #include <SDL/SDL.h>
 #include "rh_model.h"
 
@@ -53,6 +54,11 @@ typedef struct {
 	const char *(*net_status)(void);                             /* last network result for Settings > Network Status */
 } rh_ui_ops;
 void rh_ui_set_ops(const rh_ui_ops *ops);
+/* Optional install PLANNER (read-only). Given the catalog names it returns the file an install would write, or why it would be
+ * refused: 1 = target filled, 0 = refused, why = short reason (see rh_plan_target in rh_install.c). With a planner set and no ops,
+ * a verified app's action bar opens an "Install Preview" screen: it shows the plan and changes nothing. */
+typedef int (*rh_plan_fn)(const char *app_id, const char *version, const char *dest_name, char *target, size_t n, char *why, size_t wn);
+void rh_ui_set_planner(rh_plan_fn plan);
 void rh_ui_progress(uint64_t done, uint64_t total);   /* download progress for the "working" screen (total 0 = unknown) */
 int rh_ui_busy(void);             /* install running: ignore quit/power keys until it ends */
 int rh_ui_run_pending(void);      /* call after drawing: runs a queued install, returns 1 if it ran (redraw) */

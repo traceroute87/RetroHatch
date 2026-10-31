@@ -64,5 +64,8 @@ rh_err rh_recover(const rh_cfg *c);
  * unmanaged, mounted or unknown-mount-state targets are refused. */
 rh_err rh_uninstall(const rh_cfg *c, const char *app_id, const char *dest_name);
 const char *rh_strerr(rh_err e);
+/* Where rh_install() would put dest_name on the Nano, after the same name checks and with no file access (a preview).
+ * 1 = target filled; 0 = rh_install() would refuse these names, why = short reason. */
+int rh_plan_target(const char *app_id, const char *version, const char *dest_name, char *target, size_t n, char *why, size_t wn);
 
 #endif
