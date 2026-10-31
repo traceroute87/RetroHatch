@@ -22,7 +22,7 @@ static const char *IC_FILE[IC_N] = {
 	"ic_chevron_16", "ic_search_20", "ic_grid_20", "ic_refresh_20", "ic_gear_20", "ic_lock_24", "ic_download_20",
 	"ic_database_20", "ic_wifi_20", "ic_info_20", "ic_phone_20", "ic_package_28", "ic_grid_48", "ic_refresh_48", "ic_check_20", "ic_check_48", "ic_alert_48", "ic_trash_20" };
 
-static SDL_Surface *ic[IC_N], *img_header, *img_home, *img_logo;
+static SDL_Surface *ic[IC_N], *img_header, *img_home, *img_logo, *img_mark;
 static rh_font *f_body, *f_title;
 static const rh_model *M;
 static const rh_ui_ops *OPS;
@@ -58,15 +58,16 @@ int rh_ui_init(const char *dir, const rh_model *m)
 	snprintf(p, sizeof p, "%s/header.png", dir); img_header = gfx_img_load(p);
 	snprintf(p, sizeof p, "%s/home_bg.png", dir); img_home = gfx_img_load(p);
 	snprintf(p, sizeof p, "%s/logo.png", dir); img_logo = gfx_img_load(p);
-	return f_body && img_header && img_home && img_logo ? 0 : -1;
+	snprintf(p, sizeof p, "%s/mark.png", dir); img_mark = gfx_img_load(p);
+	return f_body && img_header && img_home && img_logo && img_mark ? 0 : -1;
 }
 
 void rh_ui_free(void)
 {
 	int i;
 	for (i = 0; i < IC_N; i++) { SDL_FreeSurface(ic[i]); ic[i] = NULL; }
-	SDL_FreeSurface(img_header); SDL_FreeSurface(img_home); SDL_FreeSurface(img_logo);
-	img_header = img_home = img_logo = NULL;
+	SDL_FreeSurface(img_header); SDL_FreeSurface(img_home); SDL_FreeSurface(img_logo); SDL_FreeSurface(img_mark);
+	img_header = img_home = img_logo = img_mark = NULL;
 	if (f_title != f_body) gfx_font_free(f_title);
 	gfx_font_free(f_body); f_body = f_title = NULL;
 }
@@ -259,6 +260,16 @@ static void empty_state_c(SDL_Surface *d, int ico, rh_rgb col, const char *title
 static void empty_state(SDL_Surface *d, int ico, const char *title, const char *body)
 {
 	empty_state_c(d, ico, C_GREEN, title, body);
+}
+
+/* nothing-to-show states (no apps, none installed, no updates): the RetroHatch mark instead of a generic glyph */
+static void empty_state_mark(SDL_Surface *d, const char *title, const char *body)
+{
+	int y = CONT_Y + 32;
+	gfx_img(d, img_mark, 120 - img_mark->w / 2, y - 4);
+	gfx_text_c(d, f_title, title, 120, y + 62, C_TXT);
+	y += 86;
+	paragraph(d, 20, &y, 200, body, C_TXT2, 1);
 }
 
 /* ---- install flow screens (reachable only when an ops provider is set) ---- */
@@ -591,7 +602,7 @@ static void draw_content(SDL_Surface *d)
 				list_row(d, y, i == CUR.sel, a->name, sub);
 			}
 		}
-		if (!M->n_apps) empty_state(d, IC_GRID_L, "No catalog entries", "No app files were found in the local catalog.");
+		if (!M->n_apps) empty_state_mark(d, "No catalog entries", "No app files were found in the local catalog.");
 		break;
 	case RH_S_INSTALLED:
 		for (i = 0; i < M->n_inst; i++) {
@@ -600,7 +611,7 @@ static void draw_content(SDL_Surface *d)
 			y = CONT_Y + i * LIST_P - CUR.scroll;
 			if (y + LIST_RH > CONT_Y && y < CONT_B) list_row(d, y, i == CUR.sel, a >= 0 ? M->apps[a].name : M->inst[i].id, sub);
 		}
-		if (!M->n_inst) empty_state(d, IC_GRID_L, "No installed applications", "You haven't installed any applications with RetroHatch yet.");
+		if (!M->n_inst) empty_state_mark(d, "No installed applications", "You haven't installed any applications with RetroHatch yet.");
 		break;
 	case RH_S_UPDATES:
 		for (i = 0; i < M->n_upd; i++) {
@@ -609,7 +620,7 @@ static void draw_content(SDL_Surface *d)
 			y = CONT_Y + i * LIST_P - CUR.scroll;
 			if (y + LIST_RH > CONT_Y && y < CONT_B) list_row(d, y, i == CUR.sel, M->apps[a].name, sub);
 		}
-		if (!M->n_upd) empty_state(d, IC_REFRESH_L, "No updates available", "All of your applications are up to date.");
+		if (!M->n_upd) empty_state_mark(d, "No updates available", "All of your applications are up to date.");
 		break;
 	case RH_S_SETTINGS: {
 		static const int I[4] = {IC_PHONE, IC_DATABASE, IC_WIFI, IC_INFO};

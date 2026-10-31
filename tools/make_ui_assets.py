@@ -27,11 +27,8 @@ for name, (icon, sizes) in ICONS.items():
         subprocess.check_call([RESVG, "-w", str(sz), "-h", str(sz), p, os.path.join(OUT, "ic_%s_%d.png" % (name, sz))])
 shutil.rmtree(tmp)
 
-# header: crop the art out of its black letterbox, scale to 240 wide, take a 32px band,
-# darken the centre so cream titles stay readable
-src = Image.open(os.path.join(ROOT, "Header.png")).convert("RGB")
-bb = src.point(lambda v: 255 if v > 12 else 0).convert("L").getbbox()
-art = src.crop((0, bb[1], src.width, bb[3]))
+# header: the identity artwork (Header2, same illustration as the home hero) scaled to 240 wide, a 32px band through sun glow,
+# mountains and tree edges, darkened in the centre so cream titles stay readable (was the pixel-art Header.png, which matched nothing else)
 def darken(im, lo, width):
     px = im.load(); w, h = im.size
     for x in range(w):
@@ -40,9 +37,9 @@ def darken(im, lo, width):
         for y in range(h):
             r, g, b = px[x, y][:3]; px[x, y] = (int(r * f), int(g * f), int(b * f))
     return im
-hdr = art.resize((240, round(art.height * 240 / art.width)), Image.LANCZOS)
-top = (hdr.height - 32) // 2
-darken(hdr.crop((0, top, 240, top + 32)), 0.30, 0.45).save(os.path.join(OUT, "header.png"))
+hdr = Image.open(os.path.join(ROOT, "Header2.png")).convert("RGB").resize((240, 240), Image.LANCZOS)
+HDR_TOP = 70
+darken(hdr.crop((0, HDR_TOP, 240, HDR_TOP + 32)), 0.30, 0.45).save(os.path.join(OUT, "header.png"))
 
 # home hero: Header2 (square) scaled to 240 wide, 114px band through sun + mountains + forest, slightly dimmed
 h2 = Image.open(os.path.join(ROOT, "Header2.png")).convert("RGB")
@@ -51,6 +48,12 @@ ImageEnhance.Brightness(h2.crop((0, 22, 240, 22 + 121))).enhance(0.8).save(os.pa
 
 # logo: square, aspect kept, no crop
 Image.open(os.path.join(ROOT, "Retro_Hatch.png")).convert("RGBA").resize((120, 120), Image.LANCZOS).save(os.path.join(OUT, "logo.png"))
+
+# empty-state mark: Retro_Hatch2 (logo without wordmark), trimmed to its artwork, centred on a square, 56x56
+m2 = Image.open(os.path.join(ROOT, "Retro_Hatch2.png")).convert("RGBA")
+m2 = m2.crop(m2.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox())
+side = max(m2.size); msq = Image.new("RGBA", (side, side), (0, 0, 0, 0)); msq.paste(m2, ((side - m2.width) // 2, (side - m2.height) // 2))
+msq.resize((56, 56), Image.LANCZOS).save(os.path.join(OUT, "mark.png"))
 
 # launcher icon: Retro_Hatch2 (simplified mark), trimmed to its artwork, centred on a square, 32x32 + light sharpen
 ic2 = Image.open(os.path.join(ROOT, "Retro_Hatch2.png")).convert("RGBA")
