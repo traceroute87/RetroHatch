@@ -42,6 +42,39 @@ static int app_cmp(const void *a, const void *b)
 	return strcmp(x->name, y->name);
 }
 
+static const char *const KW[RH_CAT_N][22] = {
+	[RH_CAT_GAMES] = {"game", "games", "minigame", "minigames", "puzzle", "puzzles", "arcade", "platformer", "roguelike", "rpg", "shooter", "sokoban", "sudoku", NULL},
+	[RH_CAT_EMU] = {"emulator", "emulators", "emulation", "libretro", "retroarch", NULL},
+	[RH_CAT_MEDIA] = {"music", "audio", "video", "movie", "movies", "mp3", "podcast", "radio", "photo", "photos", "media", "ebook", NULL},
+	[RH_CAT_UTIL] = {"utility", "utilities", "viewer", "editor", "manager", "calculator", "clock", "terminal", "launcher", "backup", "converter", NULL},
+	[RH_CAT_ENGINE] = {"engine", "engines", "runtime", "library", "lib", "libs", "framework", "sdk", "toolkit", "toolchain", "tool", "tools", "compiler", "interpreter", "devkit", NULL},
+};
+static const char *const CAT_NAME[RH_CAT_N] = {"All", "Games", "Emulators", "Media", "Utilities", "Engines & Tools", "Other"};
+const char *rh_cat_name(rh_cat c) { return (unsigned)c < RH_CAT_N ? CAT_NAME[c] : CAT_NAME[RH_CAT_OTHER]; }
+
+static unsigned cat_bits(const char *s)   /* bit c set when a whole word of s is a keyword of category c */
+{
+	char tok[24]; size_t n = 0; int big = 0; unsigned bits = 0;
+	if (!s) return 0;
+	for (;; s++) {
+		if (*s && isalnum((unsigned char)*s)) { if (n < sizeof tok - 1) tok[n++] = (char)tolower((unsigned char)*s); else big = 1; continue; }
+		if (n && !big) {
+			int c, i; tok[n] = 0;
+			for (c = 1; c < RH_CAT_OTHER; c++) for (i = 0; KW[c][i]; i++) if (!strcmp(tok, KW[c][i])) bits |= 1u << c;
+		}
+		n = 0; big = 0;
+		if (!*s) break;
+	}
+	return bits;
+}
+
+rh_cat rh_categorize(const char *name, const char *desc, const char *topics)
+{
+	unsigned b = cat_bits(name) | cat_bits(desc) | cat_bits(topics); int c;
+	for (c = 1; c < RH_CAT_OTHER; c++) if (b == 1u << c) return (rh_cat)c;
+	return RH_CAT_OTHER;
+}
+
 static void load_app(rh_model *m, const rj *j, const char *target)
 {
 	rh_app *a; const rj *arts, *art, *k; const char *s;
@@ -50,6 +83,7 @@ static void load_app(rh_model *m, const rj *j, const char *target)
 	memset(a, 0, sizeof *a);
 	CP(a->id, rj_str(j, "id", "")); CP(a->name, rj_str(j, "name", ""));
 	CP(a->desc, rj_str(j, "description", "")); CP(a->developer, rj_str(j, "developer", ""));
+	a->cat = rh_categorize(a->name, a->desc, NULL);
 	CP(a->license, rj_str(j, "license", "")); CP(a->source, rj_str(j, "source", "")); CP(a->category, rj_str(j, "category", ""));
 	CP(a->status, "unavailable");
 	arts = rj_get(j, "artifacts");
@@ -179,6 +213,55 @@ void rh_model_load(rh_model *m, const char *dir, const char *state_dir)
 	qsort(m->apps, m->n_apps, sizeof m->apps[0], app_cmp);
 	load_installed(m, state_dir);
 	load_devinfo(&m->di);
+}
+
+static const char *const CAT_ID[RH_CAT_N] = {"", "games", "emulators", "media", "utilities", "engines", "other"};
+static int cat_from_id(const char *s)   /* RH_CAT_* for a snapshot category id, 0 when unknown (never RH_CAT_ALL) */
+{
+	int c;
+	for (c = 1; c < RH_CAT_N; c++) if (!strcmp(s, CAT_ID[c])) return c;
+	return 0;
+}
+
+void rh_model_load_candidates(rh_model *m, const char *path)
+{
+	char *txt = slurp(path); rj *j; const rj *k, *c;
+	m->n_cands = 0;
+	if (!txt) return;
+	j = rj_parse(txt); free(txt);
+	if (!j) return;
+	if ((k = rj_get(j, "candidates")))
+		for (c = k->kid; c && m->n_cands < RH_MAX_CANDS; c = c->next) {
+			rh_cand *x = &m->cands[m->n_cands]; const rj *p = rj_get(c, "package"), *cl = rj_get(c, "claim"), *n; int i, dup = 0;
+			if (strcmp(rj_str(c, "approval", ""), "unapproved") || strcmp(rj_str(c, "hardware_test", ""), "none")) continue;   /* anything else is not ours to show */
+			memset(x, 0, sizeof *x);
+			CP(x->name, rj_str(c, "name", "")); CP(x->desc, rj_str(c, "description", ""));
+			if (strlen(rj_str(c, "description", "")) >= sizeof x->desc) strcpy(x->desc + sizeof x->desc - 4, "...");   /* cut text says so */
+			CP(x->version, rj_str(c, "version", ""));
+			CP(x->repo, rj_str(c, "repo", "")); CP(x->source, rj_str(c, "source", "")); CP(x->license, rj_str(c, "license", ""));
+			CP(x->last_activity, rj_str(c, "last_activity", ""));
+			if (!x->name[0] || !x->repo[0]) continue;
+			for (i = 0; i < m->n_cands; i++) dup |= !strcmp(m->cands[i].repo, x->repo);
+			for (i = 0; i < m->n_apps; i++) dup |= x->source[0] && !strcmp(m->apps[i].source, x->source);   /* already a catalog entry */
+			if (dup) continue;
+			if (p) {
+				CP(x->pkg_name, rj_str(p, "name", "")); x->zipped = !strcmp(rj_str(p, "container", ""), "zip");
+				x->sig_ok = !strcmp(rj_str(p, "format", ""), "opk") && !strcmp(rj_str(p, "signature", ""), "squashfs");
+				if ((n = rj_get(p, "size")) && n->t == '#' && n->num > 0) x->size = (uint64_t)n->num;
+				if ((n = rj_get(p, "more_packages")) && n->t == '#' && n->num > 0) x->more = (int)n->num;
+			}
+			{
+				char tb[256] = ""; const rj *t = rj_get(c, "topics"); size_t tl = 0;
+				for (t = t ? t->kid : NULL; t && tl + 1 < sizeof tb; t = t->next) if (t->t == 's' && t->s) tl += snprintf(tb + tl, sizeof tb - tl, "%s ", t->s);
+				x->cat = rh_categorize(x->name, rj_str(c, "description", ""), tb);   /* full description, not the possibly cut copy */
+				if ((i = cat_from_id(rj_str(c, "category", ""))) && rj_str(c, "category_basis", "")[0]) {   /* reviewed category wins, only with its evidence */
+					x->cat = (rh_cat)i; CP(x->cat_basis, rj_str(c, "category_basis", ""));
+				}
+			}
+			if (cl) { CP(x->claim, rj_str(cl, "kind", "")); CP(x->claim_text, rj_str(cl, "text", "")); CP(x->claim_where, rj_str(cl, "where", "")); }
+			m->n_cands++;
+		}
+	rj_free(j);
 }
 
 void rh_model_load_signed(rh_model *m, const char *index, size_t len, const char *src, unsigned serial, const char *expires,

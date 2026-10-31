@@ -1,0 +1,9 @@
+{
+ "schema": 1,
+ "note": "Reviewed categories for candidates the word lists cannot decide. Each entry cites quotes that tools/make_candidate_snapshot.py must find in the cached discovery data (repository description, topics, README evidence or package names); a quote it cannot find stops the run. Entries not listed here keep the category derived from their own text, or Other.",
+ "reviewed": {
+  "joyrider3774/sokoban_funkey": {"category": "games", "evidence": ["2d-game", "sokoban-game", "remake-games"]},
+  "DankMiimer/nanocraft": {"category": "games", "evidence": ["Minecraft Pocket Edition", "a grass field with a tree"]},
+  "sdhizumi/picoarch": {"category": "emulators", "evidence": ["picoarch-gambatte", "picoarch-fceumm", "picoarch-pcsx_rearmed"]}
+ }
+}

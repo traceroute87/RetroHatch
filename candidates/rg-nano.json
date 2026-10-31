@@ -1,0 +1,335 @@
+{
+ "schema": 1,
+ "device": "rg-nano",
+ "status": "UNAPPROVED local candidates, not part of the signed catalog",
+ "from": {
+  "results": "discovery-results.json",
+  "as_of": "2026-10-26"
+ },
+ "candidates": [
+  {
+   "id": "j2mefunkeyrgnano",
+   "name": "j2me-funkey-rgnano",
+   "description": "phoneME-based J2ME runtime for FunKey S / RG Nano",
+   "topics": [],
+   "version": "1.3.0",
+   "repo": "slrmoon/j2me-funkey-rgnano",
+   "source": "https://github.com/slrmoon/j2me-funkey-rgnano",
+   "license": "unknown",
+   "last_activity": "2026-10-24",
+   "package": {
+    "name": "pm.opk",
+    "url": "https://github.com/slrmoon/j2me-funkey-rgnano/releases/download/1.3.0/pm.opk",
+    "size": 3645440,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "rg-nano",
+    "text": "phoneME-based J2ME runtime for FunKey S / RG Nano",
+    "where": "description"
+   },
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "nanocraft",
+   "name": "NanoCraft",
+   "description": "Minecraft Pocket Edition 0.8.1 on the Anbernic RG Nano. Software-rendered, no GPU. You supply your own APK.",
+   "topics": [
+    "anbernic",
+    "arm",
+    "funkey-os",
+    "handheld",
+    "homebrew",
+    "minecraft",
+    "minecraft-pocket-edition",
+    "opk",
+    "retro-handheld",
+    "rg-nano",
+    "software-rendering"
+   ],
+   "version": "v1.0.13",
+   "repo": "DankMiimer/nanocraft",
+   "source": "https://github.com/DankMiimer/nanocraft",
+   "license": "GPL-3.0",
+   "last_activity": "2026-09-06",
+   "package": {
+    "name": "NanoCraft_funkey-s.opk",
+    "url": "https://github.com/DankMiimer/nanocraft/releases/download/v1.0.13/nanocraft-v1.0.13-rgnano.zip",
+    "size": 622592,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "zip",
+    "more_packages": 1
+   },
+   "claim": {
+    "kind": "rg-nano",
+    "text": "funkey-os",
+    "where": "topics"
+   },
+   "category": "games",
+   "category_basis": "Minecraft Pocket Edition; a grass field with a tree",
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "funkoban",
+   "name": "Funkoban",
+   "description": "A Sokoban Engine for funkey-s / RG-Nano",
+   "topics": [
+    "2d",
+    "2d-game",
+    "cpp",
+    "funkey-s",
+    "funkeys",
+    "remake",
+    "remake-games",
+    "retro",
+    "retrogame",
+    "rg-nano",
+    "rgnano",
+    "sdl"
+   ],
+   "version": "v1.1",
+   "repo": "joyrider3774/sokoban_funkey",
+   "source": "https://github.com/joyrider3774/sokoban_funkey",
+   "license": "MIT",
+   "last_activity": "2026-03-27",
+   "package": {
+    "name": "Funkoban.opk",
+    "url": "https://github.com/joyrider3774/sokoban_funkey/releases/download/v1.1/Funkoban.opk",
+    "size": 8531968,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "rg-nano",
+    "text": "A Sokoban Engine for funkey-s / RG-Nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "2d-game; sokoban-game; remake-games",
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "cglpsdl1",
+   "name": "Cglpsdl1",
+   "description": "crisp game lib portable for funkey",
+   "topics": [
+    "arcade",
+    "crisp-game-lib",
+    "funkey-s",
+    "funkeys",
+    "games",
+    "library",
+    "rg-nano",
+    "rgnano",
+    "sdl"
+   ],
+   "version": "v4.0",
+   "repo": "joyrider3774/crisp-game-lib-portable-funkey",
+   "source": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey",
+   "license": "MIT",
+   "last_activity": "2025-12-13",
+   "package": {
+    "name": "Cglpsdl1.opk",
+    "url": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/download/v4.0/Cglpsdl1.opk",
+    "size": 303104,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "rg-nano",
+    "text": "rg-nano",
+    "where": "topics"
+   },
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "picoarch",
+   "name": "picoarch",
+   "description": "Fork of the neonloop's picoarch. Build for FunKey-OS (I only tested with RG Nano). https://git.crowdedwood.com/picoarch/",
+   "topics": [],
+   "version": "build-231226",
+   "repo": "sdhizumi/picoarch",
+   "source": "https://github.com/sdhizumi/picoarch",
+   "license": "NOASSERTION",
+   "last_activity": "2023-12-26",
+   "package": {
+    "name": "picoarch.opk",
+    "url": "https://github.com/sdhizumi/picoarch/releases/download/build-231226/picoarch-funkey-s.zip",
+    "size": 57540608,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "zip",
+    "more_packages": 11
+   },
+   "claim": {
+    "kind": "rg-nano",
+    "text": "Build for FunKey-OS (I only tested with RG Nano)",
+    "where": "description"
+   },
+   "category": "emulators",
+   "category_basis": "picoarch-gambatte; picoarch-fceumm; picoarch-pcsx_rearmed",
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "xash3dfs",
+   "name": "XASH3DFS",
+   "description": "a port of xash 3d for the funkey s. ",
+   "topics": [],
+   "version": "xash3dfs",
+   "repo": "Sn3zee-cmds/XASH3DFS",
+   "source": "https://github.com/Sn3zee-cmds/XASH3DFS",
+   "license": "unknown",
+   "last_activity": "2026-09-14",
+   "package": {
+    "name": "XASH3DFS0.50.opk",
+    "url": "https://github.com/Sn3zee-cmds/XASH3DFS/releases/download/xash3dfs/XASH3DFS0.50.opk",
+    "size": 16420864,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "family",
+    "text": "a port of xash 3d for the funkey s.",
+    "where": "description"
+   },
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "meleelight",
+   "name": "meleelight",
+   "description": "",
+   "topics": [],
+   "version": "v1.0.1",
+   "repo": "chasemcdizzle/meleelight-funkey-s",
+   "source": "https://github.com/chasemcdizzle/meleelight-funkey-s",
+   "license": "NOASSERTION",
+   "last_activity": "2026-09-02",
+   "package": {
+    "name": "meleelight.opk",
+    "url": "https://github.com/chasemcdizzle/meleelight-funkey-s/releases/download/v1.0.1/meleelight.opk",
+    "size": 577536,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "family",
+    "text": "meleelight-funkey-s",
+    "where": "name"
+   },
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "sudokul",
+   "name": "SuDokuL",
+   "description": "Multiplatform Sudoku game, made with C++/SDL2",
+   "topics": [
+    "android",
+    "cpp",
+    "funkey-s",
+    "funkeys",
+    "game",
+    "game-development",
+    "gamecube",
+    "homebrew",
+    "linux",
+    "nintendo-switch",
+    "psp",
+    "sdl"
+   ],
+   "version": "v1.5",
+   "repo": "Mode8fx/SuDokuL",
+   "source": "https://github.com/Mode8fx/SuDokuL",
+   "license": "MIT",
+   "last_activity": "2026-06-05",
+   "package": {
+    "name": "SuDokuL-v1.5-funkey.opk",
+    "url": "https://github.com/Mode8fx/SuDokuL/releases/download/v1.5/SuDokuL-v1.5-funkey.opk",
+    "size": 913408,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "family",
+    "text": "android cpp funkey-s funkeys game game-development gamecube homebrew linux nintendo-switch psp sdl sdl2 sudoku switch visual-studio vita wii wii-u wiiu",
+    "where": "topics"
+   },
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "trispace",
+   "name": "TriSpace",
+   "description": "An Elite-like space game for the FunKey S.",
+   "topics": [],
+   "version": "1.1.0",
+   "repo": "robbi-blechdose/TriSpace",
+   "source": "https://github.com/robbi-blechdose/TriSpace",
+   "license": "AGPL-3.0",
+   "last_activity": "2026-01-01",
+   "package": {
+    "name": "TriSpace.opk",
+    "url": "https://github.com/robbi-blechdose/TriSpace/releases/download/1.1.0/TriSpace.opk",
+    "size": 3678208,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "family",
+    "text": "An Elite-like space game for the FunKey S.",
+    "where": "description"
+   },
+   "hardware_test": "none",
+   "approval": "unapproved"
+  },
+  {
+   "id": "keycraft",
+   "name": "KeyCraft",
+   "description": "A voxel/block building game for the FunKey S.",
+   "topics": [],
+   "version": "1.2.0",
+   "repo": "robbi-blechdose/KeyCraft",
+   "source": "https://github.com/robbi-blechdose/KeyCraft",
+   "license": "AGPL-3.0",
+   "last_activity": "2025-03-14",
+   "package": {
+    "name": "KeyCraft.opk",
+    "url": "https://github.com/robbi-blechdose/KeyCraft/releases/download/1.2.0/KeyCraft.opk",
+    "size": 4378624,
+    "format": "opk",
+    "signature": "squashfs",
+    "container": "",
+    "more_packages": 0
+   },
+   "claim": {
+    "kind": "family",
+    "text": "A voxel/block building game for the FunKey S.",
+    "where": "description"
+   },
+   "hardware_test": "none",
+   "approval": "unapproved"
+  }
+ ]
+}

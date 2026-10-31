@@ -11,7 +11,7 @@ static const rh_rgb C_BG = RGB(0x171B19), C_CARD = RGB(0x272721), C_ROW = RGB(0x
 	C_GREEN = RGB(0x82A779), C_LINE = RGB(0x494638), C_DIS = RGB(0x77786E), C_ERR = RGB(0xE87555);
 
 /* ---- layout (px) ---- */
-enum { W = 240, HDR_H = 32, CONT_Y = 36, CONT_B = 213, HINT_Y = 217,
+enum { W = 240, HDR_H = 32, CONT_Y = 36, CONT_B = 213, HINT_Y = 217, FILT_H = 26,   /* FILT_H: Discover category chip */
        LIST_RH = 42, LIST_P = 44,      /* app list row height / pitch */
        SET_RH = 38, SET_P = 41,        /* settings row */
        HOME_Y = 123, HOME_RH = 21, HOME_P = 22, CTA_H = 24, STEP = 16 };
@@ -29,6 +29,9 @@ static const rh_ui_ops *OPS;
 static rh_plan_fn PLAN;
 static int preview;   /* the open RH_S_CONFIRM screen is a read-only Install/Update Preview */
 static char blocked_why[40], res_msg[96];
+static int filt;                                                   /* Discover category filter: an rh_cat, RH_CAT_ALL = no filter */
+static struct { int cand, idx; } vis[RH_MAX_APPS + RH_MAX_CANDS];   /* Discover rows under the filter: approved app or candidate, index into the model */
+static int n_vis;
 static int res_rc, pending, cur_op;   /* cur_op: 0 install, 1 update, 2 uninstall, 3 download, 4 refresh catalog */
 static uint64_t prog_done, prog_total;
 void rh_ui_progress(uint64_t done, uint64_t total) { prog_done = done; prog_total = total; }
@@ -46,11 +49,27 @@ static frame st[8];
 static int depth;
 #define CUR (st[depth])
 
+/* ---- Discover category filter ---- */
+static void vis_build(void)
+{
+	int i; n_vis = 0;
+	for (i = 0; i < M->n_apps; i++) if (filt == RH_CAT_ALL || M->apps[i].cat == (rh_cat)filt) { vis[n_vis].cand = 0; vis[n_vis++].idx = i; }
+	for (i = 0; i < M->n_cands; i++) if (filt == RH_CAT_ALL || M->cands[i].cat == (rh_cat)filt) { vis[n_vis].cand = 1; vis[n_vis++].idx = i; }
+}
+static int cat_count(int c)
+{
+	int i, n = 0;
+	if (c == RH_CAT_ALL) return M->n_apps + M->n_cands;
+	for (i = 0; i < M->n_apps; i++) n += M->apps[i].cat == (rh_cat)c;
+	for (i = 0; i < M->n_cands; i++) n += M->cands[i].cat == (rh_cat)c;
+	return n;
+}
+
 /* ---- init ---- */
 int rh_ui_init(const char *dir, const rh_model *m)
 {
 	char p[512]; int i;
-	M = m; depth = 0; memset(st, 0, sizeof st);
+	M = m; depth = 0; memset(st, 0, sizeof st); filt = RH_CAT_ALL; vis_build();
 	snprintf(p, sizeof p, "%s/tarafi16.fnt", dir); f_body = gfx_font_load(p);
 	snprintf(p, sizeof p, "%s/15-KodeMono-SemiBold.fnt", dir); f_title = gfx_font_load(p);
 	if (!f_title) f_title = f_body;
@@ -103,15 +122,18 @@ static void app_tile(SDL_Surface *d, int x, int y, int s, int sel)
 	icon(d, IC_PACKAGE, x + s / 2, y + s / 2, C_GREEN);
 }
 
-static void list_row(SDL_Surface *d, int y, int sel, const char *name, const char *sub)
+static void list_row_tag(SDL_Surface *d, int y, int sel, const char *name, const char *tag, const char *sub)
 {
-	char b[80]; int hn = gfx_font_h(f_title), ty = y + (LIST_RH - (hn + 16)) / 2 + 1;
+	char b[80]; int hn = gfx_font_h(f_title), ty = y + (LIST_RH - (hn + 16)) / 2 + 1, tw = tag ? gfx_text_w(f_body, tag) + 8 : 0;
 	row_bg(d, 8, y, 224, LIST_RH, sel);
 	app_tile(d, 14, y + 5, 32, sel);
 	gfx_text(d, f_title, gfx_ellipsize(f_title, name, 150, b, sizeof b), 54, ty, sel ? C_ONACC : C_TXT);
-	gfx_text(d, f_body, gfx_ellipsize(f_body, sub, 150, b, sizeof b), 54, ty + hn, sel ? C_ONACC : C_TXT2);
+	if (tag) gfx_text(d, f_body, tag, 54, ty + hn, sel ? C_ONACC : C_ERR);   /* e.g. UNAPPROVED: never the same colour as plain text */
+	gfx_text(d, f_body, gfx_ellipsize(f_body, sub, 150 - tw, b, sizeof b), 54 + tw, ty + hn, sel ? C_ONACC : C_TXT2);
 	icon(d, IC_CHEV, 220, y + LIST_RH / 2, sel ? C_ONACC : C_TXT2);
 }
+
+static void list_row(SDL_Surface *d, int y, int sel, const char *name, const char *sub) { list_row_tag(d, y, sel, name, NULL, sub); }
 
 static void menu_row(SDL_Surface *d, int x, int y, int w, int h, int sel, int ico, const char *label)
 {
@@ -183,7 +205,7 @@ static int details(SDL_Surface *d, int y0, const rh_app *a)
 		y += h + 6;
 	}
 	snprintf(r[n].l, sizeof r[n].l, "Version"); snprintf(r[n++].v, sizeof r[0].v, "%s", a->version[0] ? a->version : "Not published");
-	snprintf(r[n].l, sizeof r[n].l, "Category"); snprintf(r[n++].v, sizeof r[0].v, "%c%s", a->category[0] >= 'a' && a->category[0] <= 'z' ? a->category[0] - 32 : a->category[0] ? a->category[0] : 'U', a->category[0] ? a->category + 1 : "nknown");
+	snprintf(r[n].l, sizeof r[n].l, "Category"); snprintf(r[n++].v, sizeof r[0].v, "%s", rh_cat_name(a->cat));
 	snprintf(r[n].l, sizeof r[n].l, "Device"); snprintf(r[n++].v, sizeof r[0].v, "%s", rh_model_dev_name(M, a->device));
 	snprintf(r[n].l, sizeof r[n].l, "Firmware"); snprintf(r[n++].v, sizeof r[0].v, "%s", or_unknown(a->firmware));
 	snprintf(r[n].l, sizeof r[n].l, "Compat"); snprintf(r[n++].v, sizeof r[0].v, "%c%s", a->compat[0] ? a->compat[0] & ~32 : 'U', a->compat[0] ? a->compat + 1 : "nknown");
@@ -196,6 +218,40 @@ static int details(SDL_Surface *d, int y0, const rh_app *a)
 		snprintf(note, sizeof note, "Catalog note: %s", a->reason);
 		paragraph(d, 10, &y, 220, note, C_TXT2, 0);
 	}
+	return y + 2 - y0;
+}
+
+/* UNAPPROVED candidate page: read-only facts from discovery. Package format, device claim, hardware test and approval are separate rows,
+ * first on the page; the description and the reading note follow the card. */
+static int cand_details(SDL_Surface *d, int y0, const rh_cand *c)
+{
+	int y = y0 + 4; kv r[14]; int n = 0; char b[96], ev[96], sz[24];
+#define CROW(L, ...) do { snprintf(r[n].l, sizeof r[n].l, "%s", L); snprintf(r[n++].v, sizeof r[0].v, __VA_ARGS__); } while (0)
+	gfx_rbox(d, 8, y, 40, 40, 5, C_LINE, C_CARD);
+	icon(d, IC_PACKAGE, 28, y + 20, C_GREEN);
+	gfx_text(d, f_title, gfx_ellipsize(f_title, c->name, 170, b, sizeof b), 56, y + 2, C_TXT);
+	gfx_text(d, f_title, "UNAPPROVED", 56, y + 22, C_ERR);
+	y += 48;
+	CROW("Package", "%s", c->sig_ok ? (c->zipped ? "OPK verified (ZIP)" : "OPK verified") : "Unknown");
+	CROW("Claim", "%s", !strcmp(c->claim, "rg-nano") ? "RG Nano" : !strcmp(c->claim, "family") ? "FunKey only" : "Unknown");
+	CROW("Hardware", "Not tested");
+	CROW("Approval", "UNAPPROVED");
+	if (!c->claim_text[0] || !strcmp(c->claim_text, "Unknown")) snprintf(ev, sizeof ev, "Unknown");
+	else snprintf(ev, sizeof ev, "%.64s%s (%s)", c->claim_text, strlen(c->claim_text) > 64 ? "..." : "", c->claim_where[0] ? c->claim_where : "unknown");
+	CROW("Evidence", "%s", ev);
+	CROW("Category", "%s", rh_cat_name(c->cat));
+	if (c->cat_basis[0]) CROW("Basis", "%s", c->cat_basis);
+	CROW("Release", "%s", c->version[0] ? c->version : "Unknown");
+	fmt_size(sz, sizeof sz, c->size); CROW("Size", "%s", sz);
+	CROW("Source", "%s", strncmp(c->source, "https://", 8) ? or_unknown(c->source) : c->source + 8);
+	CROW("File", "%s", or_unknown(c->pkg_name));
+	if (c->more) CROW("Also", "%d more in repo", c->more);
+	CROW("License", "%s", or_unknown(c->license));
+	CROW("Updated", "%s", or_unknown(c->last_activity));
+	y += kv_card(d, y, r, n, C_TXT) + 8;
+	paragraph(d, 10, &y, 220, c->desc[0] ? c->desc : "No description. Unknown.", C_TXT, 0);
+	y += 4;
+	paragraph(d, 10, &y, 220, "Verified means the OPK file format was seen, not that it is safe or works. Claim is the project's own words. Read-only: RetroHatch cannot install or download this.", C_TXT2, 0);
 	return y + 2 - y0;
 }
 
@@ -374,7 +430,7 @@ static int list_n(void)
 {
 	switch (CUR.s) {
 	case RH_S_HOME: case RH_S_SETTINGS: return 4;
-	case RH_S_DISCOVER: return M->n_apps;
+	case RH_S_DISCOVER: return n_vis;
 	case RH_S_INSTALLED: return M->n_inst;
 	case RH_S_UPDATES: return M->n_upd;
 	default: return 0;
@@ -424,15 +480,18 @@ int rh_ui_run_pending(void)
 	else if (cur_op == 4) res_rc = OPS->refresh_catalog ? OPS->refresh_catalog(res_msg, sizeof res_msg) : 1;
 	else if (cur_op == 3) res_rc = OPS->download ? OPS->download(&M->apps[CUR.app], res_msg, sizeof res_msg) : 1;
 	else res_rc = (cur_op == 2 ? OPS->uninstall : cur_op ? OPS->update : OPS->install)(&M->apps[CUR.app], res_msg, sizeof res_msg);
-	if (OPS && OPS->refresh) OPS->refresh();
+	if (OPS && OPS->refresh) { OPS->refresh(); vis_build(); }   /* the model was reloaded: row indices changed */
 	CUR.s = RH_S_RESULT;
 	return 1;
 }
-static int view_h(void) { return CONT_B - CONT_Y - (has_cta() ? CTA_H + 4 : 0); }
+/* top of the scrolling content: Discover carries the category chip above its rows (only when there is anything to filter) */
+static int ctop(void) { return CONT_Y + (CUR.s == RH_S_DISCOVER && M->n_apps + M->n_cands ? FILT_H : 0); }
+static int view_h(void) { return CONT_B - ctop() - (has_cta() ? CTA_H + 4 : 0); }
 
 static int total_h(void)
 {
 	if (CUR.s == RH_S_DETAILS) return details(NULL, 0, &M->apps[CUR.app]);
+	if (CUR.s == RH_S_CAND) return cand_details(NULL, 0, &M->cands[CUR.app]);
 	if (CUR.s == RH_S_INFO) return info_page(NULL, 0, CUR.info);
 	if (is_list()) return list_n() * row_p();
 	return 0;
@@ -458,7 +517,7 @@ static void go(rh_screen s, rh_info info, int app)
 static int row_app(int i)
 {
 	switch (CUR.s) {
-	case RH_S_DISCOVER: return i;
+	case RH_S_DISCOVER: return vis[i].cand ? -1 : vis[i].idx;   /* candidates have their own read-only page */
 	case RH_S_INSTALLED: return M->inst[i].app;
 	case RH_S_UPDATES: return M->inst[M->upd[i]].app;
 	default: return -1;
@@ -477,12 +536,21 @@ void rh_ui_key(rh_key k)
 		return;
 	}
 	if (CUR.s == RH_S_RESULT) { if (k == RH_K_A && depth) depth--; return; }
+	if (CUR.s == RH_S_DISCOVER && (k == RH_K_LEFT || k == RH_K_RIGHT) && M->n_apps + M->n_cands) {   /* LEFT/RIGHT: previous/next category, wrapping */
+		int was_c = n ? vis[CUR.sel].cand : 0, was_i = n ? vis[CUR.sel].idx : -1, i;
+		filt = (filt + (k == RH_K_RIGHT ? 1 : RH_CAT_N - 1)) % RH_CAT_N;
+		vis_build();
+		CUR.sel = 0; CUR.scroll = 0;
+		for (i = 0; i < n_vis; i++) if (vis[i].cand == was_c && vis[i].idx == was_i) CUR.sel = i;   /* stay on the same entry when it is still listed */
+		if (n_vis) ensure_visible();
+		return;
+	}
 	if (k == RH_K_UP || k == RH_K_DOWN) {
 		int dn = k == RH_K_DOWN;
 		if (CUR.s == RH_S_HOME || is_list()) {
 			if (n) CUR.sel += dn ? (CUR.sel < n - 1) : -(CUR.sel > 0);
 			if (CUR.s != RH_S_HOME) ensure_visible();
-		} else if (CUR.s == RH_S_DETAILS || CUR.s == RH_S_INFO) {
+		} else if (CUR.s == RH_S_DETAILS || CUR.s == RH_S_INFO || CUR.s == RH_S_CAND) {
 			CUR.scroll += dn ? STEP : -STEP;
 			if (CUR.scroll > max_scroll()) CUR.scroll = max_scroll();
 			if (CUR.scroll < 0) CUR.scroll = 0;
@@ -498,6 +566,7 @@ void rh_ui_key(rh_key k)
 		break;
 	case RH_S_DISCOVER: case RH_S_INSTALLED: case RH_S_UPDATES:
 		if (n && row_app(CUR.sel) >= 0) go(RH_S_DETAILS, 0, row_app(CUR.sel));
+		else if (CUR.s == RH_S_DISCOVER && n && vis[CUR.sel].cand) go(RH_S_CAND, 0, vis[CUR.sel].idx);
 		break;
 	case RH_S_DETAILS:
 		{ rh_action act = app_action(CUR.app);
@@ -519,8 +588,8 @@ void rh_ui_view_get(rh_ui_view *v)
 	v->result = res_rc;
 	if (CUR.s == RH_S_HOME) v->sel_visible = 1;
 	else if (is_list() && v->count) {
-		int top = CONT_Y + CUR.sel * row_p() - CUR.scroll;
-		v->sel_visible = top >= CONT_Y && top + row_h() <= CONT_B;
+		int top = ctop() + CUR.sel * row_p() - CUR.scroll;
+		v->sel_visible = top >= ctop() && top + row_h() <= CONT_B;
 	} else v->sel_visible = 1;
 }
 
@@ -530,6 +599,7 @@ static const char *screen_title(void)
 	switch (CUR.s) {
 	case RH_S_DISCOVER: return "Discover";
 	case RH_S_DETAILS: return "App Details";
+	case RH_S_CAND: return "Candidate";
 	case RH_S_INSTALLED: return "Installed";
 	case RH_S_UPDATES: return "Updates";
 	case RH_S_SETTINGS: return "Settings";
@@ -553,8 +623,8 @@ static void scrollbar(SDL_Surface *d, int total, int vh, int scroll)
 	int th;
 	if (total <= vh) return;
 	th = vh * vh / total; if (th < 12) th = 12;
-	gfx_fill(d, 235, CONT_Y, 3, vh, C_CARD);
-	gfx_fill(d, 235, CONT_Y + (vh - th) * scroll / (total - vh), 3, th, C_TXT2);
+	gfx_fill(d, 235, ctop(), 3, vh, C_CARD);
+	gfx_fill(d, 235, ctop() + (vh - th) * scroll / (total - vh), 3, th, C_TXT2);
 }
 
 static void draw_home(SDL_Surface *d)
@@ -588,21 +658,37 @@ static void draw_action(SDL_Surface *d, rh_action act)
 	gfx_text(d, f_title, A[act].txt ? A[act].txt : blocked_why, 44, cy + (CTA_H - gfx_font_h(f_title)) / 2, tx_c);
 }
 
+/* category chip: < Games (3) >, LEFT/RIGHT change it; counts include approved apps and unapproved candidates */
+static void draw_filter(SDL_Surface *d)
+{
+	char b[48]; int y = CONT_Y + 1, ty = y + (22 - gfx_font_h(f_title)) / 2;
+	snprintf(b, sizeof b, "%s (%d)", rh_cat_name((rh_cat)filt), cat_count(filt));
+	gfx_rbox(d, 8, y, 224, 22, 4, C_LINE, C_CARD);
+	gfx_text(d, f_title, "<", 16, ty, C_ACC);
+	gfx_text(d, f_title, ">", 216, ty, C_ACC);
+	gfx_text_c(d, f_title, b, 120, ty, C_TXT);
+}
+
 static void draw_content(SDL_Surface *d)
 {
 	int i, y, vh = view_h(), total = total_h();
 	switch (CUR.s) {
 	case RH_S_DISCOVER:
-		for (i = 0; i < M->n_apps; i++) {
-			const rh_app *a = &M->apps[i];
-			y = CONT_Y + i * LIST_P - CUR.scroll;
-			if (y + LIST_RH > CONT_Y && y < CONT_B) {
-				char sub[160];   /* installed status comes from RetroHatch's own record; absent record = nothing claimed */
-				snprintf(sub, sizeof sub, "%s%s", inst_ver(i)[0] ? "Installed. " : "", a->desc[0] ? a->desc : "No description");
+		for (i = 0; i < n_vis; i++) {
+			y = ctop() + i * LIST_P - CUR.scroll;
+			if (y + LIST_RH <= ctop() || y >= CONT_B) continue;
+			if (vis[i].cand) list_row_tag(d, y, i == CUR.sel, M->cands[vis[i].idx].name, "UNAPPROVED", M->cands[vis[i].idx].version);
+			else {
+				const rh_app *a = &M->apps[vis[i].idx]; char sub[160];   /* installed status comes from RetroHatch's own record; absent record = nothing claimed */
+				snprintf(sub, sizeof sub, "%s%s", inst_ver(vis[i].idx)[0] ? "Installed. " : "", a->desc[0] ? a->desc : "No description");
 				list_row(d, y, i == CUR.sel, a->name, sub);
 			}
 		}
-		if (!M->n_apps) empty_state_mark(d, "No catalog entries", "No app files were found in the local catalog.");
+		if (!M->n_apps && !M->n_cands) empty_state_mark(d, "No catalog entries", "No app files were found in the local catalog.");
+		else if (!n_vis) {
+			char t[48]; snprintf(t, sizeof t, "None in %s", rh_cat_name((rh_cat)filt));
+			empty_state_mark(d, t, "Press left or right for another category.");
+		}
 		break;
 	case RH_S_INSTALLED:
 		for (i = 0; i < M->n_inst; i++) {
@@ -630,6 +716,7 @@ static void draw_content(SDL_Surface *d)
 		}
 		break; }
 	case RH_S_DETAILS: details(d, CONT_Y - CUR.scroll, &M->apps[CUR.app]); break;
+	case RH_S_CAND: cand_details(d, CONT_Y - CUR.scroll, &M->cands[CUR.app]); break;
 	case RH_S_INFO: info_page(d, CONT_Y - CUR.scroll, CUR.info); break;
 	case RH_S_CONFIRM: draw_confirm(d); break;
 	case RH_S_WORKING:
@@ -648,16 +735,17 @@ static void draw_content(SDL_Surface *d)
 
 void rh_ui_draw(SDL_Surface *scr)
 {
-	SDL_Rect clip = {0, CONT_Y, W, (Uint16)(CONT_B - CONT_Y)}, all = {0, 0, W, W};
+	SDL_Rect clip = {0, 0, W, 0}, all = {0, 0, W, W};
 	int a_ok;
 	gfx_fill(scr, 0, 0, W, W, C_BG);
 	if (CUR.s == RH_S_HOME) draw_home(scr);
 	else {
-		clip.h = (Uint16)view_h();
+		clip.y = (Sint16)ctop(); clip.h = (Uint16)view_h();
 		SDL_SetClipRect(scr, &clip);
 		draw_content(scr);
 		SDL_SetClipRect(scr, &all);
 		if (has_cta()) draw_action(scr, app_action(CUR.app));
+		if (CUR.s == RH_S_DISCOVER && M->n_apps + M->n_cands) draw_filter(scr);
 		gfx_img(scr, img_header, 0, 0);
 		gfx_fill(scr, 0, HDR_H, W, 1, C_LINE);
 		{
@@ -666,7 +754,7 @@ void rh_ui_draw(SDL_Surface *scr)
 			gfx_text_c(scr, f_title, t, W / 2, (HDR_H - gfx_font_h(f_title)) / 2, C_TXT);
 		}
 	}
-	a_ok = CUR.s == RH_S_HOME || CUR.s == RH_S_CONFIRM || CUR.s == RH_S_RESULT || (CUR.s == RH_S_DETAILS && act_focus(app_action(CUR.app))) || (CUR.s == RH_S_INFO && CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) || (is_list() && list_n() && (CUR.s == RH_S_SETTINGS || row_app(CUR.sel) >= 0));
+	a_ok = CUR.s == RH_S_HOME || CUR.s == RH_S_CONFIRM || CUR.s == RH_S_RESULT || (CUR.s == RH_S_DETAILS && act_focus(app_action(CUR.app))) || (CUR.s == RH_S_INFO && CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) || (is_list() && list_n() && (CUR.s == RH_S_SETTINGS || row_app(CUR.sel) >= 0 || CUR.s == RH_S_DISCOVER));
 	gfx_fill(scr, 8, HINT_Y - 2, 224, 1, C_LINE);
 	hint(scr, 22, "A", a_ok ? C_GREEN : C_DIS, "Select", a_ok ? C_TXT : C_DIS);
 	hint(scr, 178, "B", depth && CUR.s != RH_S_WORKING ? C_ACC : C_DIS, "Back", depth && CUR.s != RH_S_WORKING ? C_TXT : C_DIS);

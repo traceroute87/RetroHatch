@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 #ifndef RH_DEV
 	static rh_model m;
 #endif
-	const char *catalog = "catalog", *assets = "assets", *state = STATE_DEFAULT, *shot = NULL;
+	const char *catalog = "catalog", *assets = "assets", *state = STATE_DEFAULT, *shot = NULL, *cands = "candidates/rg-nano.json";
 	SDL_Surface *scr; SDL_Event e; int run = 1, i;
 
 #ifdef RH_DEV
@@ -72,13 +72,15 @@ int main(int argc, char **argv)
 		else if (!strcmp(argv[i], "--assets")) assets = argv[i + 1];
 		else if (!strcmp(argv[i], "--state")) state = argv[i + 1];
 		else if (!strcmp(argv[i], "--shot")) shot = argv[i + 1];
+		else if (!strcmp(argv[i], "--candidates")) cands = argv[i + 1];
 		else { fprintf(stderr, "retrohatch: unknown option %s\n", argv[i]); return 2; }
 	}
 #ifdef RH_DEV
-	(void)state;
+	(void)state; (void)cands;
 	refresh();
 #else
 	rh_model_load(&m, catalog, state);
+	rh_model_load_candidates(&m, cands);   /* UNAPPROVED discovery results: read-only, never installable (not in DEV: its catalog is signed) */
 #endif
 #ifdef RH_DEV
 	{

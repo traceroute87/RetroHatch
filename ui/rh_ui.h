@@ -8,7 +8,8 @@
 
 typedef enum { RH_K_UP, RH_K_DOWN, RH_K_LEFT, RH_K_RIGHT, RH_K_A, RH_K_B } rh_key;
 typedef enum { RH_S_HOME, RH_S_DISCOVER, RH_S_DETAILS, RH_S_INSTALLED, RH_S_UPDATES, RH_S_SETTINGS, RH_S_INFO,
-	RH_S_CONFIRM, RH_S_WORKING, RH_S_RESULT } rh_screen;   /* last three: install flow (DEV builds only) */
+	RH_S_CONFIRM, RH_S_WORKING, RH_S_RESULT,   /* CONFIRM/WORKING/RESULT: install flow (DEV builds only) */
+	RH_S_CAND } rh_screen;   /* read-only page of an UNAPPROVED candidate (app = index into the model's cands) */
 typedef enum { RH_I_DEVICE, RH_I_CATALOG, RH_I_NETWORK, RH_I_ABOUT } rh_info;
 
 /* App Details action bar (never focusable, A does nothing) */
@@ -24,7 +25,7 @@ typedef struct {
 	rh_screen screen;
 	rh_action action;    /* RH_S_DETAILS only */
 	rh_info info;        /* RH_S_INFO only */
-	int app;             /* RH_S_DETAILS: index into model apps */
+	int app;             /* RH_S_DETAILS: index into model apps; RH_S_CAND: index into model candidates */
 	int sel, count;      /* selected row / rows on this screen (lists, home, settings) */
 	int scroll;          /* pixels */
 	int sel_visible;     /* 1 when the selected row lies fully inside the content area */

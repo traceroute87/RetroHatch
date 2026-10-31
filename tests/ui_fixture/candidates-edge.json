@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "device": "rg-nano",
+ "status": "TEST candidates: odd metadata for UI tests, not real software",
+ "candidates": [
+  {"name": "Bare Minimum", "repo": "t/bare", "category": "bogus", "category_basis": "not a category id", "approval": "unapproved", "hardware_test": "none"},
+  {"name": "An Extremely Long Candidate Application Name That Cannot Fit On A Row", "repo": "t/long",
+   "description": "A description that is long enough to wrap over several lines on the candidate page of the RG Nano screen.",
+   "version": "build-20231226-extra-long-version-string", "source": "https://github.com/t/long", "license": "GPL-3.0", "last_activity": "2024-01-02",
+   "package": {"name": "a-very-long-package-file-name-for-the-candidate-v1.2.3-funkey-s.opk", "size": 123456, "format": "opk", "signature": "squashfs", "container": "zip", "more_packages": 11},
+   "category": "utilities", "category_basis": "test quote one; test quote two", "claim": {"kind": "family", "text": "This README sentence is deliberately much longer than the sixty-four characters the page keeps", "where": "readme"},
+   "approval": "unapproved", "hardware_test": "none"},
+  {"name": "Duplicate Repo", "repo": "t/bare", "approval": "unapproved", "hardware_test": "none"},
+  {"name": "Already Approved", "repo": "t/fx", "source": "https://example.invalid/fx/1", "approval": "unapproved", "hardware_test": "none"},
+  {"name": "Claims Approval", "repo": "t/approved", "approval": "approved", "hardware_test": "none"},
+  {"name": "Claims Hardware Test", "repo": "t/tested", "approval": "unapproved", "hardware_test": "passed"},
+  {"name": "No Repo", "approval": "unapproved", "hardware_test": "none"}
+ ]
+}

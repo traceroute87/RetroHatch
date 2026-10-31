@@ -37,6 +37,7 @@ rm -rf "$PKG"; mkdir -p "$PKG/assets" "$PKG/catalog/apps" "$PKG/catalog/devices"
 cp "$ROOT"/ui/assets/* "$PKG/assets/"
 cp "$ROOT"/catalog/apps/*.json "$PKG/catalog/apps/"          # read-only snapshot; TaraFi stays unavailable
 cp "$ROOT"/catalog/devices/*.json "$PKG/catalog/devices/"
+[ "${DEV:-0}" = 1 ] || { mkdir -p "$PKG/candidates" && cp "$ROOT/candidates/rg-nano.json" "$PKG/candidates/"; }   # UNAPPROVED discovery snapshot, read-only; never in the DEV build
 if [ "${DEV:-0}" = 1 ]; then   # DEV: signed catalog snapshot + trusted roots instead of loose JSON files
 	rm -rf "$PKG/catalog"; mkdir -p "$PKG/catalog" "$PKG/certs"
 	cp "$DEVCAT" "$PKG/catalog/catalog.pkg"; cp "$HERE/ca-bundle.crt" "$PKG/certs/ca-bundle.crt"
