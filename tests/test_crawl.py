@@ -806,3 +806,69 @@ for k_, v_ in (("page", "https://w.org/p"), ("owner", "o"), ("repo", "a/b"), ("f
     c.push(k_, v_, {"from": "t"}, 0)
 assert c.out_of_scope == 5 and [(k_, v_) for k_, v_, _, _ in c.q] == [("repo", "sub/game"), ("opk", "https://x.org/a.opk"), ("zip", "https://x.org/a.zip")] and not len(c.pq)
 print("submitted-only tests OK")
+
+# ---- README-mention search: bounded, paginated, deduplicated, fair (offline: C.api and sleep are stubs) -----------------
+import urllib.parse
+Q = C.readme_queries(C.PROF)
+assert len(Q) == len(set(Q)) and all(x in Q for x in ('"rg nano" in:readme', '"funkeyos" in:readme', '"funkey s" in:readme', '"rg nano" opk in:readme', '"funkey" opk in:readme')), Q
+assert Q[0] == '"rg nano" in:readme' and all("in:readme" in x for x in Q)   # direct device terms first; README mentions only
+saved_api, saved_sleep = C.api, C.time.sleep
+C.time.sleep = lambda s: None
+calls = []
+repo_ = lambda name, **kw: {"full_name": name, "description": "d", "topics": [], "pushed_at": "2024-01-01T00:00:00Z", "license": None, **kw}
+
+
+def readme_crawl(table, stored=(), pre=()):
+    """A Crawl whose search API serves table[(query, page)] -> items, or an HTTP status int."""
+    c = C.Crawl(); c.stored_repos = set(stored); c.known_ids.add("known-app")
+    for x in pre: c.push("repo", x, {"from": "t"}, 0)
+    del calls[:]
+
+    def fake(path):
+        qs = urllib.parse.parse_qs(urllib.parse.urlsplit(path).query)
+        key = (qs["q"][0], int(qs["page"][0])); calls.append(key)
+        r = table.get(key, [])
+        return (r, None) if isinstance(r, int) else (200, {"items": r})
+    C.api = fake
+    return c
+
+
+# admission: repos named without any device term, buried at the end of page 1 and on page 2, behind many already-stored repos, are queued
+fill = [repo_(f"old{i}/tool{i}") for i in range(46)]
+buried = [repo_("dev1/zeta"), repo_("Dev2/Viewer"), repo_("dev3/bin")]
+table = {(Q[0], 1): fill + buried + [repo_("dev4/late")], (Q[0], 2): [repo_("dev5/page-two")], (Q[1], 1): buried[:1] + [repo_("dev1/ZETA")]}
+c = readme_crawl(table, stored=[f"old{i}/tool{i}" for i in range(46)])
+notes = C.seed_readme(c)
+assert notes == [] and {"dev1/zeta", "dev2/viewer", "dev3/bin", "dev4/late", "dev5/page-two"} <= c.readme_seeds
+assert len(c.readme_seeds) == C.README_SEED_MAX and [k for _, k, _, _ in c.q][:5] == ["dev1/zeta", "Dev2/Viewer", "dev3/bin", "dev4/late", "dev5/page-two"]   # unstored repos first, then search rank
+assert not any(r[0].startswith("dev1/zeta") and r[0] != "dev1/zeta" for r in [(k,) for _, k, _, _ in c.q]) and sum(k.lower() == "dev1/zeta" for _, k, _, _ in c.q) == 1   # case variants are one repo
+assert c.dropped == {"readme search repos beyond per-run limit": 51 - C.README_SEED_MAX} and all(v["from"] == "github-search" and v["anchor"] in Q for _, _, v, _ in c.q)
+# bounded pagination: page 2 only for the query whose page 1 was full, never more than README_QUERY_MAX requests
+assert calls.count((Q[0], 2)) == 1 and sum(p == 2 for _, p in calls) == 1 and len(calls) == len(Q) + 1 <= C.README_QUERY_MAX
+c = readme_crawl({(q, p): [repo_(f"o{p}/{n}") for n in range(C.README_PER_PAGE)] for q in Q for p in (1, 2)})
+C.seed_readme(c)
+assert len(calls) == C.README_QUERY_MAX and len(set(calls)) == len(calls) and len(c.readme_seeds) <= C.README_SEED_MAX
+# dedup against other seeds, the catalog, and forks; a stored repo still queues when there is room
+c = readme_crawl({(Q[0], 1): [repo_("pre/seeded"), repo_("x/known-app"), repo_("f/fork", fork=True), repo_("keep/stored"), repo_("bad"), repo_("a/b/c")]}, stored=["keep/stored"], pre=["pre/seeded"])
+C.seed_readme(c)
+assert c.readme_seeds == {"keep/stored"} and [k for _, k, _, _ in c.q] == ["pre/seeded", "keep/stored"]
+# rate limit: stop at once, say so, queue nothing
+c = readme_crawl({(Q[0], 1): 403, (Q[1], 1): [repo_("a/b")]})
+notes = C.seed_readme(c)
+assert len(calls) == 1 and len(notes) == 1 and "HTTP 403" in notes[0] and not c.readme_seeds and not c.q
+# another failure is noted, the remaining queries still run
+c = readme_crawl({(Q[0], 1): 500, (Q[1], 1): [repo_("a/b")]})
+assert len(C.seed_readme(c)) == 1 and c.readme_seeds == {"a/b"}
+# fairness: README-search repos take no slot from other discovery and are not starved by it
+saved_max = C.MAX_REPOS
+C.MAX_REPOS = 2
+c = C.Crawl(); c.readme_seeds = {"s/one"}
+C.fetch = lambda url, rng=None, limit=0: (404, {}, b"", url)
+for name in ("a/one", "a/two", "s/one"): c.do_repo(name, {"from": "t"}, 0)
+assert sorted(c.repos) == ["a/one", "a/two", "s/one"] and not c.dropped   # the seed fit beside two others
+c.do_repo("a/three", {"from": "t"}, 0)
+assert "a/three" not in c.repos and c.dropped == {"repo cap": 1}          # others stay capped at MAX_REPOS, seeds excluded from the count
+c.readme_seeds.add("s/two"); c.do_repo("s/two", {"from": "t"}, 0)
+assert "s/two" in c.repos
+C.MAX_REPOS, C.fetch, C.api, C.time.sleep = saved_max, real_fetch, saved_api, saved_sleep
+print("readme search tests OK")

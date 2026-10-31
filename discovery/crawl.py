@@ -17,6 +17,7 @@ import discover as D
 UA = "retrohatch-discovery/1 (+https://github.com/traceroute87/RetroHatch)"
 MAX_REQ, MAX_PAGES, MAX_REPOS, MAX_OWNERS, MAXD, DEADLINE_S, DELAY = 1500, 80, 160, 12, 4, 1500, 0.1
 PER_HOST, LOW_PAGE_SHARE, VERIFY_RESERVE, GOOD, TREE_MAX, TREE_RUN_MAX = 8, 0.6, 0.85, 3, 40, 120   # TREE_RUN_MAX: tree package probes per run, all repos   # pages per host; share of page budget open to low-score pages; request share after which only package checks run; "promising" score
+README_QUERY_MAX, README_PER_PAGE, README_PAGES, README_SEED_MAX = 16, 50, 2, 30   # README-mention search: requests, results per page, pages per query, new repos queued per run (own repo slots on top of MAX_REPOS)
 RESERVED = {"topics", "orgs", "features", "sponsors", "about", "pricing", "marketplace", "login", "join", "settings",
             "collections", "explore", "enterprise", "search", "apps", "site", "customer-stories", "readme", "security", "trending"}
 FORGE_RESERVED = {"explore", "users", "user", "groups", "dashboard", "help", "api", "search", "projects", "admin", "snippets", "topics",
@@ -226,9 +227,14 @@ class Crawl:
         self.tree_left, self.tree_salt = TREE_RUN_MAX, str(T0)
         self.tree_scans = {}   # repo lower -> {"repo", "commit", "complete", "scanned", "packages"}, kept between runs (set by main())
         self.scope, self.out_of_scope = None, 0   # submitted-only mode: the only repos/forge projects that may be queued (set by submitted_only())
+        self.stored_repos, self.readme_seeds = set(), set()   # repos with packages in the store (set by main()); lower-case repos queued by README search
         self.releases, self.deferred = {}, set()   # repo lower -> {"tag", "assets": {file name: tagged URL}} resolved THIS run; latest URLs requeued once
 
     def drop(self, why): self.dropped[why] = self.dropped.get(why, 0) + 1
+
+    def repo_capped(self, key):
+        """README-search repos have their own README_SEED_MAX slots on top of MAX_REPOS: they take none from other discovery and are not starved by it."""
+        return key.lower() not in self.readme_seeds and len(self.repos) - sum(k in self.repos for k in self.readme_seeds) >= MAX_REPOS
 
     def push(self, kind, key, via, depth):
         if self.scope is not None and kind not in ("opk", "zip") and (kind, key.lower()) not in self.scope:
@@ -293,7 +299,7 @@ class Crawl:
             self.push("repo", full, {"from": f"https://github.com/{name}?tab=repositories", "anchor": "owner listing"}, depth + 1)
 
     def do_repo(self, full, via, depth):
-        if len(self.repos) >= MAX_REPOS: return self.drop("repo cap")
+        if self.repo_capped(full): return self.drop("repo cap")
         r = self.repos[full.lower()] = {"repo": full, "url": f"https://github.com/{full}", "via": [via], "meta": self.pending_meta.get(full.lower(), {}), "packages": [],
                                         "in_catalog": D.norm_url(f"https://github.com/{full}") in self.known_src or full.split("/")[1].lower() in self.known_ids}
         if r["in_catalog"]: return
@@ -361,7 +367,7 @@ class Crawl:
     def do_forge(self, key, via, depth):
         """key = 'codeberg.org/owner/repo' or 'gitlab.com/<url-encoded path>|group/sub/project'. README and release assets via the
         forge's own API. A README device claim is candidate evidence for following its links, never proof of compatibility."""
-        if len(self.repos) >= MAX_REPOS: return self.drop("repo cap")
+        if self.repo_capped(key): return self.drop("repo cap")
         host, rest = key.split("/", 1)
         pid, full = (rest.split("|", 1) if host == "gitlab.com" else (None, rest))
         url = f"https://{host}/{full}"
@@ -472,6 +478,52 @@ def seed(c):
             c.push("repo", r["full_name"], {"from": "github-search", "anchor": q}, 0)
             c.pending_meta[r["full_name"].lower()] = meta
         time.sleep(1)
+    return notes + seed_readme(c)
+
+
+def readme_queries(prof):
+    """Search strings from the device profile: every device term, then each term with each package extension (direct terms first)."""
+    terms = list(dict.fromkeys(prof["direct"] + prof["family"]))
+    exts = [e.lstrip(".") for e in prof.get("package_ext") or []]
+    return [f'"{t}" in:readme' for t in terms] + [f'"{t}" {x} in:readme' for x in exts for t in terms]
+
+
+def seed_readme(c):
+    """Repositories whose README mentions the device, whatever their names say. Bounded: README_QUERY_MAX search requests,
+    README_PAGES pages per query (page 2 only when page 1 was full). Deduplicated by lower-case repo before queueing: a repo already
+    queued by another seed is not queued again; catalog repos and forks are skipped. At most README_SEED_MAX new repos
+    are queued (repos without stored packages first, then more matching queries, then search rank); they use their own repo slots."""
+    notes, found, spent = [], {}, 0
+    pause = 1 if os.environ.get("GITHUB_TOKEN") else 6.5   # unauthenticated search allows ~10 requests per minute
+    for page in range(1, README_PAGES + 1):
+        for q in readme_queries(PROF):
+            if spent >= README_QUERY_MAX: break
+            if page > 1 and len(found.get(q, ())) < README_PER_PAGE * (page - 1): continue
+            st, js = api(f"/search/repositories?q={urllib.parse.quote(q)}&per_page={README_PER_PAGE}&page={page}")
+            spent += 1
+            if st != 200 or not js:
+                notes.append(f"readme search {q!r} page {page}: HTTP {st}")
+                if st in (403, 429): return notes   # rate limited: stop, do not hammer
+                continue
+            found.setdefault(q, []).extend(js.get("items") or [])
+            time.sleep(pause)
+    uniq = {}
+    for q, items in found.items():
+        for r in items:
+            full = r.get("full_name") if isinstance(r, dict) else None
+            if isinstance(full, str) and full.count("/") == 1: uniq.setdefault(full.lower(), {"r": r, "q": []})["q"].append(q)
+    new = []
+    for key, e in uniq.items():
+        r = e["r"]
+        if ("repo", key) in c.seen: continue   # already queued by another seed
+        if r.get("fork") or D.norm_url(f"https://github.com/{key}") in c.known_src or key.split("/")[1] in c.known_ids: continue
+        new.append((key in c.stored_repos, -len(e["q"]), len(new), key))
+    for _, _, _, key in sorted(new)[:README_SEED_MAX]:
+        r = uniq[key]["r"]
+        c.pending_meta[key] = {**{k: r.get(k) for k in ("description", "topics", "pushed_at", "fork", "archived")}, "license": (r.get("license") or {}).get("spdx_id") or "unknown"}
+        c.readme_seeds.add(key)
+        c.push("repo", r["full_name"], {"from": "github-search", "anchor": uniq[key]["q"][0]}, 0)
+    for _ in new[README_SEED_MAX:]: c.drop("readme search repos beyond per-run limit")
     return notes
 
 
@@ -1006,6 +1058,7 @@ def main():
     for kind, key, url in leads: c.push(kind, key, {"from": SUBMITTED, "anchor": url}, 0)   # queued first; same handlers, checks and budget
     try:
         c.tree_known = tree_known(store)
+        c.stored_repos = {v["repo"].lower() for v in store.values() if isinstance(v.get("repo"), str)}
         rechecked = seed_packages(c, store)
         notes = ([] if a.no_github_seed else seed(c)) + seed_multi(c)
         optional["freeserp"] = {"status": "disabled"} if a.no_freeserp else seed_freeserp(c, a.lead_cache)
@@ -1016,7 +1069,7 @@ def main():
     uniq = unique_apps(c)
     for s in sub: s["packages"] = [{k: p.get(k) for k in ("url", "name", "kind", "size", "judgement", "reason")} for p in s["packages"]]
     why = assess(notes, len(c.q) + len(c.pq), STOP, FAILS, c.dropped)
-    caps = [n for n, hit in (("repos", len(c.repos) >= MAX_REPOS), ("pages", len(c.pages) >= MAX_PAGES), ("owners", len(c.owners) >= MAX_OWNERS)) if hit]
+    caps = [n for n, hit in (("repos", len(c.repos) - sum(k in c.repos for k in c.readme_seeds) >= MAX_REPOS), ("pages", len(c.pages) >= MAX_PAGES), ("owners", len(c.owners) >= MAX_OWNERS)) if hit]
     sites = {}
     for pg in c.pages.values():
         if pg["status"] == 200 and pg.get("relevant"): sites.setdefault(pg.get("host"), []).append(pg["url"])
