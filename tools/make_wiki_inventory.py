@@ -7,7 +7,7 @@ Makes no request and never touches catalog/, approvals or keys. Two offline step
   build    evidence + candidates/rg-nano.json  ->  candidates/wiki-listings.json (+ the Markdown report)   (reproducible from Git alone)
 
   python tools/make_wiki_inventory.py extract --results A.json B.json ... [--leads L.json ...] [--out discovery/wiki-links-evidence.json]
-  python tools/make_wiki_inventory.py build [--evidence ...] [--existing candidates/rg-nano.json] [--out candidates/wiki-listings.json] [--md docs/WIKI_LISTINGS_INVENTORY.md]
+  python tools/make_wiki_inventory.py build [--evidence ...] [--metadata discovery/opk-metadata-evidence.json] [--existing candidates/rg-nano.json] [--out candidates/wiki-listings.json] [--md docs/WIKI_LISTINGS_INVENTORY.md]
 
 The crawler kept the page's LINKS (anchor + target) but not its text, so wiki category headings and descriptions are NOT in the data:
 every entry says so ("wiki_category": ""), and its RetroHatch category comes from the file name alone, with that basis written next to it.
@@ -15,6 +15,9 @@ An application that the page lists without a file link we crawled is absent from
 """
 import argparse, collections, json, re, sys, urllib.parse
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))   # -I does not add the script directory
+import opk_metadata as OM
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGE = "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
@@ -139,7 +142,7 @@ def evidence(results, leads):
             "listed_repos": {k: sorted(a for a in v if a) for k, v in sorted(listed.items())}}
 
 
-def build(ev, existing_path):
+def build(ev, existing_path, metadata=None):
     rows = ev["rows"]; tag = {(t[0], t[1]): (t[2], t[3]) for t in ev["tagged"]}; meta = ev["repos"]
     groups = collections.defaultdict(list); support = []
     for r in rows:
@@ -183,6 +186,7 @@ def build(ev, existing_path):
              "listing": {"source": "wiki", "page": PAGE, "wiki_category": "", "download": dl, "mirror": mirror,
                          "anchors": sorted({a for r in rs for a in r["anchors"] if a}), "urls": sorted({r["url"] for r in rs})}}
         if ex: c["same_as"] = ex["id"]
+        OM.enrich(c, (metadata or {}).get(c["id"]))   # package .desktop evidence: fills only an empty description; never changes name or category
         out.append(c)
     for repo, anchors in sorted(ev["listed_repos"].items()):
         k = ident(repo.split("/")[1])
@@ -206,6 +210,7 @@ def main():
     b = sub.add_parser("build", help="evidence + existing candidates -> wiki-listings.json (+ report)")
     b.add_argument("--evidence", default=str(ROOT / "discovery" / "wiki-links-evidence.json"))
     b.add_argument("--existing", default=str(ROOT / "candidates" / "rg-nano.json"))
+    b.add_argument("--metadata", default=str(OM.EVIDENCE))
     b.add_argument("--out", default=str(ROOT / "candidates" / "wiki-listings.json")); b.add_argument("--md", default=None)
     a = ap.parse_args()
     if a.cmd == "extract":
@@ -214,10 +219,11 @@ def main():
         print(f"{len(ev['rows'])} wiki-linked package rows, {len(ev['listed_repos'])} linked repositories, {len(ev['repos'])} with metadata -> {a.out}")
         return
     ev = load(a.evidence)
-    cands, support, unnamed = build(ev, a.existing)
+    meta = OM.load(a.metadata)
+    cands, support, unnamed = build(ev, a.existing, meta)
     if unnamed: sys.exit("no display name for: %s (add to NAMES)" % unnamed)
     doc = {"schema": 1, "device": "rg-nano", "status": "UNAPPROVED wiki listings, read-only; not part of the signed catalog",
-           "from": {"page": PAGE, "inputs": ev["inputs"],
+           "from": {"page": PAGE, "inputs": ev["inputs"], "package_metadata_records": sum("package_metadata" in c for c in cands),
                     "note": "Link targets only. The page text (category headings, descriptions) was not cached by the crawler."},
            "support_files": [{"name": urllib.parse.unquote(r["name"]), "url": r["url"], "anchors": sorted(x for x in r["anchors"] if x), "role": SUPPORT[ident(r["name"])]} for r in sorted(support, key=lambda r: r["name"])],
            "candidates": cands}
@@ -239,10 +245,12 @@ def render_md(doc, ev):
          "- The crawler kept the page's **link targets, not its text**. The wiki's original category headings and descriptions are **missing** from every local file. Every entry carries `wiki_category: \"\"`, and the Nano UI shows \"Wiki category: Not recorded\". None was invented.",
          "- The %d entries are the applications whose links the crawler followed. An application the page lists without such a link is **not here**, so %d is a floor, not the page's total. Full coverage is not claimed." % (len(doc["candidates"]), len(doc["candidates"])),
          "- The RetroHatch category column is **not** the wiki's heading. It is a filter bucket picked from the file name alone, and each entry says so in its basis line (`Wiki heading not cached; by file name only: ...`). %d entries whose names say nothing stay `Other`. Re-derive all of them from the real headings once the page text is available." % sum(x["category"] == "other" for x in doc["candidates"]),
-         "- Reproducible from Git: `python tools/make_wiki_inventory.py build --md docs/WIKI_LISTINGS_INVENTORY.md` rebuilds this report and `candidates/wiki-listings.json` byte for byte from `discovery/wiki-links-evidence.json` and `candidates/rg-nano.json`, both tracked, with no network. The evidence file was distilled once (`extract`) from %d crawl-result and package-lead files dated %s, some of them an earlier session's artifacts that were never tracked, so **that extraction cannot be repeated from a clean checkout**. No new crawl was made." % (ev["inputs"], ", ".join(ev["as_of"]) or "unknown"),
+         "- Reproducible from Git: `python tools/make_wiki_inventory.py build --md docs/WIKI_LISTINGS_INVENTORY.md` rebuilds this report and `candidates/wiki-listings.json` byte for byte from `discovery/wiki-links-evidence.json`, `discovery/opk-metadata-evidence.json` and `candidates/rg-nano.json`, all tracked, with no network. The evidence file was distilled once (`extract`) from %d crawl-result and package-lead files dated %s, some of them an earlier session's artifacts that were never tracked, so **that extraction cannot be repeated from a clean checkout**. No new crawl was made." % (ev["inputs"], ", ".join(ev["as_of"]) or "unknown"),
+         "- Where the OPK itself was inspected, its own `.desktop` Name, Comment, Categories and icon facts are kept under `package_metadata`. They are the package author's words, not the wiki's. A Comment fills an empty description only when it really describes the app (never a BIOS note, \"Modified\" or just the app's name); names and categories are never changed, and differences are listed under `metadata_review`. Icons are recorded, not imported.",
          "- \"Package verified\" means a squashfs signature was seen. It says nothing about safety or compatibility. Every entry is UNAPPROVED, hardware-untested and read-only in the UI.", "",
          "| Measure | Count |", "|---|---|", "| Distinct listings recovered | %d |" % n, "| Already shown among the 10 discovered candidates | %d |" % same,
-         "| Newly represented | %d |" % (n - same), "| Package verified (squashfs seen) | %d |" % ver, "| Not verified | %d |" % (n - ver),
+         "| Newly represented | %d |" % (n - same), "| Descriptions filled from a package .desktop Comment | %d |" % sum("description_source" in x for x in c),
+         "| Entries with package .desktop evidence (names, comments, categories, icon facts) | %d |" % sum("package_metadata" in x for x in c), "| Package verified (squashfs seen) | %d |" % ver, "| Not verified | %d |" % (n - ver),
          "| Support files linked, not counted as applications | %d |" % len(doc["support_files"]), "", "| Category (name-based) | Count |", "|---|---|"]
     names = {"games": "Games", "emulators": "Emulators", "media": "Media", "utilities": "Utilities", "engines": "Engines & Tools", "other": "Other"}
     L += ["| %s | %d |" % (names[k], cc.get(k, 0)) for k in CATS]

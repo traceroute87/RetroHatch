@@ -5,9 +5,17 @@ installable package with verified squashfs signature, repo not a fork or archive
 'supports' (RG Nano named) before 'family' (FunKey only), newest activity first, at most PER_OWNER per owner, at most MAX entries.
 
   python tools/make_candidate_snapshot.py [--results build/crawl-full/discovery-results.json] [--out candidates/rg-nano.json]
+  python tools/make_candidate_snapshot.py --enrich-only [--out candidates/rg-nano.json]   # tracked files only: re-apply the package evidence
+
+Package .desktop evidence (discovery/opk-metadata-evidence.json, see tools/opk_metadata.py) is applied to every entry it covers: it fills an empty
+description only from a Comment that really describes the app, and records package categories, name proposals and icon facts. It never changes a
+name, a category or an existing description. --enrich-only needs no crawl result: the existing snapshot is the input, and it is idempotent.
 """
-import argparse, json, re
+import argparse, json, re, sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))   # -I does not add the script directory
+import opk_metadata as OM
 
 ROOT = Path(__file__).resolve().parent.parent
 CATS = {"games", "emulators", "media", "utilities", "engines", "other"}   # ids the UI reads; anything else is ignored there
@@ -57,7 +65,16 @@ def main():
     ap.add_argument("--results", default=str(ROOT / "build" / "crawl-full" / "discovery-results.json"))
     ap.add_argument("--out", default=str(ROOT / "candidates" / "rg-nano.json"))
     ap.add_argument("--categories", default=str(ROOT / "candidates" / "categories.json"))
+    ap.add_argument("--metadata", default=str(OM.EVIDENCE), help="package .desktop evidence")
+    ap.add_argument("--enrich-only", action="store_true", help="re-apply the evidence to the existing --out snapshot; reads no crawl result")
     a = ap.parse_args()
+    meta = OM.load(a.metadata)
+    if a.enrich_only:
+        doc = json.loads(Path(a.out).read_text(encoding="utf-8"))
+        n = sum(1 for c in doc["candidates"] if OM.enrich(c, meta.get(c["id"])))
+        Path(a.out).write_bytes((json.dumps(doc, indent=1, ensure_ascii=False) + "\n").encode("utf-8"))
+        print(f"{n} of {len(doc['candidates'])} entries carry package evidence")
+        return
     res = json.loads(Path(a.results).read_text(encoding="utf-8"))
     repos = {r["repo"].lower(): r for r in res["repos"]}
     cf = Path(a.categories)
@@ -90,10 +107,11 @@ def main():
             "claim": {"kind": kind, "text": text, "where": where},
             **({"category": cat, "category_basis": basis} if cat else {}),
             "hardware_test": "none", "approval": "unapproved"})
+    for c in out: OM.enrich(c, meta.get(c["id"]))
     doc = {"schema": 1, "device": "rg-nano", "status": "UNAPPROVED local candidates, not part of the signed catalog",
            "from": {"results": Path(a.results).name, "as_of": res["as_of"]}, "candidates": out}
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
-    Path(a.out).write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    Path(a.out).write_bytes((json.dumps(doc, indent=1, ensure_ascii=False) + "\n").encode("utf-8"))
     for c in out: print(f"{c['name']:22} {c['version']:14} {c['claim']['kind']:8} {c['package']['size']:>9} +{c['package']['more_packages']} {c['repo']}")
 
 

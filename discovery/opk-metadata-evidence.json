@@ -1,0 +1,912 @@
+{
+ "schema": 1,
+ "source": "OPK package .desktop files, read with tools/opk_metadata_probe.py (squashfs signature and recorded size checked; nothing executed)",
+ "note": "Original package bytes and icons are not kept. Icons are recorded, not imported. Package categories are evidence, not a category assignment.",
+ "records": [
+  {
+   "id": "cglpsdl1",
+   "listed_as": "wiki-cglpsdl1",
+   "package": {
+    "name": "Cglpsdl1.opk",
+    "size": 303104,
+    "sha256": "5b4205bf866dec116d51d6e59a9ff60bb7517fd65e271e80bbd1691041c5153f",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "Cglpsdl1.funkey-s.desktop",
+    "name": "cglpsdl1",
+    "comment": "Crisp Games Library Portable",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "cglpsdl1.png",
+    "bytes": 2826,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description",
+   "multiple_desktop_files": true
+  },
+  {
+   "id": "funkoban",
+   "listed_as": "wiki-funkoban",
+   "package": {
+    "name": "Funkoban.opk",
+    "size": 8531968,
+    "sha256": "ef28ed1445742ee7793108d55b30dc97a480787f7c659e826be01d769d38b843",
+    "identity": "high: SHA-256 on record"
+   },
+   "desktop": {
+    "file": "Funkoban.funkey-s.desktop",
+    "name": "Funkoban",
+    "comment": "A Sokoban Engine",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "graphics/sokoban.png",
+    "bytes": 9679,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "j2mefunkeyrgnano",
+   "package": {
+    "name": "pm.opk",
+    "size": 3645440,
+    "sha256": "568e6b9b665b16efcb463c1d43dfbcbaf6ea624d27ccb23231c0bb4d840aa5ca",
+    "identity": "high: SHA-256 on record"
+   },
+   "desktop": {
+    "file": "pm.funkey-s.desktop",
+    "name": "J2ME",
+    "comment": "Java ME runtime",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "pm.png",
+    "bytes": 610,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "sudokul",
+   "package": {
+    "name": "SuDokuL-v1.5-funkey.opk",
+    "size": 913408,
+    "sha256": "dfd5837d4d57f067f855e21ce04974b0a1580a105241541d6f0cba1f7fa67ecd",
+    "identity": "high: SHA-256 on record"
+   },
+   "desktop": {
+    "file": "sudokul.funkey-s.desktop",
+    "name": "SuDokuL",
+    "comment": "Sudoku made with SDL",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "sudokul-image.png",
+    "bytes": 1869,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-3doh",
+   "package": {
+    "name": "3DOh-V1.opk",
+    "size": 53248,
+    "sha256": "88eeae6aa2ff785a1094ac646dccb9b55871b4e2d1a5bc832c8f74fc1b6da1fc",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "3DO!h",
+    "comment": "Needs bios.bin in $HOME/.3doh",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 1832,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "note",
+   "comment_reason": "setup or status note"
+  },
+  {
+   "id": "wiki-blips",
+   "package": {
+    "name": "Blips.opk",
+    "size": 819200,
+    "sha256": "4540ff6035bdb16c36ad5dbb13de0617ff5f6e8bcc41e3e12612b4d37de28628",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "Blips.funkey-s.desktop",
+    "name": "Blips",
+    "comment": "A remake of the dos Bips game",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "graphics/blips.png",
+    "bytes": 9834,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-blockdude",
+   "package": {
+    "name": "Blockdude.opk",
+    "size": 3407872,
+    "sha256": "78c8b5042d686598c0fc19f81de8051c7a1dabd1b5f9e35c28c3c535e51c2882",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "Blockdude.funkey-s.desktop",
+    "name": "Blockdude",
+    "comment": "A remake of the TI-83 puzzle game",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "blockdudefs/icon.png",
+    "bytes": 1557,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-commodore64",
+   "package": {
+    "name": "Commodore_64_funkey-s.opk",
+    "size": 2891776,
+    "sha256": "94d725a76bd82944fb8b821ca9746c9cf41d5dab3fe5054c8a12d388b96ee05c",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "c64.funkey-s.desktop",
+    "name": "C64",
+    "comment": "Commodore 64 emulator for Libretro",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "c64.png",
+    "bytes": 533,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-dinothawr",
+   "package": {
+    "name": "Dinothawr-V2.opk",
+    "size": 7663616,
+    "sha256": "733774b3cc8a331688fb69091c0f0f3cefa950e8ef3e2f3c739db9962e1a75b8",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "dino.funkey-s.desktop",
+    "name": "Dinothawr",
+    "comment": "Dinothawr v1.0 for Libretro",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "dino.png",
+    "bytes": 8737,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-dosboxpure",
+   "package": {
+    "name": "DOSBox_Pure-V1.opk",
+    "size": 2744320,
+    "sha256": "fee6afa369b393fb79897209c85959f360896e0a45e85ac06dc01526eab32029",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "dosbox_pure.funkey-s.desktop",
+    "name": "DOSBox Pure",
+    "comment": "DOSBox Pure for Libretro",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "dosbox.png",
+    "bytes": 10640,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-easyrpg",
+   "package": {
+    "name": "EasyRPG.opk",
+    "size": 21303296,
+    "sha256": "150bb847b4d906f5dbbac9f34819b82d360cf8b332b04e0c215c0b4a452ab0a6",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "EasyRPG",
+    "comment": "EasyRPG Player",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "easyrpg.png",
+    "bytes": 2575,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "product name plus \"Player\""
+  },
+  {
+   "id": "wiki-fake08",
+   "package": {
+    "name": "Fake08.opk",
+    "size": 233472,
+    "sha256": "90c961f08729986faab33fbbb3aeda4ab6847e78b9371d8bd4d6de283ec5e7ed",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "FAKE08",
+    "comment": "PICO-8 Emulator (port gameblabla)",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 163,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-finalburnalpha2012",
+   "package": {
+    "name": "FinalBurnAlpha2012-V3.opk",
+    "size": 5877760,
+    "sha256": "893168ea8d0230e5dfb6ebf2f96e3931b24395cd0661dd0df5c36a39b8e97322",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "fba.funkey-s.desktop",
+    "name": "FBA 2012",
+    "comment": "Final Burn Alpha (0.2.97.29) for Libretro",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "fba.png",
+    "bytes": 795,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-finalburnneo",
+   "package": {
+    "name": "FinalBurnNeo-V1.opk",
+    "size": 10264576,
+    "sha256": "e9c6998339f5ce2fdebd8e4087bb589aa801207961ddd3712ef90778a3f4fd6e",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "fbneo.funkey-s.desktop",
+    "name": "FB Neo",
+    "comment": "Final Burn Neo (0.2.97.44) for Libretro",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "fbneo.png",
+    "bytes": 9949,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-formula1",
+   "package": {
+    "name": "Formula1.opk",
+    "size": 196608,
+    "sha256": "8baa049ff3291663ffbdbbc8458836eb312046dd206578c66ef0796f7acdb8f6",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "Formula1.funkey-s.desktop",
+    "name": "Formula 1",
+    "comment": "Little fake F1 Game and Watch game",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "filesystem/icon.png",
+    "bytes": 646,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-gambatte",
+   "package": {
+    "name": "Gambatte-V4.opk",
+    "size": 1843200,
+    "sha256": "aff26988e9bd33211dbed42821cff4cfbf6ff8e8897325aed910f1e160c5d501",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "gambatte.funkey-s.desktop",
+    "name": "Gambatte",
+    "comment": "Gambatte v0.5.0-netlink for Libretro",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "gambatte.png",
+    "bytes": 1110,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-gamemusicemu",
+   "package": {
+    "name": "Game_Music_Emu-V2.opk",
+    "size": 1953792,
+    "sha256": "c91168e8cee37f8fdf9cbe217f00c3cc6b73898dae1fc7e621c682af71c0c92a",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "gme.funkey-s.desktop",
+    "name": "GME",
+    "comment": "Game Music Emu for Libretro",
+    "categories": "applications"
+   },
+   "icon": {
+    "file": "gme.png",
+    "bytes": 2500,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-ganbarenatuskian",
+   "package": {
+    "name": "Ganbare-Natuskian.opk",
+    "size": 27557888,
+    "sha256": "085fd0ac4f8badb527901c04af91eb76ebba5ced69b120d178b09d98964c1fe4",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "Ganbare Natsuki-san",
+    "comment": "Puzzle/Platform game",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 1112,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-gnash",
+   "package": {
+    "name": "Gnash-V2.opk",
+    "size": 8450048,
+    "sha256": "6587d6f041beac1e90a8c307f833cf4ce7342882a1737eb2c00e50552d4b0dd8",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "Gnash",
+    "comment": "Adobe flash 8 emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "gnash.png",
+    "bytes": 1214,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-lameds",
+   "package": {
+    "name": "LameDS.opk",
+    "size": 487424,
+    "sha256": "2a8429fc26c9f8bc103214f1b30365dff1d0c3e0d4049f45d7547a426e868f95",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "LameDS",
+    "comment": "Horrible NDS emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 251,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description",
+   "display_comment": "NDS emulator",
+   "display_comment_reason": "maintainer edit: leading word \"Horrible\" dropped"
+  },
+  {
+   "id": "wiki-mame2000",
+   "package": {
+    "name": "MAME2000-V3.opk",
+    "size": 4677632,
+    "sha256": "87c8dd4ee6daa36ababebf72dcc03402e37332c688734399aa3b1b4aba1f35ab",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "mame.funkey-s.desktop",
+    "name": "MAME 2000",
+    "comment": "MAME (0.37b5) for Libretro",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "mame.png",
+    "bytes": 1124,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-mednafennesonly",
+   "package": {
+    "name": "Mednafen_(NES_only).opk",
+    "size": 4096,
+    "sha256": "c01566283b718b97101156754d44b73009ca84ed90132077bb0cc7f283776cd8",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "nes.funkey-s.desktop",
+    "name": "NES (Mednafen)",
+    "comment": "Nintendo Entertainment System emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "nes.png",
+    "bytes": 363,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-mplayer",
+   "package": {
+    "name": "MPlayer-V2.opk",
+    "size": 7847936,
+    "sha256": "abe979ddc11b97ab2e9334d68545d65b17a0e35f280e8f5d5214d0ac709c8415",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "MPlayer",
+    "comment": "Native video player",
+    "categories": "applications"
+   },
+   "icon": {
+    "file": "mplayer.png",
+    "bytes": 357,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-pcfxemu",
+   "package": {
+    "name": "Pcfxemu_funkey-s.opk",
+    "size": 552960,
+    "sha256": "d106ce43dca139fa2262eb4f31311a3c5956123b44a1d338e72572eb5b15abf3",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "PCFXEmu",
+    "comment": "Needs pcfx.rom in $HOME/.pcfxemu",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "pcfx.png",
+    "bytes": 235,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "note",
+   "comment_reason": "setup or status note"
+  },
+  {
+   "id": "wiki-pcsxrearmed",
+   "package": {
+    "name": "PCSX_ReARMed_V2.opk",
+    "size": 516096,
+    "sha256": "f88c20d9ab91c9d22a17dd6d4b7a81ee82603de937be6c0071610244bb80278b",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "PCSX Rearmed",
+    "comment": "Modified",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 2269,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "note",
+   "comment_reason": "setup or status note"
+  },
+  {
+   "id": "wiki-picodrive",
+   "package": {
+    "name": "PicoDrive-V3.opk",
+    "size": 458752,
+    "sha256": "996debb24bdb1def77c6f3d10e85add0dc1b032ab12a0707ea9a464be4154e0a",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "picodrive.funkey-s.desktop",
+    "name": "PicoDrive",
+    "comment": "SMS/GG/MD/MCD/32X emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "picodrive.png",
+    "bytes": 1702,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-piemu",
+   "package": {
+    "name": "Piemu_funkey-s.opk",
+    "size": 20480,
+    "sha256": "efa73104bec90f2991c69fd7aad5783bbde6f3373ec70a36ee57be7ebe5aad03",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "piemu",
+    "comment": "P/EDE emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 6419,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-pocketcdg",
+   "package": {
+    "name": "Pocket_CDG-V1.opk",
+    "size": 1802240,
+    "sha256": "87f715bc667f7800ba5f391b943b80b5a52836931c51536a729e4ceaa545f6eb",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "cdg.funkey-s.desktop",
+    "name": "PocketCDG",
+    "comment": "PocketCDG for Libretro",
+    "categories": "applications"
+   },
+   "icon": {
+    "file": "cdg.png",
+    "bytes": 2500,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "name-only",
+   "comment_reason": "the app's own name (and \"for Libretro\" or a version)"
+  },
+  {
+   "id": "wiki-pokemini",
+   "package": {
+    "name": "Pokemini_funkey.opk",
+    "size": 499712,
+    "sha256": "f0cb12b5882e57bfb8a6fb971e1023d2bb16cc6c6ccddb2234d2003df1141c64",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "PokeMini",
+    "comment": "Pokemon Mini emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 955,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-rubido",
+   "package": {
+    "name": "Rubido.opk",
+    "size": 3469312,
+    "sha256": "bbd02cca31f7842b62563a677901682a7dbaceb4b0c6cf00ba7771d971a9eef6",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "Rubido.funkey-s.desktop",
+    "name": "Rubido",
+    "comment": "A Chinese checkers board game",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "rubidofs/icon.png",
+    "bytes": 6656,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-sdlretro",
+   "package": {
+    "name": "SDL_Retro-V9.opk",
+    "size": 11096064,
+    "sha256": "0fc41c248edc8870d24c21c371b8aad4062d18388fd41262a60f569ea7a69bab",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "sdlretro.funkey-s.desktop",
+    "name": "SDLRetro",
+    "comment": "Essential core pack for Libretro",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "sdlretro.png",
+    "bytes": 1362,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-smsplus",
+   "package": {
+    "name": "Smsplus_funkey-s.opk",
+    "size": 479232,
+    "sha256": "6a7731f660bc24a6cffaa2d10649360c6b0c374f5744e68848c2140009af3a88",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "SMS Plus GX",
+    "comment": "SMS/GG/SG emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "sms.png",
+    "bytes": 539,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-st",
+   "package": {
+    "name": "ST.opk",
+    "size": 81920,
+    "sha256": "6531abb2b177c87a5f76d78aa57485434047f5ea93967f57398332103620a873",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "ST-SDL",
+    "comment": "ST Terminal",
+    "categories": "applications"
+   },
+   "icon": {
+    "file": "st.png",
+    "bytes": 441,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-swanemu",
+   "package": {
+    "name": "SwanEmu.opk",
+    "size": 466944,
+    "sha256": "9e846ca94af1b78b239a180118e0478f593af35e672987abbd45d73dd78078d0",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "SwanEmu",
+    "comment": "Wonderswan emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "icon.png",
+    "bytes": 333,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-vbanext",
+   "package": {
+    "name": "VBA_Next.opk",
+    "size": 552960,
+    "sha256": "574cec796ae80a3db8b97c6836e4f083bcddc890efd9387faa695c01067a99ff",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "VBA Next",
+    "comment": "GBA emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "vbanext.png",
+    "bytes": 696,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-vbemu",
+   "package": {
+    "name": "VBEmu.opk",
+    "size": 434176,
+    "sha256": "9c5123bcf39126aab785a559b88524e7c08507ad5d017f741c706a350774a1ed",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "default.funkey-s.desktop",
+    "name": "VBEmu",
+    "comment": "Virtual Boy emulator",
+    "categories": "emulators"
+   },
+   "icon": {
+    "file": "vb.png",
+    "bytes": 2356,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  },
+  {
+   "id": "wiki-znax",
+   "package": {
+    "name": "Znax.opk",
+    "size": 1363968,
+    "sha256": "774c2a337e328bf816582762e282d4ad96bec001d303fe47ea6f5054f41b6705",
+    "identity": "medium: squashfs signature + recorded size"
+   },
+   "desktop": {
+    "file": "Znax.funkey-s.desktop",
+    "name": "Znax",
+    "comment": "A Connect 4 Style arcade / puzzle game",
+    "categories": "games"
+   },
+   "icon": {
+    "file": "graphics/znax.png",
+    "bytes": 8725,
+    "format": "PNG",
+    "width": 32,
+    "height": 32,
+    "available": true
+   },
+   "comment_class": "description"
+  }
+ ]
+}

@@ -75,7 +75,7 @@ src = (ROOT / "tools" / "make_wiki_inventory.py").read_text(encoding="utf-8")
 assert not any(m in src for m in ("urllib.request", "import socket", "http.client", "requests"))
 with tempfile.TemporaryDirectory() as t:
     t = Path(t)
-    for rel in ("tools/make_wiki_inventory.py", "discovery/wiki-links-evidence.json", "candidates/rg-nano.json"):
+    for rel in ("tools/make_wiki_inventory.py", "tools/opk_metadata.py", "discovery/wiki-links-evidence.json", "discovery/opk-metadata-evidence.json", "candidates/rg-nano.json"):
         (t / rel).parent.mkdir(parents=True, exist_ok=True); shutil.copy(ROOT / rel, t / rel)
     r = subprocess.run([sys.executable, "-I", str(t / "tools" / "make_wiki_inventory.py"), "build", "--md", str(t / "report.md")], capture_output=True, text=True, cwd=t)
     assert r.returncode == 0, r.stdout + r.stderr
@@ -93,7 +93,8 @@ assert sum(bool(c["package"]["signature"]) for c in C) == 35 and sum(not c["pack
 assert sum(c["listing"]["download"].startswith("Unavailable") for c in C) == 7 and sum(c["listing"]["download"] == "No file link crawled" for c in C) == 2
 assert sorted(c["category"] for c in C).count("emulators") == 20 and all(c["category"] in W.CATS for c in C)
 assert all(c["approval"] == "unapproved" and c["hardware_test"] == "none" and c["listing"]["source"] == "wiki" and c["listing"]["wiki_category"] == "" for c in C)
-assert all(c["category_basis"].startswith("Wiki heading not cached; by file name only: ") and c["description"] == "" for c in C)   # nothing presented as the wiki's own words
+assert all(c["category_basis"].startswith("Wiki heading not cached; by file name only: ") for c in C)
+assert all(c["description"] == "" or str(c.get("description_source", "")).startswith("package .desktop Comment") for c in C)   # every description says where it came from: the package, never the wiki
 assert all(not ({"sha256", "install", "approved", "dest_name"} & set(c)) for c in C)
 assert all(u.startswith("https://") for c in C for u in c["listing"]["urls"])
 assert [s["name"] for s in d["support_files"]] == ["Databases.zip", "Machines.zip", "SquashFS.zip"]

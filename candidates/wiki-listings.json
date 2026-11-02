@@ -5,6 +5,7 @@
  "from": {
   "page": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications",
   "inputs": 10,
+  "package_metadata_records": 33,
   "note": "Link targets only. The page text (category headings, descriptions) was not cached by the crawler."
  },
  "support_files": [
@@ -59,7 +60,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: 3DO emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: 3DO emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -77,12 +78,40 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/3doh_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/1/1d/3DOh-V1.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "3DOh-V1.opk",
+     "size": 53248,
+     "sha256": "88eeae6aa2ff785a1094ac646dccb9b55871b4e2d1a5bc832c8f74fc1b6da1fc",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "3DO!h",
+    "comment": "Needs bios.bin in $HOME/.3doh",
+    "comment_class": "note",
+    "comment_reason": "setup or status note",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 1832,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-blips",
    "name": "Blips",
-   "description": "",
+   "description": "A remake of the dos Bips game",
    "topics": [],
    "version": "v1.0",
    "repo": "joyrider3774/blips_funkey",
@@ -104,7 +133,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -119,12 +148,40 @@
     "urls": [
      "https://github.com/joyrider3774/blips_funkey/releases/latest/download/Blips.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Blips.opk",
+     "size": 819200,
+     "sha256": "4540ff6035bdb16c36ad5dbb13de0617ff5f6e8bcc41e3e12612b4d37de28628",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Blips",
+    "comment": "A remake of the dos Bips game",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "graphics/blips.png",
+     "bytes": 9834,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-blockdude",
    "name": "Blockdude",
-   "description": "",
+   "description": "A remake of the TI-83 puzzle game",
    "topics": [],
    "version": "v1.0",
    "repo": "joyrider3774/blockdude_funkey",
@@ -146,7 +203,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -161,6 +218,34 @@
     "urls": [
      "https://github.com/joyrider3774/blockdude_funkey/releases/latest/download/Blockdude.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Blockdude.opk",
+     "size": 3407872,
+     "sha256": "78c8b5042d686598c0fc19f81de8051c7a1dabd1b5f9e35c28c3c535e51c2882",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Blockdude",
+    "comment": "A remake of the TI-83 puzzle game",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "blockdudefs/icon.png",
+     "bytes": 1557,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -252,7 +337,7 @@
   {
    "id": "wiki-commodore64",
    "name": "Commodore 64",
-   "description": "",
+   "description": "Commodore 64 emulator for Libretro",
    "topics": [],
    "version": "",
    "repo": "",
@@ -274,7 +359,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: C64 machine by name",
+   "category_basis": "Wiki heading not cached; by file name only: C64 machine by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -289,6 +374,41 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/a/ad/Commodore_64_funkey-s.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Commodore_64_funkey-s.opk",
+     "size": 2891776,
+     "sha256": "94d725a76bd82944fb8b821ca9746c9cf41d5dab3fe5054c8a12d388b96ee05c",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "C64",
+    "comment": "Commodore 64 emulator for Libretro",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "c64.png",
+     "bytes": 533,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "C64",
+     "listed": "Commodore 64",
+     "applied": false
+    }
    }
   },
   {
@@ -316,7 +436,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -333,6 +453,34 @@
      "https://static.miraheze.org/funkeywiki/2/28/Dinothawr-V2.opk",
      "https://static.miraheze.org/funkeywiki/4/44/Dinothawr.zip"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Dinothawr-V2.opk",
+     "size": 7663616,
+     "sha256": "733774b3cc8a331688fb69091c0f0f3cefa950e8ef3e2f3c739db9962e1a75b8",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Dinothawr",
+    "comment": "Dinothawr v1.0 for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "dino.png",
+     "bytes": 8737,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -402,7 +550,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: DOSBox by name",
+   "category_basis": "Wiki heading not cached; by file name only: DOSBox by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -417,6 +565,34 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/e/ec/DOSBox_Pure-V1.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "DOSBox_Pure-V1.opk",
+     "size": 2744320,
+     "sha256": "fee6afa369b393fb79897209c85959f360896e0a45e85ac06dc01526eab32029",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "DOSBox Pure",
+    "comment": "DOSBox Pure for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "dosbox.png",
+     "bytes": 10640,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -444,7 +620,7 @@
     "where": "wiki"
    },
    "category": "engines",
-   "category_basis": "Wiki heading not cached; by file name only: RPG Maker player: runtime by name",
+   "category_basis": "Wiki heading not cached; by file name only: RPG Maker player: runtime by name; package differs",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -459,12 +635,47 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/5/5a/EasyRPG.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "EasyRPG.opk",
+     "size": 21303296,
+     "sha256": "150bb847b4d906f5dbbac9f34819b82d360cf8b332b04e0c215c0b4a452ab0a6",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "EasyRPG",
+    "comment": "EasyRPG Player",
+    "comment_class": "name-only",
+    "comment_reason": "product name plus \"Player\"",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Engines & Tools",
+     "row_category_reviewed": true,
+     "verdict": "differs"
+    },
+    "icon": {
+     "file": "easyrpg.png",
+     "bytes": 2575,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "category": {
+     "package": "games",
+     "row": "Engines & Tools",
+     "applied": false
+    }
    }
   },
   {
    "id": "wiki-fake08",
    "name": "Fake-08",
-   "description": "",
+   "description": "PICO-8 Emulator (port gameblabla)",
    "topics": [],
    "version": "",
    "repo": "",
@@ -486,7 +697,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: PICO-8 player by name",
+   "category_basis": "Wiki heading not cached; by file name only: PICO-8 player by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -504,6 +715,34 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/fake08_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/1/18/Fake08.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Fake08.opk",
+     "size": 233472,
+     "sha256": "90c961f08729986faab33fbbb3aeda4ab6847e78b9371d8bd4d6de283ec5e7ed",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "FAKE08",
+    "comment": "PICO-8 Emulator (port gameblabla)",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 163,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -531,7 +770,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -547,6 +786,41 @@
      "https://static.miraheze.org/funkeywiki/9/9e/FinalBurnAlpha2012-V3.opk",
      "https://static.miraheze.org/funkeywiki/c/cc/FinalBurnAlpha2012-V3.zip"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "FinalBurnAlpha2012-V3.opk",
+     "size": 5877760,
+     "sha256": "893168ea8d0230e5dfb6ebf2f96e3931b24395cd0661dd0df5c36a39b8e97322",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "FBA 2012",
+    "comment": "Final Burn Alpha (0.2.97.29) for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "fba.png",
+     "bytes": 795,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "FBA 2012",
+     "listed": "FinalBurn Alpha 2012",
+     "applied": false
+    }
    }
   },
   {
@@ -574,7 +848,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -590,12 +864,47 @@
      "https://static.miraheze.org/funkeywiki/2/25/FinalBurnNeo-V1.zip",
      "https://static.miraheze.org/funkeywiki/7/7c/FinalBurnNeo-V1.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "FinalBurnNeo-V1.opk",
+     "size": 10264576,
+     "sha256": "e9c6998339f5ce2fdebd8e4087bb589aa801207961ddd3712ef90778a3f4fd6e",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "FB Neo",
+    "comment": "Final Burn Neo (0.2.97.44) for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "fbneo.png",
+     "bytes": 9949,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "FB Neo",
+     "listed": "FinalBurn Neo",
+     "applied": false
+    }
    }
   },
   {
    "id": "wiki-formula1",
    "name": "Formula1",
-   "description": "",
+   "description": "Little fake F1 Game and Watch game",
    "topics": [],
    "version": "v1.0",
    "repo": "joyrider3774/formula1_funkey",
@@ -617,7 +926,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -632,6 +941,34 @@
     "urls": [
      "https://github.com/joyrider3774/formula1_funkey/releases/latest/download/Formula1.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Formula1.opk",
+     "size": 196608,
+     "sha256": "8baa049ff3291663ffbdbbc8458836eb312046dd206578c66ef0796f7acdb8f6",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Formula 1",
+    "comment": "Little fake F1 Game and Watch game",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "filesystem/icon.png",
+     "bytes": 646,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -702,7 +1039,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: Game Boy emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: Game Boy emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -717,6 +1054,34 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/9/93/Gambatte-V4.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Gambatte-V4.opk",
+     "size": 1843200,
+     "sha256": "aff26988e9bd33211dbed42821cff4cfbf6ff8e8897325aed910f1e160c5d501",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Gambatte",
+    "comment": "Gambatte v0.5.0-netlink for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "gambatte.png",
+     "bytes": 1110,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -786,7 +1151,7 @@
     "where": "wiki"
    },
    "category": "media",
-   "category_basis": "Wiki heading not cached; by file name only: music player by name",
+   "category_basis": "Wiki heading not cached; by file name only: music player by name; package generic",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -801,12 +1166,47 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/4/4c/Game_Music_Emu-V2.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Game_Music_Emu-V2.opk",
+     "size": 1953792,
+     "sha256": "c91168e8cee37f8fdf9cbe217f00c3cc6b73898dae1fc7e621c682af71c0c92a",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "GME",
+    "comment": "Game Music Emu for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "applications",
+    "category_evidence": {
+     "maps_to": null,
+     "row_category": "Media",
+     "row_category_reviewed": true,
+     "verdict": "generic"
+    },
+    "icon": {
+     "file": "gme.png",
+     "bytes": 2500,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "GME",
+     "listed": "Game Music Emu",
+     "applied": false
+    }
    }
   },
   {
    "id": "wiki-ganbarenatuskian",
    "name": "Ganbare Natuskian",
-   "description": "",
+   "description": "Puzzle/Platform game",
    "topics": [],
    "version": "",
    "repo": "",
@@ -828,7 +1228,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -843,6 +1243,41 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/b/b0/Ganbare-Natuskian.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Ganbare-Natuskian.opk",
+     "size": 27557888,
+     "sha256": "085fd0ac4f8badb527901c04af91eb76ebba5ced69b120d178b09d98964c1fe4",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Ganbare Natsuki-san",
+    "comment": "Puzzle/Platform game",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 1112,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "Ganbare Natsuki-san",
+     "listed": "Ganbare Natuskian",
+     "applied": false
+    }
    }
   },
   {
@@ -890,7 +1325,7 @@
   {
    "id": "wiki-gnash",
    "name": "Gnash",
-   "description": "",
+   "description": "Adobe flash 8 emulator",
    "topics": [],
    "version": "V2",
    "repo": "",
@@ -912,7 +1347,7 @@
     "where": "wiki"
    },
    "category": "engines",
-   "category_basis": "Wiki heading not cached; by file name only: Flash player: runtime by name",
+   "category_basis": "Wiki heading not cached; by file name only: Flash player: runtime by name; package differs",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -930,6 +1365,41 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/gnash_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/b/b1/Gnash-V2.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Gnash-V2.opk",
+     "size": 8450048,
+     "sha256": "6587d6f041beac1e90a8c307f833cf4ce7342882a1737eb2c00e50552d4b0dd8",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Gnash",
+    "comment": "Adobe flash 8 emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Engines & Tools",
+     "row_category_reviewed": true,
+     "verdict": "differs"
+    },
+    "icon": {
+     "file": "gnash.png",
+     "bytes": 1214,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "category": {
+     "package": "emulators",
+     "row": "Engines & Tools",
+     "applied": false
+    }
    }
   },
   {
@@ -1019,7 +1489,7 @@
   {
    "id": "wiki-lameds",
    "name": "LameDS",
-   "description": "",
+   "description": "NDS emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1041,7 +1511,7 @@
     "where": "wiki"
    },
    "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say; package differs",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1059,6 +1529,43 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/lameds_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/c/c4/LameDS.opk"
     ]
+   },
+   "description_source": "package .desktop Comment, edited",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "LameDS.opk",
+     "size": 487424,
+     "sha256": "2a8429fc26c9f8bc103214f1b30365dff1d0c3e0d4049f45d7547a426e868f95",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "LameDS",
+    "comment": "Horrible NDS emulator",
+    "comment_class": "description",
+    "display_comment": "NDS emulator",
+    "display_comment_reason": "maintainer edit: leading word \"Horrible\" dropped",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Other",
+     "row_category_reviewed": true,
+     "verdict": "differs"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 251,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "category": {
+     "package": "emulators",
+     "row": "Other",
+     "applied": false
+    }
    }
   },
   {
@@ -1086,7 +1593,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1102,12 +1609,40 @@
      "https://static.miraheze.org/funkeywiki/2/2e/MAME2000-V3.zip",
      "https://static.miraheze.org/funkeywiki/d/de/MAME2000-V3.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "MAME2000-V3.opk",
+     "size": 4677632,
+     "sha256": "87c8dd4ee6daa36ababebf72dcc03402e37332c688734399aa3b1b4aba1f35ab",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "MAME 2000",
+    "comment": "MAME (0.37b5) for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "mame.png",
+     "bytes": 1124,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-mednafennesonly",
    "name": "Mednafen (NES only)",
-   "description": "",
+   "description": "Nintendo Entertainment System emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1129,7 +1664,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: Mednafen emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: Mednafen emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1144,12 +1679,47 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/4/45/Mednafen_%28NES_only%29.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Mednafen_(NES_only).opk",
+     "size": 4096,
+     "sha256": "c01566283b718b97101156754d44b73009ca84ed90132077bb0cc7f283776cd8",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "NES (Mednafen)",
+    "comment": "Nintendo Entertainment System emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "nes.png",
+     "bytes": 363,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "NES (Mednafen)",
+     "listed": "Mednafen (NES only)",
+     "applied": false
+    }
    }
   },
   {
    "id": "wiki-mplayer",
    "name": "MPlayer",
-   "description": "",
+   "description": "Native video player",
    "topics": [],
    "version": "V2",
    "repo": "",
@@ -1171,7 +1741,7 @@
     "where": "wiki"
    },
    "category": "media",
-   "category_basis": "Wiki heading not cached; by file name only: media player by name",
+   "category_basis": "Wiki heading not cached; by file name only: media player by name; package generic",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1186,6 +1756,34 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/1/1d/MPlayer-V2.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "MPlayer-V2.opk",
+     "size": 7847936,
+     "sha256": "abe979ddc11b97ab2e9334d68545d65b17a0e35f280e8f5d5214d0ac709c8415",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "MPlayer",
+    "comment": "Native video player",
+    "comment_class": "description",
+    "categories": "applications",
+    "category_evidence": {
+     "maps_to": null,
+     "row_category": "Media",
+     "row_category_reviewed": true,
+     "verdict": "generic"
+    },
+    "icon": {
+     "file": "mplayer.png",
+     "bytes": 357,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -1256,7 +1854,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1274,6 +1872,34 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pcfxemu_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/d/d6/Pcfxemu_funkey-s.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Pcfxemu_funkey-s.opk",
+     "size": 552960,
+     "sha256": "d106ce43dca139fa2262eb4f31311a3c5956123b44a1d338e72572eb5b15abf3",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "PCFXEmu",
+    "comment": "Needs pcfx.rom in $HOME/.pcfxemu",
+    "comment_class": "note",
+    "comment_reason": "setup or status note",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "pcfx.png",
+     "bytes": 235,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -1301,7 +1927,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: PlayStation emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: PlayStation emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1319,12 +1945,40 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pcsx_rearmed_ultimate.opk",
      "https://static.miraheze.org/funkeywiki/6/65/PCSX_ReARMed_V2.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "PCSX_ReARMed_V2.opk",
+     "size": 516096,
+     "sha256": "f88c20d9ab91c9d22a17dd6d4b7a81ee82603de937be6c0071610244bb80278b",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "PCSX Rearmed",
+    "comment": "Modified",
+    "comment_class": "note",
+    "comment_reason": "setup or status note",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 2269,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-picodrive",
    "name": "PicoDrive",
-   "description": "",
+   "description": "SMS/GG/MD/MCD/32X emulator",
    "topics": [],
    "version": "V3",
    "repo": "",
@@ -1346,7 +2000,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: Mega Drive emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: Mega Drive emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1361,12 +2015,40 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "PicoDrive-V3.opk",
+     "size": 458752,
+     "sha256": "996debb24bdb1def77c6f3d10e85add0dc1b032ab12a0707ea9a464be4154e0a",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "PicoDrive",
+    "comment": "SMS/GG/MD/MCD/32X emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "picodrive.png",
+     "bytes": 1702,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-piemu",
    "name": "Piemu",
-   "description": "",
+   "description": "P/EDE emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1388,7 +2070,7 @@
     "where": "wiki"
    },
    "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say; package differs",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1406,6 +2088,41 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/piemu_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/d/d4/Piemu_funkey-s.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Piemu_funkey-s.opk",
+     "size": 20480,
+     "sha256": "efa73104bec90f2991c69fd7aad5783bbde6f3373ec70a36ee57be7ebe5aad03",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "piemu",
+    "comment": "P/EDE emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Other",
+     "row_category_reviewed": true,
+     "verdict": "differs"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 6419,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "category": {
+     "package": "emulators",
+     "row": "Other",
+     "applied": false
+    }
    }
   },
   {
@@ -1433,7 +2150,7 @@
     "where": "wiki"
    },
    "category": "media",
-   "category_basis": "Wiki heading not cached; by file name only: CD+G karaoke player by name",
+   "category_basis": "Wiki heading not cached; by file name only: CD+G karaoke player by name; package generic",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1448,12 +2165,40 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/c/c3/Pocket_CDG-V1.opk"
     ]
+   },
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Pocket_CDG-V1.opk",
+     "size": 1802240,
+     "sha256": "87f715bc667f7800ba5f391b943b80b5a52836931c51536a729e4ceaa545f6eb",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "PocketCDG",
+    "comment": "PocketCDG for Libretro",
+    "comment_class": "name-only",
+    "comment_reason": "the app's own name (and \"for Libretro\" or a version)",
+    "categories": "applications",
+    "category_evidence": {
+     "maps_to": null,
+     "row_category": "Media",
+     "row_category_reviewed": true,
+     "verdict": "generic"
+    },
+    "icon": {
+     "file": "cdg.png",
+     "bytes": 2500,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-pokemini",
    "name": "PokeMini",
-   "description": "",
+   "description": "Pokemon Mini emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1475,7 +2220,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: Pokemon Mini emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: Pokemon Mini emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1493,12 +2238,40 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pokemini_funkey.opk",
      "https://static.miraheze.org/funkeywiki/f/fd/Pokemini_funkey.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Pokemini_funkey.opk",
+     "size": 499712,
+     "sha256": "f0cb12b5882e57bfb8a6fb971e1023d2bb16cc6c6ccddb2234d2003df1141c64",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "PokeMini",
+    "comment": "Pokemon Mini emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 955,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-rubido",
    "name": "Rubido",
-   "description": "",
+   "description": "A Chinese checkers board game",
    "topics": [],
    "version": "v1.0",
    "repo": "joyrider3774/rubido_funkey",
@@ -1520,7 +2293,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1535,12 +2308,40 @@
     "urls": [
      "https://github.com/joyrider3774/rubido_funkey/releases/latest/download/Rubido.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Rubido.opk",
+     "size": 3469312,
+     "sha256": "bbd02cca31f7842b62563a677901682a7dbaceb4b0c6cf00ba7771d971a9eef6",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Rubido",
+    "comment": "A Chinese checkers board game",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "rubidofs/icon.png",
+     "bytes": 6656,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-sdlretro",
    "name": "SDL Retro",
-   "description": "",
+   "description": "Essential core pack for Libretro",
    "topics": [],
    "version": "V9",
    "repo": "",
@@ -1562,7 +2363,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: libretro frontend by name",
+   "category_basis": "Wiki heading not cached; by file name only: libretro frontend by name; package differs",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1578,12 +2379,47 @@
      "https://static.miraheze.org/funkeywiki/3/30/SDL_Retro-V9.zip",
      "https://static.miraheze.org/funkeywiki/e/e6/SDL_Retro-V9.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "SDL_Retro-V9.opk",
+     "size": 11096064,
+     "sha256": "0fc41c248edc8870d24c21c371b8aad4062d18388fd41262a60f569ea7a69bab",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "SDLRetro",
+    "comment": "Essential core pack for Libretro",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "differs"
+    },
+    "icon": {
+     "file": "sdlretro.png",
+     "bytes": 1362,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "category": {
+     "package": "games",
+     "row": "Emulators",
+     "applied": false
+    }
    }
   },
   {
    "id": "wiki-smsplus",
    "name": "SMS Plus",
-   "description": "",
+   "description": "SMS/GG/SG emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1605,7 +2441,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: Master System emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: Master System emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1623,6 +2459,41 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/smsplus_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/2/22/Smsplus_funkey-s.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Smsplus_funkey-s.opk",
+     "size": 479232,
+     "sha256": "6a7731f660bc24a6cffaa2d10649360c6b0c374f5744e68848c2140009af3a88",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "SMS Plus GX",
+    "comment": "SMS/GG/SG emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "sms.png",
+     "bytes": 539,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "SMS Plus GX",
+     "listed": "SMS Plus",
+     "applied": false
+    }
    }
   },
   {
@@ -1670,7 +2541,7 @@
   {
    "id": "wiki-st",
    "name": "ST",
-   "description": "",
+   "description": "ST Terminal",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1692,7 +2563,7 @@
     "where": "wiki"
    },
    "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say; package generic",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1707,6 +2578,41 @@
     "urls": [
      "https://static.miraheze.org/funkeywiki/c/cb/ST.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "ST.opk",
+     "size": 81920,
+     "sha256": "6531abb2b177c87a5f76d78aa57485434047f5ea93967f57398332103620a873",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "ST-SDL",
+    "comment": "ST Terminal",
+    "comment_class": "description",
+    "categories": "applications",
+    "category_evidence": {
+     "maps_to": null,
+     "row_category": "Other",
+     "row_category_reviewed": true,
+     "verdict": "generic"
+    },
+    "icon": {
+     "file": "st.png",
+     "bytes": 441,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "name": {
+     "package_name": "ST-SDL",
+     "listed": "ST",
+     "applied": false
+    }
    }
   },
   {
@@ -1754,7 +2660,7 @@
   {
    "id": "wiki-swanemu",
    "name": "SwanEmu",
-   "description": "",
+   "description": "Wonderswan emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1776,7 +2682,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: WonderSwan emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: WonderSwan emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1794,12 +2700,40 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/swanemu_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/b/bc/SwanEmu.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "SwanEmu.opk",
+     "size": 466944,
+     "sha256": "9e846ca94af1b78b239a180118e0478f593af35e672987abbd45d73dd78078d0",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "SwanEmu",
+    "comment": "Wonderswan emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "icon.png",
+     "bytes": 333,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-vbanext",
    "name": "VBA Next",
-   "description": "",
+   "description": "GBA emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1821,7 +2755,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: Game Boy Advance emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: Game Boy Advance emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1839,12 +2773,40 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/vbanext_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/0/02/VBA_Next.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "VBA_Next.opk",
+     "size": 552960,
+     "sha256": "574cec796ae80a3db8b97c6836e4f083bcddc890efd9387faa695c01067a99ff",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "VBA Next",
+    "comment": "GBA emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "vbanext.png",
+     "bytes": 696,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
    "id": "wiki-vbemu",
    "name": "VBEmu",
-   "description": "",
+   "description": "Virtual Boy emulator",
    "topics": [],
    "version": "",
    "repo": "",
@@ -1866,7 +2828,7 @@
     "where": "wiki"
    },
    "category": "emulators",
-   "category_basis": "Wiki heading not cached; by file name only: Virtual Boy emulator by name",
+   "category_basis": "Wiki heading not cached; by file name only: Virtual Boy emulator by name; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -1884,6 +2846,34 @@
      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/vbemu_funkey-s.opk",
      "https://static.miraheze.org/funkeywiki/2/20/VBEmu.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "VBEmu.opk",
+     "size": 434176,
+     "sha256": "9c5123bcf39126aab785a559b88524e7c08507ad5d017f741c706a350774a1ed",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "VBEmu",
+    "comment": "Virtual Boy emulator",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Emulators",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "vb.png",
+     "bytes": 2356,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   },
   {
@@ -1973,7 +2963,7 @@
   {
    "id": "wiki-znax",
    "name": "Znax",
-   "description": "",
+   "description": "A Connect 4 Style arcade / puzzle game",
    "topics": [],
    "version": "v1.0",
    "repo": "joyrider3774/znax_funkey",
@@ -1995,7 +2985,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
    "hardware_test": "none",
    "approval": "unapproved",
    "listing": {
@@ -2010,6 +3000,34 @@
     "urls": [
      "https://github.com/joyrider3774/znax_funkey/releases/latest/download/Znax.opk"
     ]
+   },
+   "description_source": "package .desktop Comment",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Znax.opk",
+     "size": 1363968,
+     "sha256": "774c2a337e328bf816582762e282d4ad96bec001d303fe47ea6f5054f41b6705",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "Znax",
+    "comment": "A Connect 4 Style arcade / puzzle game",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "graphics/znax.png",
+     "bytes": 8725,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
    }
   }
  ]

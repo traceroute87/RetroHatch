@@ -32,7 +32,50 @@
     "where": "description"
    },
    "hardware_test": "none",
-   "approval": "unapproved"
+   "approval": "unapproved",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "pm.opk",
+     "size": 3645440,
+     "sha256": "568e6b9b665b16efcb463c1d43dfbcbaf6ea624d27ccb23231c0bb4d840aa5ca",
+     "identity": "high: SHA-256 on record"
+    },
+    "name": "J2ME",
+    "comment": "Java ME runtime",
+    "comment_class": "description",
+    "categories": "emulators",
+    "category_evidence": {
+     "maps_to": "Emulators",
+     "row_category": "Engines & Tools",
+     "row_category_reviewed": false,
+     "verdict": "differs"
+    },
+    "icon": {
+     "file": "pm.png",
+     "bytes": 610,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "description": {
+     "package_comment": "Java ME runtime",
+     "kept": "existing description"
+    },
+    "name": {
+     "package_name": "J2ME",
+     "listed": "j2me-funkey-rgnano",
+     "applied": false
+    },
+    "category": {
+     "package": "emulators",
+     "row": "Engines & Tools",
+     "applied": false
+    }
+   }
   },
   {
    "id": "nanocraft",
@@ -113,9 +156,36 @@
     "where": "description"
    },
    "category": "games",
-   "category_basis": "2d-game; sokoban-game; remake-games",
+   "category_basis": "2d-game; sokoban-game; remake-games; package agrees",
    "hardware_test": "none",
-   "approval": "unapproved"
+   "approval": "unapproved",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Funkoban.opk",
+     "size": 8531968,
+     "sha256": "ef28ed1445742ee7793108d55b30dc97a480787f7c659e826be01d769d38b843",
+     "identity": "high: SHA-256 on record"
+    },
+    "name": "Funkoban",
+    "comment": "A Sokoban Engine",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": true,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "graphics/sokoban.png",
+     "bytes": 9679,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   }
   },
   {
    "id": "cglpsdl1",
@@ -152,7 +222,46 @@
     "where": "topics"
    },
    "hardware_test": "none",
-   "approval": "unapproved"
+   "approval": "unapproved",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "Cglpsdl1.opk",
+     "size": 303104,
+     "sha256": "5b4205bf866dec116d51d6e59a9ff60bb7517fd65e271e80bbd1691041c5153f",
+     "identity": "medium: squashfs signature + recorded size"
+    },
+    "name": "cglpsdl1",
+    "comment": "Crisp Games Library Portable",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Other",
+     "row_category_reviewed": false,
+     "verdict": "differs"
+    },
+    "icon": {
+     "file": "cglpsdl1.png",
+     "bytes": 2826,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    },
+    "multiple_desktop_files": true
+   },
+   "metadata_review": {
+    "description": {
+     "package_comment": "Crisp Games Library Portable",
+     "kept": "existing description"
+    },
+    "category": {
+     "package": "games",
+     "row": "Other",
+     "applied": false
+    }
+   }
   },
   {
    "id": "picoarch",
@@ -275,7 +384,40 @@
     "where": "topics"
    },
    "hardware_test": "none",
-   "approval": "unapproved"
+   "approval": "unapproved",
+   "package_metadata": {
+    "source": "package .desktop",
+    "package": {
+     "name": "SuDokuL-v1.5-funkey.opk",
+     "size": 913408,
+     "sha256": "dfd5837d4d57f067f855e21ce04974b0a1580a105241541d6f0cba1f7fa67ecd",
+     "identity": "high: SHA-256 on record"
+    },
+    "name": "SuDokuL",
+    "comment": "Sudoku made with SDL",
+    "comment_class": "description",
+    "categories": "games",
+    "category_evidence": {
+     "maps_to": "Games",
+     "row_category": "Games",
+     "row_category_reviewed": false,
+     "verdict": "agrees"
+    },
+    "icon": {
+     "file": "sudokul-image.png",
+     "bytes": 1869,
+     "format": "PNG",
+     "width": 32,
+     "height": 32,
+     "available": true
+    }
+   },
+   "metadata_review": {
+    "description": {
+     "package_comment": "Sudoku made with SDL",
+     "kept": "existing description"
+    }
+   }
   },
   {
    "id": "trispace",
