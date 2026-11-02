@@ -1,0 +1,1485 @@
+{
+ "schema": 1,
+ "page": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications",
+ "note": "Link targets only: the crawler did not keep the wiki page's text, so category headings and descriptions are not here.",
+ "inputs": 10,
+ "as_of": [
+  "2026-10-26",
+  "2026-10-27"
+ ],
+ "rows": [
+  {
+   "url": "https://static.miraheze.org/funkeywiki/7/79/SquashFS.zip",
+   "name": "SquashFS.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "here"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 1306635,
+   "status": [],
+   "opks": 0,
+   "entries": 6,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/clock_app_funkey-s.opk",
+   "name": "clock_app_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/5/5a/EasyRPG.opk",
+   "name": "EasyRPG.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 21303296,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/4/4c/Game_Music_Emu-V2.opk",
+   "name": "Game_Music_Emu-V2.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 1953792,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/1/1d/MPlayer-V2.opk",
+   "name": "MPlayer-V2.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 7847936,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/c/c3/Pocket_CDG-V1.opk",
+   "name": "Pocket_CDG-V1.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 1802240,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/c/cb/ST.opk",
+   "name": "ST.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 81920,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/3/30/SDL_Retro-V9.zip",
+   "name": "SDL_Retro-V9.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 1728512,
+   "status": [],
+   "opks": 1,
+   "entries": 31,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/e/e6/SDL_Retro-V9.opk",
+   "name": "SDL_Retro-V9.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 11096064,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/e/e6/Databases.zip",
+   "name": "Databases.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Databases folder"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 294914,
+   "status": [],
+   "opks": 0,
+   "entries": 7,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/1/1c/Machines.zip",
+   "name": "Machines.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Machines folder"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 4164282,
+   "status": [],
+   "opks": 0,
+   "entries": 497,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/3doh_funkey-s.opk",
+   "name": "3doh_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/1/1d/3DOh-V1.opk",
+   "name": "3DOh-V1.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 53248,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/e/ec/DOSBox_Pure-V1.opk",
+   "name": "DOSBox_Pure-V1.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 2744320,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/fake08_funkey-s.opk",
+   "name": "fake08_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/1/18/Fake08.opk",
+   "name": "Fake08.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 233472,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/c/cc/FinalBurnAlpha2012-V3.zip",
+   "name": "FinalBurnAlpha2012-V3.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 4042979,
+   "status": [],
+   "opks": 0,
+   "entries": 1,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/9/9e/FinalBurnAlpha2012-V3.opk",
+   "name": "FinalBurnAlpha2012-V3.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 5877760,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/2/25/FinalBurnNeo-V1.zip",
+   "name": "FinalBurnNeo-V1.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 8294668,
+   "status": [],
+   "opks": 0,
+   "entries": 1,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/7/7c/FinalBurnNeo-V1.opk",
+   "name": "FinalBurnNeo-V1.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 10264576,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/6/69/Gambatte_%28SDL_Retro_Core%29.zip",
+   "name": "Gambatte_%28SDL_Retro_Core%29.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 108972,
+   "status": [],
+   "opks": 0,
+   "entries": 1,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/9/93/Gambatte-V4.opk",
+   "name": "Gambatte-V4.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 1843200,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/gnash_funkey-s.opk",
+   "name": "gnash_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/b/b1/Gnash-V2.opk",
+   "name": "Gnash-V2.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 8450048,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/lameds_funkey-s.opk",
+   "name": "lameds_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/c/c4/LameDS.opk",
+   "name": "LameDS.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 487424,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/2/2e/MAME2000-V3.zip",
+   "name": "MAME2000-V3.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 2840199,
+   "status": [],
+   "opks": 0,
+   "entries": 1,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/d/de/MAME2000-V3.opk",
+   "name": "MAME2000-V3.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 4677632,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/4/45/Mednafen_%28NES_only%29.opk",
+   "name": "Mednafen_(NES_only).opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 4096,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/pcfxemu_funkey-s.opk",
+   "name": "pcfxemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/d/d6/Pcfxemu_funkey-s.opk",
+   "name": "Pcfxemu_funkey-s.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 552960,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/pcsx_rearmed_ultimate.opk",
+   "name": "pcsx_rearmed_ultimate.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/6/65/PCSX_ReARMed_V2.opk",
+   "name": "PCSX_ReARMed_V2.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 516096,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk",
+   "name": "PicoDrive-V3.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 458752,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/piemu_funkey-s.opk",
+   "name": "piemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/d/d4/Piemu_funkey-s.opk",
+   "name": "Piemu_funkey-s.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 20480,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/pokemini_funkey.opk",
+   "name": "pokemini_funkey.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/f/fd/Pokemini_funkey.opk",
+   "name": "Pokemini_funkey.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 499712,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/smsplus_funkey-s.opk",
+   "name": "smsplus_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/2/22/Smsplus_funkey-s.opk",
+   "name": "Smsplus_funkey-s.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 479232,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/swanemu_funkey-s.opk",
+   "name": "swanemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/b/bc/SwanEmu.opk",
+   "name": "SwanEmu.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 466944,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/vbanext_funkey-s.opk",
+   "name": "vbanext_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/0/02/VBA_Next.opk",
+   "name": "VBA_Next.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 552960,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/vbemu_funkey-s.opk",
+   "name": "vbemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/2/20/VBEmu.opk",
+   "name": "VBEmu.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 434176,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/c/c9/VICE_%28SDL_Retro_Core%29.zip",
+   "name": "VICE_%28SDL_Retro_Core%29.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 1100102,
+   "status": [],
+   "opks": 0,
+   "entries": 1,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/a/ad/Commodore_64_funkey-s.opk",
+   "name": "Commodore_64_funkey-s.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 2891776,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://github.com/joyrider3774/blips_funkey/releases/latest/download/Blips.opk",
+   "name": "Blips.opk",
+   "host": "github.com",
+   "repo": "joyrider3774/blips_funkey",
+   "anchors": [
+    "Link"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 819200,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://github.com/joyrider3774/blockdude_funkey/releases/latest/download/Blockdude.opk",
+   "name": "Blockdude.opk",
+   "host": "github.com",
+   "repo": "joyrider3774/blockdude_funkey",
+   "anchors": [
+    "Link"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 3407872,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/ncrafti_funkey-s.opk",
+   "name": "ncrafti_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/latest/download/Cglpsdl1.opk",
+   "name": "Cglpsdl1.opk",
+   "host": "github.com",
+   "repo": "joyrider3774/crisp-game-lib-portable-funkey",
+   "anchors": [
+    "Link"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 303104,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/2/28/Dinothawr-V2.opk",
+   "name": "Dinothawr-V2.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 7663616,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/4/44/Dinothawr.zip",
+   "name": "Dinothawr.zip",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Game files"
+   ],
+   "magic": false,
+   "fp": false,
+   "size": 6731994,
+   "status": [],
+   "opks": 0,
+   "entries": 152,
+   "kind": "zip-container"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/dividead_funkey-s.opk",
+   "name": "dividead_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://github.com/joyrider3774/formula1_funkey/releases/latest/download/Formula1.opk",
+   "name": "Formula1.opk",
+   "host": "github.com",
+   "repo": "joyrider3774/formula1_funkey",
+   "anchors": [
+    "Link"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 196608,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://github.com/joyrider3774/sokoban_funkey/releases/latest/download/Funkoban.opk",
+   "name": "Funkoban.opk",
+   "host": "github.com",
+   "repo": "joyrider3774/sokoban_funkey",
+   "anchors": [
+    "Link"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 8531968,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://static.miraheze.org/funkeywiki/b/b0/Ganbare-Natuskian.opk",
+   "name": "Ganbare-Natuskian.opk",
+   "host": "static.miraheze.org",
+   "repo": null,
+   "anchors": [
+    "Download"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 27557888,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/heboris_funkey-s.opk",
+   "name": "heboris_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://github.com/joyrider3774/rubido_funkey/releases/latest/download/Rubido.opk",
+   "name": "Rubido.opk",
+   "host": "github.com",
+   "repo": "joyrider3774/rubido_funkey",
+   "anchors": [
+    "Link"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 3469312,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/srb2_funkey-s.opk",
+   "name": "srb2_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/stk_funkey-s.opk",
+   "name": "stk_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/worship_vector_funkey-s.opk",
+   "name": "worship_vector_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://github.com/joyrider3774/znax_funkey/releases/latest/download/Znax.opk",
+   "name": "Znax.opk",
+   "host": "github.com",
+   "repo": "joyrider3774/znax_funkey",
+   "anchors": [
+    "Link"
+   ],
+   "magic": true,
+   "fp": false,
+   "size": 1363968,
+   "status": [
+    206
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/clock_app_funkey-s.opk",
+   "name": "clock_app_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/3doh_funkey-s.opk",
+   "name": "3doh_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/fake08_funkey-s.opk",
+   "name": "fake08_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/gnash_funkey-s.opk",
+   "name": "gnash_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/lameds_funkey-s.opk",
+   "name": "lameds_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pcfxemu_funkey-s.opk",
+   "name": "pcfxemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pcsx_rearmed_ultimate.opk",
+   "name": "pcsx_rearmed_ultimate.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/piemu_funkey-s.opk",
+   "name": "piemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pokemini_funkey.opk",
+   "name": "pokemini_funkey.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/smsplus_funkey-s.opk",
+   "name": "smsplus_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/swanemu_funkey-s.opk",
+   "name": "swanemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/vbanext_funkey-s.opk",
+   "name": "vbanext_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/vbemu_funkey-s.opk",
+   "name": "vbemu_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  },
+  {
+   "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/ncrafti_funkey-s.opk",
+   "name": "ncrafti_funkey-s.opk",
+   "host": "gitlab.com",
+   "repo": null,
+   "anchors": [
+    "Link"
+   ],
+   "magic": false,
+   "fp": true,
+   "size": null,
+   "status": [
+    403
+   ],
+   "opks": null,
+   "entries": null,
+   "kind": "direct"
+  }
+ ],
+ "tagged": [
+  [
+   "joyrider3774/blips_funkey",
+   "blips.opk",
+   "https://github.com/joyrider3774/blips_funkey/releases/download/v1.0/Blips.opk",
+   819200
+  ],
+  [
+   "joyrider3774/blockdude_funkey",
+   "blockdude.opk",
+   "https://github.com/joyrider3774/blockdude_funkey/releases/download/v1.0/Blockdude.opk",
+   3407872
+  ],
+  [
+   "joyrider3774/crisp-game-lib-portable-funkey",
+   "cglpsdl1.opk",
+   "https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/download/v4.0/Cglpsdl1.opk",
+   303104
+  ],
+  [
+   "joyrider3774/formula1_funkey",
+   "formula1.opk",
+   "https://github.com/joyrider3774/formula1_funkey/releases/download/v1.0/Formula1.opk",
+   196608
+  ],
+  [
+   "joyrider3774/rubido_funkey",
+   "rubido.opk",
+   "https://github.com/joyrider3774/rubido_funkey/releases/download/v1.0/Rubido.opk",
+   3469312
+  ],
+  [
+   "joyrider3774/sokoban_funkey",
+   "funkoban.opk",
+   "https://github.com/joyrider3774/sokoban_funkey/releases/download/v1.1/Funkoban.opk",
+   8531968
+  ],
+  [
+   "joyrider3774/znax_funkey",
+   "znax.opk",
+   "https://github.com/joyrider3774/znax_funkey/releases/download/v1.0/Znax.opk",
+   1363968
+  ]
+ ],
+ "repos": {
+  "joyrider3774/blips_funkey": {
+   "license": "MIT",
+   "pushed_at": "2025-12-04T19:16:48Z",
+   "release": "v1.0"
+  },
+  "joyrider3774/blockdude_funkey": {
+   "license": "MIT",
+   "pushed_at": "2025-04-05T06:14:05Z",
+   "release": "v1.0"
+  },
+  "joyrider3774/crisp-game-lib-portable-funkey": {
+   "license": "MIT",
+   "pushed_at": "2025-12-13T16:01:05Z",
+   "release": "v4.0"
+  },
+  "joyrider3774/formula1_funkey": {
+   "license": "MIT",
+   "pushed_at": "2025-04-05T06:12:09Z",
+   "release": "v1.0"
+  },
+  "joyrider3774/rubido_funkey": {
+   "license": "MIT",
+   "pushed_at": "2025-04-05T06:11:25Z",
+   "release": "v1.0"
+  },
+  "joyrider3774/sokoban_funkey": {
+   "license": "MIT",
+   "pushed_at": "2026-03-27T07:40:56Z",
+   "release": "v1.1"
+  },
+  "joyrider3774/znax_funkey": {
+   "license": "MIT",
+   "pushed_at": "2025-02-23T21:09:05Z",
+   "release": "v1.0"
+  }
+ },
+ "listed_repos": {
+  "DrUm78/gmenu2x": [
+   "Link"
+  ],
+  "Robbi-Blechdose/KeyKalc": [
+   "Link"
+  ]
+ }
+}

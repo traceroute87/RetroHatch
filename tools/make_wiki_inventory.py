@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """Offline inventory of the software the FunKey wiki page "List of third-party OPK applications" links to.
 
-Reads only files that already exist on disk (crawl results and package leads); makes no request, never touches catalog/, approvals or keys.
-The crawler kept the page's LINKS (anchor + target) but not its text, so wiki category headings and descriptions are NOT in the local data:
+Makes no request and never touches catalog/, approvals or keys. Two offline steps:
+
+  extract  crawl results + package leads  ->  discovery/wiki-links-evidence.json   (done once; the raw crawl files were not tracked)
+  build    evidence + candidates/rg-nano.json  ->  candidates/wiki-listings.json (+ the Markdown report)   (reproducible from Git alone)
+
+  python tools/make_wiki_inventory.py extract --results A.json B.json ... [--leads L.json ...] [--out discovery/wiki-links-evidence.json]
+  python tools/make_wiki_inventory.py build [--evidence ...] [--existing candidates/rg-nano.json] [--out candidates/wiki-listings.json] [--md docs/WIKI_LISTINGS_INVENTORY.md]
+
+The crawler kept the page's LINKS (anchor + target) but not its text, so wiki category headings and descriptions are NOT in the data:
 every entry says so ("wiki_category": ""), and its RetroHatch category comes from the file name alone, with that basis written next to it.
 An application that the page lists without a file link we crawled is absent from this inventory; the report says so instead of guessing.
-
-  python tools/make_wiki_inventory.py --results A.json B.json ... --leads L.json ... [--existing candidates/rg-nano.json]
-         [--out candidates/wiki-listings.json] [--md docs/WIKI_LISTINGS_INVENTORY.md]
 """
 import argparse, collections, json, re, sys, urllib.parse
 from pathlib import Path
@@ -119,10 +123,26 @@ def listed_repos(results):
     return out
 
 
-def build(results, leads, existing_path):
-    rows = collect(results, leads); tag = tagged(results); meta = repo_meta(results)
+def evidence(results, leads):
+    """Everything build() needs, as plain JSON: the wiki-linked package rows (in discovery order, which build() depends on),
+    the tag URLs and repository facts for the repositories involved, and the repositories the page links to directly."""
+    rows = collect(results, leads); tag = tagged(results); meta = repo_meta(results); listed = listed_repos(results)
+    out = [dict(r, anchors=sorted(a for a in r["anchors"] if a), status=sorted(r["status"])) for r in rows.values()]
+    repos = {r["repo"] for r in out if r["repo"]} | set(listed)
+    return {"schema": 1, "page": PAGE,
+            "note": "Link targets only: the crawler did not keep the wiki page's text, so category headings and descriptions are not here.",
+            "inputs": len(results) + len(leads), "as_of": sorted({load(f).get("as_of") for f in results if load(f).get("as_of")}),
+            "rows": out,
+            "tagged": [[k[0], k[1], v[0], v[1]] for k, v in tag.items() if k[0] in repos],
+            "repos": {k: {"license": (m.get("meta") or {}).get("license"), "pushed_at": (m.get("meta") or {}).get("pushed_at"), "release": m.get("release")}
+                      for k, m in sorted(meta.items()) if k in repos},
+            "listed_repos": {k: sorted(a for a in v if a) for k, v in sorted(listed.items())}}
+
+
+def build(ev, existing_path):
+    rows = ev["rows"]; tag = {(t[0], t[1]): (t[2], t[3]) for t in ev["tagged"]}; meta = ev["repos"]
     groups = collections.defaultdict(list); support = []
-    for r in rows.values():
+    for r in rows:
         k = ident(r["name"])
         if k in SUPPORT: support.append(r); continue
         groups[k].append(r)
@@ -150,7 +170,7 @@ def build(results, leads, existing_path):
         else: dl = "No file link crawled"
         mirrors = [r for r in rs if r is not shown and r["name"].lower().endswith(".opk") and r["host"] != shown["host"]]
         mirror = "; ".join(sorted({"%s: %s" % (r["host"], "HTTP %s" % ",".join(map(str, sorted(r["status"]))) if r["fp"] and r["status"] else "found") for r in mirrors}))
-        m = meta.get(repo, {}).get("meta", {}) if repo else {}
+        m = meta.get(repo, {}) if repo else {}
         ex = existing.get(k)
         c = {"id": "wiki-" + k, "name": name, "description": "", "topics": [], "version": version_of(shown["name"]) or (meta.get(repo, {}).get("release") or "" if repo else ""),
              "repo": repo, "source": ("https://github.com/" + repo) if repo and shown["host"] == "github.com" else PAGE,
@@ -164,7 +184,7 @@ def build(results, leads, existing_path):
                          "anchors": sorted({a for r in rs for a in r["anchors"] if a}), "urls": sorted({r["url"] for r in rs})}}
         if ex: c["same_as"] = ex["id"]
         out.append(c)
-    for repo, anchors in sorted(listed_repos(results).items()):
+    for repo, anchors in sorted(ev["listed_repos"].items()):
         k = ident(repo.split("/")[1])
         if k in groups or repo.lower() == "drum78/drum78": continue
         name, cat, why = NAMES.get(k, (repo.split("/")[1], "other", "name does not say"))
@@ -178,28 +198,39 @@ def build(results, leads, existing_path):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--results", nargs="+", required=True); ap.add_argument("--leads", nargs="*", default=[])
-    ap.add_argument("--existing", default=str(ROOT / "candidates" / "rg-nano.json"))
-    ap.add_argument("--out", default=str(ROOT / "candidates" / "wiki-listings.json")); ap.add_argument("--md", default=None)
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    x = sub.add_parser("extract", help="distil crawl results and package leads into the tracked evidence file")
+    x.add_argument("--results", nargs="+", required=True); x.add_argument("--leads", nargs="*", default=[])
+    x.add_argument("--out", default=str(ROOT / "discovery" / "wiki-links-evidence.json"))
+    b = sub.add_parser("build", help="evidence + existing candidates -> wiki-listings.json (+ report)")
+    b.add_argument("--evidence", default=str(ROOT / "discovery" / "wiki-links-evidence.json"))
+    b.add_argument("--existing", default=str(ROOT / "candidates" / "rg-nano.json"))
+    b.add_argument("--out", default=str(ROOT / "candidates" / "wiki-listings.json")); b.add_argument("--md", default=None)
     a = ap.parse_args()
-    cands, support, unnamed = build(a.results, a.leads, a.existing)
+    if a.cmd == "extract":
+        ev = evidence(a.results, a.leads)
+        Path(a.out).write_bytes((json.dumps(ev, indent=1, ensure_ascii=False) + "\n").encode("utf-8"))   # bytes: the same file on every OS
+        print(f"{len(ev['rows'])} wiki-linked package rows, {len(ev['listed_repos'])} linked repositories, {len(ev['repos'])} with metadata -> {a.out}")
+        return
+    ev = load(a.evidence)
+    cands, support, unnamed = build(ev, a.existing)
     if unnamed: sys.exit("no display name for: %s (add to NAMES)" % unnamed)
     doc = {"schema": 1, "device": "rg-nano", "status": "UNAPPROVED wiki listings, read-only; not part of the signed catalog",
-           "from": {"page": PAGE, "inputs": len(a.results) + len(a.leads),
+           "from": {"page": PAGE, "inputs": ev["inputs"],
                     "note": "Link targets only. The page text (category headings, descriptions) was not cached by the crawler."},
            "support_files": [{"name": urllib.parse.unquote(r["name"]), "url": r["url"], "anchors": sorted(x for x in r["anchors"] if x), "role": SUPPORT[ident(r["name"])]} for r in sorted(support, key=lambda r: r["name"])],
            "candidates": cands}
-    Path(a.out).write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    Path(a.out).write_bytes((json.dumps(doc, indent=1, ensure_ascii=False) + "\n").encode("utf-8"))
     n = len(cands); same = sum("same_as" in c for c in cands)
     ver = sum(bool(c["package"]["signature"]) for c in cands)
     cc = collections.Counter(c["category"] for c in cands)
     print(f"{n} listings, {same} already shown, {n - same} new, {ver} package-verified, {n - ver} not verified, {len(support)} support files")
     print(dict(cc))
-    if a.md: Path(a.md).write_text(render_md(doc), encoding="utf-8")
+    if a.md: Path(a.md).write_bytes(render_md(doc, ev).encode("utf-8"))
 
 
-def render_md(doc):
+def render_md(doc, ev):
     c = doc["candidates"]; n = len(c); same = sum("same_as" in x for x in c); ver = sum(bool(x["package"]["signature"]) for x in c)
     cc = collections.Counter(x["category"] for x in c)
     L = ["# FunKey wiki listings recovered from local data", "",
@@ -208,7 +239,7 @@ def render_md(doc):
          "- The crawler kept the page's **link targets, not its text**. The wiki's original category headings and descriptions are **missing** from every local file. Every entry carries `wiki_category: \"\"`, and the Nano UI shows \"Wiki category: Not recorded\". None was invented.",
          "- The %d entries are the applications whose links the crawler followed. An application the page lists without such a link is **not here**, so %d is a floor, not the page's total. Full coverage is not claimed." % (len(doc["candidates"]), len(doc["candidates"])),
          "- The RetroHatch category column is **not** the wiki's heading. It is a filter bucket picked from the file name alone, and each entry says so in its basis line (`Wiki heading not cached; by file name only: ...`). %d entries whose names say nothing stay `Other`. Re-derive all of them from the real headings once the page text is available." % sum(x["category"] == "other" for x in doc["candidates"]),
-         "- Inputs were crawl results and package leads on this machine, including an earlier session's artifacts that are not in the repository, so the generator cannot be re-run from a clean checkout. The committed `candidates/wiki-listings.json` is the record.",
+         "- Reproducible from Git: `python tools/make_wiki_inventory.py build --md docs/WIKI_LISTINGS_INVENTORY.md` rebuilds this report and `candidates/wiki-listings.json` byte for byte from `discovery/wiki-links-evidence.json` and `candidates/rg-nano.json`, both tracked, with no network. The evidence file was distilled once (`extract`) from %d crawl-result and package-lead files dated %s, some of them an earlier session's artifacts that were never tracked, so **that extraction cannot be repeated from a clean checkout**. No new crawl was made." % (ev["inputs"], ", ".join(ev["as_of"]) or "unknown"),
          "- \"Package verified\" means a squashfs signature was seen. It says nothing about safety or compatibility. Every entry is UNAPPROVED, hardware-untested and read-only in the UI.", "",
          "| Measure | Count |", "|---|---|", "| Distinct listings recovered | %d |" % n, "| Already shown among the 10 discovered candidates | %d |" % same,
          "| Newly represented | %d |" % (n - same), "| Package verified (squashfs seen) | %d |" % ver, "| Not verified | %d |" % (n - ver),
