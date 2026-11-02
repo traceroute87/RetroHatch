@@ -117,8 +117,28 @@ def enrich(c, rec):
 # ---- icon redistribution rights ---------------------------------------------------------------------------------------
 STATUSES = ("redistributable", "unclear", "restricted")
 # Only an entry here can make an icon "redistributable"/"restricted": it needs evidence naming the icon (or its asset folder) and the licence
-# that covers it. Nothing qualifies today: no audited icon carries an icon-specific licence or credit.
-RIGHTS_OVERRIDE = {}
+# that covers it. Found by reading the upstream repositories on 2026-11-02 (docs/ICON_LICENSE_AUDIT.md); the commit URLs below are what was read.
+_ZN = "https://github.com/joyrider3774/znax_funkey/blob/d196189936e5/"
+_RU = "https://github.com/joyrider3774/rubido_funkey/blob/8ca470ce87b6/"
+_BL = "https://github.com/joyrider3774/blips_funkey/blob/903679a02b7c/"
+RIGHTS_OVERRIDE = {
+    "wiki-znax": {"status": "redistributable", "source_license": "MIT", "package_files_inspected": False,
+                  "evidence": "README Credits: \"All Graphics were made by Willems Davy initially for the gp2x version ... adapted for the funkey handheld resolution using gimp.\" "
+                              "The icon is graphics/znax.png in the repository, byte-identical to the packaged icon. The repository is MIT.",
+                  "copyright": "Copyright (c) 2025 Willems Davy", "notice": "candidates/icons/NOTICE.md",
+                  "attribution": "The MIT copyright and permission notice must accompany the icon; nothing else is required.",
+                  "sources": [_ZN + "README.md", _ZN + "LICENSE", _ZN + "graphics/znax.png"]},
+    "wiki-rubido": {"status": "redistributable", "source_license": "MIT", "package_files_inspected": False,
+                    "evidence": "README Credits: \"Graphcis are made by me willems davy aka joyrider3774 using gimp\"; the bought assets it lists and warns not to reuse are sounds only. "
+                                "The icon is rubidofs/icon.png in the repository, byte-identical to the packaged icon (it sits beside graphics/, so this rests on the blanket graphics statement). The repository is MIT.",
+                    "copyright": "Copyright (c) 2024 Willems Davy", "notice": "candidates/icons/NOTICE.md",
+                    "attribution": "The MIT copyright and permission notice must accompany the icon; nothing else is required.",
+                    "sources": [_RU + "README.md", _RU + "LICENSE", _RU + "rubidofs/icon.png"]},
+    "wiki-blips": {"status": "restricted", "source_license": "MIT", "package_files_inspected": False,
+                   "evidence": "The icon is a 2x2 composite that includes the dynamite tile (graphics/bomb.png). README Graphics: \"dynamite: GUI Icons by Rexard ... I Payed for this asset do not reuse !\" "
+                               "(also graphics/credits.txt). The repository's MIT grant does not extend to a bought asset its author says not to reuse.",
+                   "sources": [_BL + "README.md", _BL + "graphics/credits.txt", _BL + "graphics/blips.png"]},
+}
 _DEFAULT = "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork."
 _MIT_REPO = "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork."
 _NOTES = {

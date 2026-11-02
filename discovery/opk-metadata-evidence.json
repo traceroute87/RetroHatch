@@ -185,10 +185,15 @@
     "available": true,
     "sha256": "8828127d7fec48e3c9d9f5f6410920321034858254ebf52e2f5f281a60f2e5b5",
     "redistribution": {
-     "status": "unclear",
-     "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork. The game is a remake of another author's DOS game.",
+     "status": "restricted",
      "source_license": "MIT",
-     "package_files_inspected": false
+     "package_files_inspected": false,
+     "evidence": "The icon is a 2x2 composite that includes the dynamite tile (graphics/bomb.png). README Graphics: \"dynamite: GUI Icons by Rexard ... I Payed for this asset do not reuse !\" (also graphics/credits.txt). The repository's MIT grant does not extend to a bought asset its author says not to reuse.",
+     "sources": [
+      "https://github.com/joyrider3774/blips_funkey/blob/903679a02b7c/README.md",
+      "https://github.com/joyrider3774/blips_funkey/blob/903679a02b7c/graphics/credits.txt",
+      "https://github.com/joyrider3774/blips_funkey/blob/903679a02b7c/graphics/blips.png"
+     ]
     }
    },
    "comment_class": "description"
@@ -942,10 +947,18 @@
     "available": true,
     "sha256": "7912849e026db082fa6a305d3e8164959854275e5baa43200cef613bc8bba8b7",
     "redistribution": {
-     "status": "unclear",
-     "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork.",
+     "status": "redistributable",
      "source_license": "MIT",
-     "package_files_inspected": false
+     "package_files_inspected": false,
+     "evidence": "README Credits: \"Graphcis are made by me willems davy aka joyrider3774 using gimp\"; the bought assets it lists and warns not to reuse are sounds only. The icon is rubidofs/icon.png in the repository, byte-identical to the packaged icon (it sits beside graphics/, so this rests on the blanket graphics statement). The repository is MIT.",
+     "copyright": "Copyright (c) 2024 Willems Davy",
+     "notice": "candidates/icons/NOTICE.md",
+     "attribution": "The MIT copyright and permission notice must accompany the icon; nothing else is required.",
+     "sources": [
+      "https://github.com/joyrider3774/rubido_funkey/blob/8ca470ce87b6/README.md",
+      "https://github.com/joyrider3774/rubido_funkey/blob/8ca470ce87b6/LICENSE",
+      "https://github.com/joyrider3774/rubido_funkey/blob/8ca470ce87b6/rubidofs/icon.png"
+     ]
     }
    },
    "comment_class": "description"
@@ -1159,10 +1172,18 @@
     "available": true,
     "sha256": "aca247a27f9a3329d3886018cfa611ded2dd28278cf3d93f3f9a3e3dcf0a0af6",
     "redistribution": {
-     "status": "unclear",
-     "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork. The game is a remake of another author's Flash game.",
+     "status": "redistributable",
      "source_license": "MIT",
-     "package_files_inspected": false
+     "package_files_inspected": false,
+     "evidence": "README Credits: \"All Graphics were made by Willems Davy initially for the gp2x version ... adapted for the funkey handheld resolution using gimp.\" The icon is graphics/znax.png in the repository, byte-identical to the packaged icon. The repository is MIT.",
+     "copyright": "Copyright (c) 2025 Willems Davy",
+     "notice": "candidates/icons/NOTICE.md",
+     "attribution": "The MIT copyright and permission notice must accompany the icon; nothing else is required.",
+     "sources": [
+      "https://github.com/joyrider3774/znax_funkey/blob/d196189936e5/README.md",
+      "https://github.com/joyrider3774/znax_funkey/blob/d196189936e5/LICENSE",
+      "https://github.com/joyrider3774/znax_funkey/blob/d196189936e5/graphics/znax.png"
+     ]
     }
    },
    "comment_class": "description"

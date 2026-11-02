@@ -88,20 +88,32 @@ assert [c["name"] for c in O][:3] == ["j2me-funkey-rgnano", "NanoCraft", "Funkob
 # ---- icons: all 37 are recorded; an icon ships (tracked file, snapshot name, OPK) only with a recorded right to redistribute it -------
 import collections, hashlib
 status = collections.Counter(r["icon"]["redistribution"]["status"] for r in E)
-assert status == {"unclear": 37}, status                      # the audit found no icon-specific licence or credit; nothing is restricted by evidence either
+assert status == {"unclear": 34, "redistributable": 2, "restricted": 1}, status
+SHIP = {"wiki-znax", "wiki-rubido"}                              # the two whose upstream says, in words, that the graphics are the author's own and MIT
 allowed = set()
 for r in E:
     red = r["icon"]["redistribution"]; row = rows[r["id"]]
     assert red["status"] in OM.STATUSES and red["evidence"] and re.fullmatch(r"[0-9a-f]{64}", r["icon"]["sha256"]) and "source_license" in red
     assert ("icon_file" in row) == (red["status"] == "redistributable")                      # glyph for everything else
     assert row["package_metadata"]["icon"]["redistribution"]["status"] == red["status"]     # the snapshot keeps the verdict next to the icon facts
+    if red["status"] != "unclear": assert red["sources"] and all(s.startswith("https://github.com/") for s in red["sources"])   # a verdict other than "unclear" cites what it rests on
     if red["status"] == "redistributable":
         allowed.add(r["id"])
-        assert hashlib.sha256((ROOT / "candidates" / row["icon_file"]).read_bytes()).hexdigest() == r["icon"]["sha256"]
+        assert hashlib.sha256((ROOT / "candidates" / row["icon_file"]).read_bytes()).hexdigest() == r["icon"]["sha256"]     # the tracked file is the recorded one
+        assert red["source_license"] == "MIT" and red["copyright"].startswith("Copyright (c) ") and red["notice"] == "candidates/icons/NOTICE.md"
+assert allowed == SHIP and rows["wiki-blips"]["package_metadata"]["icon"]["redistribution"]["status"] == "restricted" and "icon_file" not in rows["wiki-blips"]
 assert {p.stem for p in (ROOT / "candidates" / "icons").glob("*.png")} == allowed             # no unclear or restricted file in the distribution folder
-assert sum("icon_file" in c for c in rows.values()) == len(allowed) == 0
-assert OM.icon_rights("wiki-blips", "MIT")["status"] == "unclear" and OM.icon_rights("x", None)["source_license"] == "unknown"   # a project licence alone never clears artwork
-assert "candidates/icons/*.png" in (ROOT / ".gitignore").read_text(encoding="utf-8")        # an icon can only be tracked on purpose (git add -f)
+assert sorted(c["id"] for c in rows.values() if "icon_file" in c) == sorted(SHIP)             # the snapshots name exactly those two
+notice = (ROOT / "candidates" / "icons" / "NOTICE.md").read_text(encoding="utf-8")
+for r in E:
+    if r["id"] in SHIP:
+        red = r["icon"]["redistribution"]
+        assert red["copyright"] in notice and r["icon"]["sha256"] in notice and r["id"] + ".png" in notice and red["sources"][2].replace("https://github.com/", "https://github.com/") in notice
+assert "Permission is hereby granted, free of charge" in notice and "The above copyright notice and this permission notice shall be included" in notice
+assert OM.icon_rights("wiki-blips", "MIT")["status"] == "restricted" and OM.icon_rights("x", None)["status"] == "unclear"
+assert OM.icon_rights("funkoban", "MIT")["status"] == "unclear"                               # a project licence alone never clears artwork
+gi = (ROOT / ".gitignore").read_text(encoding="utf-8").split("\n")
+assert "candidates/icons/*.png" in gi and sorted(l for l in gi if l.startswith("!candidates/icons/")) == sorted("!candidates/icons/%s.png" % i for i in SHIP)   # only cleared icons can be tracked
 for status_, has in (("redistributable", True), ("unclear", False), ("restricted", False)):
     e = copy.deepcopy(base); OM.enrich(e, dict(rec, icon=dict(rec["icon"], sha256="1" * 64, redistribution={"status": status_, "evidence": "t", "source_license": "MIT"})))
     assert ("icon_file" in e) == has and e["package_metadata"]["icon"]["redistribution"]["status"] == status_

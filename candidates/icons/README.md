@@ -8,4 +8,4 @@ Icons that are `unclear` or `restricted` are not tracked in Git, not copied into
 candidates show the package glyph. Development copies of the extracted icons stay in `build/opk-icons/` (git-ignored), with
 `manifest.json` (SHA-256 per file). See `docs/ICON_LICENSE_AUDIT.md`.
 
-`*.png` here is git-ignored: add an approved icon with `git add -f`.
+`*.png` here is git-ignored; a cleared icon is allowed by its own `!candidates/icons/<id>.png` line in `.gitignore`. Cleared today: `wiki-znax.png`, `wiki-rubido.png` (notices in `NOTICE.md`).

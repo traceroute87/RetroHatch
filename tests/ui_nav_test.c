@@ -533,7 +533,20 @@ static void icons(const char *root, const char *assets)
 	for (i = 0; i < m.n_cands; i++) if (m.cands[i].icon[0]) {
 		n_icon++; fp = fopen(m.cands[i].icon, "rb"); CHECK(fp != NULL); if (fp) fclose(fp);
 	}
-	CHECK(n_icon <= m.n_cands);
+	CHECK(n_icon == 2);                                                                          /* exactly the two cleared icons are named */
+	CHECK(find_cand(&m, "Znax") >= 0 && find_cand(&m, "Rubido") >= 0 && m.cands[find_cand(&m, "Znax")].icon[0] && m.cands[find_cand(&m, "Rubido")].icon[0]);
+	CHECK(!m.cands[find_cand(&m, "Blips")].icon[0] && !m.cands[find_cand(&m, "Funkoban")].icon[0]);   /* restricted and unclear icons keep the package glyph */
+	CHECK(rh_ui_init(assets, &m) == 0);
+	{
+		static const char *const SHOW[] = {"Rubido", "Znax", "Blips"};
+		for (k = 0; k < 3; k++) {
+			char nm[64]; keys("a"); for (i = 0; i < m.n_apps + find_cand(&m, SHOW[k]); i++) keys("d");
+			snprintf(nm, sizeof nm, "icon_real_%d_%s_row", k + 1, SHOW[k]); shot(nm);
+			keys("a"); CHECK(V().screen == RH_S_CAND && V().action == RH_ACT_NONE); snprintf(nm, sizeof nm, "icon_real_%d_%s_details", k + 1, SHOW[k]); shot(nm);
+			keys("bbb"); CHECK(V().screen == RH_S_HOME);
+		}
+	}
+	rh_ui_free();
 
 	/* the feature, on synthetic icons made for these tests */
 	snprintf(f, sizeof f, "%s/tests/ui_fixture/candidates-icons.json", root);

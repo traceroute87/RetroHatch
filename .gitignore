@@ -65,5 +65,7 @@ desktop.ini
 *.log
 *.swp
 
-# ---- candidate icons: only icons with a recorded right to redistribute may be tracked (git add -f after the audit says so)
+# ---- candidate icons: only icons with a recorded right to redistribute may be tracked; each cleared icon gets its own "!" line below
 candidates/icons/*.png
+!candidates/icons/wiki-znax.png
+!candidates/icons/wiki-rubido.png
