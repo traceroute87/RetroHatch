@@ -2,6 +2,7 @@
  *   ui_nav_test <repo_root> [shots_dir]
  * With shots_dir, also writes one BMP per screen. Uses SDL's dummy video. */
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <SDL/SDL.h>
@@ -409,6 +410,107 @@ static void categories(const char *root, const char *assets)
 	rh_ui_free();
 }
 
+/* ---- FunKey wiki listings: the whole inventory, no fixed limit, all UNAPPROVED and read-only ---- */
+static void wiki_listings(const char *root, const char *assets)
+{
+	static rh_model m; char cat[512], st[512], f[512], tmp[] = "/tmp/rh_wiki_XXXXXX"; rh_ui_view v; int i, j, n_apps, n_wiki = 0, n_unver = 0, n_ver = 0, fd, last;
+	static const char *const OLD[] = {"j2me-funkey-rgnano", "NanoCraft", "Funkoban", "Cglpsdl1", "picoarch", "XASH3DFS", "meleelight", "SuDokuL", "TriSpace", "KeyCraft"};
+	FILE *fp;
+	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root);
+	snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root);
+	rh_model_load(&m, cat, st); n_apps = m.n_apps; rh_model_load_candidates(&m, f);
+	CHECK(m.n_cands == 10);
+	snprintf(f, sizeof f, "%s/candidates/wiki-listings.json", root);
+	rh_model_add_candidates(&m, f);
+	CHECK(m.n_cands > 12 && m.n_apps == n_apps);                                        /* past the old 12-row limit; approved apps untouched */
+	for (i = 0; i < 10; i++) CHECK(find_cand(&m, OLD[i]) >= 0);                         /* nothing unique to the existing source was dropped */
+	CHECK(m.cands[find_cand(&m, "Funkoban")].wiki && m.cands[find_cand(&m, "Cglpsdl1")].wiki);   /* matched, not duplicated */
+	for (i = 0, j = 0; i < m.n_cands; i++) j += !strcmp(m.cands[i].name, "Funkoban") || !strcmp(m.cands[i].name, "Cglpsdl1");
+	CHECK(j == 2);
+	for (i = 0; i < m.n_cands; i++) {
+		const rh_cand *c = &m.cands[i]; int k;
+		CHECK(c->name[0] && c->id[0]);
+		for (k = i + 1; k < m.n_cands; k++) CHECK(strcmp(c->id, m.cands[k].id) != 0);   /* every application keeps its own identity */
+		if (!c->wiki) continue;
+		n_wiki++;
+		CHECK(c->cat >= RH_CAT_GAMES && c->cat <= RH_CAT_OTHER);
+		if (c->sig_ok) n_ver++;
+		else { n_unver++; CHECK(c->dl[0]); }                                             /* an unverified listing says why */
+	}
+	CHECK(n_wiki >= 46 && n_ver > 0 && n_unver > 0 && n_wiki == n_ver + n_unver);
+	for (i = 0, j = 0; i < RH_CAT_N; i++) j += n_cat(&m, i) * (i != RH_CAT_ALL);
+	CHECK(j == n_apps + m.n_cands);                                                      /* one category each */
+
+	CHECK(rh_ui_init(assets, &m) == 0);
+	rh_ui_set_planner(rh_plan_target);                                                  /* even with a planner, no install, download or preview */
+	keys("a"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.count == n_apps + m.n_cands);
+	for (i = 0; i < n_apps + 10; i++) keys("d");                                         /* first wiki-only row */
+	CHECK(V().sel_visible); shot("wiki_1_browse");
+	last = v.count - 1;
+	for (i = n_apps + 10; i < last; i++) { keys("d"); CHECK(V().sel_visible); }          /* every row reachable and on screen */
+	CHECK(V().sel == last); shot("wiki_2_browse_last");
+	keys("a"); v = V(); CHECK(v.screen == RH_S_CAND && v.app == m.n_cands - 1 && v.action == RH_ACT_NONE);
+	keys("a"); keys("a"); CHECK(V().screen == RH_S_CAND && V().depth == 2);              /* A does nothing */
+	keys("bb"); CHECK(V().screen == RH_S_HOME);
+	rh_ui_free();
+
+	{   /* a verified listing, an unverified one, a long name: details pages */
+		const char *pick[][2] = {{"Gambatte", "wiki_3_details_verified"}, {"Clock App", "wiki_4_details_unverified"}, {"FinalBurn Alpha 2012", "wiki_5_details_long_name"}, {"KeyKalc", "wiki_6_details_no_file"}};
+		for (j = 0; j < 4; j++) {
+			int idx = find_cand(&m, pick[j][0]), k;
+			CHECK(idx >= 0 && m.cands[idx].wiki);
+			CHECK(rh_ui_init(assets, &m) == 0);
+			keys("a"); for (k = 0; k < n_apps + idx; k++) keys("d");
+			keys("a"); v = V(); CHECK(v.screen == RH_S_CAND && v.app == idx); shot(pick[j][1]);
+			if (j == 1) { for (k = 0; k < 8; k++) keys("d"); shot("wiki_4a_details_unverified_middle"); }
+			for (k = 0; k < 40; k++) keys("d");
+			CHECK(V().scroll > 0); if (j == 1) shot("wiki_4b_details_unverified_bottom");
+			rh_ui_free();
+		}
+		CHECK(!m.cands[find_cand(&m, "Clock App")].sig_ok && m.cands[find_cand(&m, "Gambatte")].sig_ok);
+	}
+	{   /* every candidate page opens, scrolls to its end and comes back under the sanitizers: row buffers and text wrapping stay in bounds */
+		int idx, k;
+		for (idx = 0; idx < m.n_cands; idx++) {
+			CHECK(rh_ui_init(assets, &m) == 0);
+			keys("a"); for (k = 0; k < n_apps + idx; k++) keys("d");
+			keys("a"); v = V(); CHECK(v.screen == RH_S_CAND && v.app == idx && v.action == RH_ACT_NONE);
+			for (k = 0; k < 60; k++) keys("d");
+			for (k = 0; k < 60; k++) keys("u");
+			CHECK(V().scroll == 0); keys("b"); CHECK(V().screen == RH_S_DISCOVER);
+			rh_ui_free();
+		}
+	}
+	{   /* category filter over the combined list: Emulators holds the most wiki entries */
+		CHECK(rh_ui_init(assets, &m) == 0);
+		keys("a"); keys("rr"); v = V(); CHECK(v.count == n_cat(&m, RH_CAT_EMU) && v.count > 12); shot("wiki_7_filter_emulators");
+		for (i = 1; i < v.count; i++) { keys("d"); CHECK(V().sel_visible); }
+		shot("wiki_8_filter_emulators_last");
+		rh_ui_free();
+	}
+
+	/* no arbitrary cap: 300 distinct ids load, a repeated id and an entry without id or repo do not */
+	fd = mkstemp(tmp); CHECK(fd >= 0);
+	fp = fdopen(fd, "w"); fprintf(fp, "{\"candidates\":[");
+	for (i = 0; i < 300; i++) fprintf(fp, "%s{\"id\":\"t%d\",\"name\":\"Test %d\",\"approval\":\"unapproved\",\"hardware_test\":\"none\"}", i ? "," : "", i, i);
+	fprintf(fp, ",{\"id\":\"t7\",\"name\":\"Repeat\",\"approval\":\"unapproved\",\"hardware_test\":\"none\"},{\"name\":\"Nameless\",\"approval\":\"unapproved\",\"hardware_test\":\"none\"}]}");
+	fclose(fp);
+	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, tmp);
+	CHECK(m.n_cands == 300);
+	rh_model_add_candidates(&m, tmp); CHECK(m.n_cands == 300);                           /* adding the same file again changes nothing */
+	CHECK(rh_ui_init(assets, &m) == 0);
+	keys("a"); CHECK(V().count == n_apps + 300);
+	for (i = 0; i < n_apps + 299; i++) keys("d");
+	CHECK(V().sel_visible); keys("a"); CHECK(V().screen == RH_S_CAND && V().app == 299);
+	rh_ui_free();
+	fp = fopen(tmp, "w"); fprintf(fp, "{\"candidates\":[{\"id\":\"big\",\"name\":\"Big\",\"description\":\"");   /* over 1 MB: refused whole, never half-read */
+	for (i = 0; i < (1 << 20); i++) fputc('x', fp);
+	fprintf(fp, "\",\"approval\":\"unapproved\",\"hardware_test\":\"none\"}]}"); fclose(fp);
+	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, tmp); CHECK(m.n_cands == 0);
+	remove(tmp);
+	rh_ui_set_planner(NULL);
+}
+
 int main(int argc, char **argv)
 {
 	char assets[512];
@@ -423,6 +525,7 @@ int main(int argc, char **argv)
 	preview(argv[1], assets);
 	candidates(argv[1], assets);
 	categories(argv[1], assets);
+	wiki_listings(argv[1], assets);
 	scenario(argv[1], assets, "populated"); scenario(argv[1], assets, "noupdates"); scenario(argv[1], assets, "empty");
 	SDL_Quit();
 	printf("%d checks, %d failed\n", checks, fails);

@@ -29,9 +29,8 @@ typedef struct {
 typedef struct { char id[24], name[48]; } rh_dev;
 
 /* UNAPPROVED local candidate (a discovery result, never part of the signed catalog). Read-only: no install data is kept at all. */
-#define RH_MAX_CANDS 12
 typedef struct {
-	char name[48], desc[200], version[24], repo[64], source[128], license[32], last_activity[11];
+	char id[40], name[48], desc[200], version[24], repo[64], source[128], license[32], last_activity[11];
 	char pkg_name[64], claim_text[160], claim_where[16];
 	rh_cat cat;           /* the snapshot's reviewed "category" when it has one (basis kept), else derived by rh_categorize() */
 	char cat_basis[120];  /* quotes the reviewed category rests on; "" = derived, not reviewed */
@@ -40,6 +39,10 @@ typedef struct {
 	int sig_ok;           /* 1 = squashfs signature of the OPK seen by the crawler; 0 = unknown. It says nothing about safety or compatibility */
 	int zipped;           /* package is inside a ZIP release asset */
 	int more;             /* other packages found in the same repository */
+	int wiki;             /* the FunKey wiki list of third-party OPK applications links to it */
+	char wiki_cat[40];    /* the wiki's own category heading; "" = not recorded (the crawler kept links, not page text) */
+	char dl[48];          /* wiki listings: what the file link gave when it was crawled ("Found...", "Unavailable (HTTP 403)", ...); "" = n/a */
+	char mirror[64];      /* wiki listings: result of the page's other link(s) to the same application, "" = none */
 } rh_cand;
 
 typedef struct {
@@ -53,7 +56,7 @@ typedef struct {
 	struct { char id[40], version[24]; int app; } inst[RH_MAX_APPS]; int n_inst;
 	int upd[RH_MAX_APPS];     int n_upd;   /* indexes into inst[]: catalog has a different available version */
 	rh_devinfo di;
-	rh_cand cands[RH_MAX_CANDS]; int n_cands;   /* rh_model_load_candidates(); shown after the approved apps, always labeled UNAPPROVED */
+	rh_cand *cands; int n_cands, cap_cands;   /* rh_model_load_candidates(); grown as needed, no fixed limit; shown after the approved apps, always labeled UNAPPROVED */
 	int dev_fixture;          /* local catalog dir holds a DEV_FIXTURE marker: entries are test fixtures, not approved apps */
 	/* signed catalog (DEV): where the entries came from and whether the signature held. source == "" = local files */
 	struct { char source[16]; unsigned serial; char generated[11], expires[11]; int ok; char status[96]; } cat;
@@ -64,6 +67,9 @@ void rh_model_load(rh_model *m, const char *catalog_dir, const char *state_dir);
 /* Unapproved candidate snapshot (JSON, see tools/make_candidate_snapshot.py). Fail closed: an entry is kept only when it says
  * approval "unapproved" and hardware_test "none"; duplicates (same repo) and entries already in the catalog are skipped. Missing file = none. */
 void rh_model_load_candidates(rh_model *m, const char *path);
+/* Same file format, appended to what is already loaded (replaces nothing). An entry carrying "same_as": "<id>" is not a new row: it marks
+ * the already loaded candidate with that id as listed on the wiki. Entries are keyed by "id" when they have one, else by repo. */
+void rh_model_add_candidates(rh_model *m, const char *path);
 /* Entries from an index that rh_catalog_verify_persist() accepted (never call this with unverified bytes). src = "bundled" or
  * "cached". serial/generated/expires come from the verifier. Only apps for device_id are shown. */
 void rh_model_load_signed(rh_model *m, const char *index, size_t len, const char *src, unsigned serial, const char *expires,

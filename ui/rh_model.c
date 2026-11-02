@@ -11,17 +11,19 @@
 
 #define CP(d, s) snprintf((d), sizeof(d), "%s", (s))
 
-static char *slurp(const char *path)
+static char *slurp_max(const char *path, long max)
 {
 	FILE *f = fopen(path, "rb");
 	char *b; long n;
 	if (!f) return NULL;
 	fseek(f, 0, SEEK_END); n = ftell(f); fseek(f, 0, SEEK_SET);
-	if (n < 0 || n > 65536 || !(b = malloc(n + 1))) { fclose(f); return NULL; }
+	if (n < 0 || n > max || !(b = malloc(n + 1))) { fclose(f); return NULL; }
 	if (fread(b, 1, n, f) != (size_t)n) { fclose(f); free(b); return NULL; }
 	fclose(f); b[n] = 0;
 	return b;
 }
+
+static char *slurp(const char *path) { return slurp_max(path, 65536); }
 
 static rj *load_json(const char *dir, const char *sub, const char *name)
 {
@@ -190,6 +192,7 @@ static void load_devinfo(rh_devinfo *d)
 void rh_model_load(rh_model *m, const char *dir, const char *state_dir)
 {
 	char path[512], target[24] = "rg-nano"; DIR *d; struct dirent *e; rj *j;
+	free(m->cands);   /* a model is static (zero at first use); the candidate list is the only heap part */
 	memset(m, 0, sizeof *m);
 	snprintf(path, sizeof path, "%s/DEV_FIXTURE", dir);
 	m->dev_fixture = !access(path, F_OK);
@@ -223,25 +226,42 @@ static int cat_from_id(const char *s)   /* RH_CAT_* for a snapshot category id, 
 	return 0;
 }
 
-void rh_model_load_candidates(rh_model *m, const char *path)
+#define CAND_FILE_MAX (1L << 20)   /* local trusted file, ~60 KB today; parsing takes ~5x its size in heap, so 1 MB keeps a runaway file near 5 MB on a 64 MB device */
+
+static int cand_grow(rh_model *m)
 {
-	char *txt = slurp(path); rj *j; const rj *k, *c;
-	m->n_cands = 0;
+	rh_cand *t;
+	if (m->n_cands < m->cap_cands) return 1;
+	if (!(t = realloc(m->cands, (m->cap_cands ? m->cap_cands * 2 : 16) * sizeof *t))) return 0;
+	m->cands = t; m->cap_cands = m->cap_cands ? m->cap_cands * 2 : 16;
+	return 1;
+}
+
+void rh_model_add_candidates(rh_model *m, const char *path)
+{
+	char *txt = slurp_max(path, CAND_FILE_MAX); rj *j; const rj *k, *c;
 	if (!txt) return;
 	j = rj_parse(txt); free(txt);
 	if (!j) return;
 	if ((k = rj_get(j, "candidates")))
-		for (c = k->kid; c && m->n_cands < RH_MAX_CANDS; c = c->next) {
-			rh_cand *x = &m->cands[m->n_cands]; const rj *p = rj_get(c, "package"), *cl = rj_get(c, "claim"), *n; int i, dup = 0;
+		for (c = k->kid; c; c = c->next) {
+			rh_cand t, *x = &t; const rj *p = rj_get(c, "package"), *cl = rj_get(c, "claim"), *ls = rj_get(c, "listing"), *n; int i, dup = 0;
 			if (strcmp(rj_str(c, "approval", ""), "unapproved") || strcmp(rj_str(c, "hardware_test", ""), "none")) continue;   /* anything else is not ours to show */
 			memset(x, 0, sizeof *x);
-			CP(x->name, rj_str(c, "name", "")); CP(x->desc, rj_str(c, "description", ""));
+			CP(x->id, rj_str(c, "id", "")); CP(x->name, rj_str(c, "name", "")); CP(x->desc, rj_str(c, "description", ""));
 			if (strlen(rj_str(c, "description", "")) >= sizeof x->desc) strcpy(x->desc + sizeof x->desc - 4, "...");   /* cut text says so */
 			CP(x->version, rj_str(c, "version", ""));
 			CP(x->repo, rj_str(c, "repo", "")); CP(x->source, rj_str(c, "source", "")); CP(x->license, rj_str(c, "license", ""));
 			CP(x->last_activity, rj_str(c, "last_activity", ""));
-			if (!x->name[0] || !x->repo[0]) continue;
-			for (i = 0; i < m->n_cands; i++) dup |= !strcmp(m->cands[i].repo, x->repo);
+			if (!x->name[0] || (!x->repo[0] && !x->id[0])) continue;
+			x->wiki = !strcmp(rj_str(ls, "source", ""), "wiki");
+			if (x->wiki) { CP(x->wiki_cat, rj_str(ls, "wiki_category", "")); CP(x->dl, rj_str(ls, "download", "")); CP(x->mirror, rj_str(ls, "mirror", "")); }
+			if (rj_str(c, "same_as", "")[0]) {   /* the wiki lists something already loaded: mark it, never a second row */
+				for (i = 0; i < m->n_cands; i++)
+					if (m->cands[i].id[0] && !strcmp(m->cands[i].id, rj_str(c, "same_as", ""))) { m->cands[i].wiki = 1; CP(m->cands[i].wiki_cat, x->wiki_cat); }
+				continue;
+			}
+			for (i = 0; i < m->n_cands; i++) dup |= x->id[0] ? !strcmp(m->cands[i].id, x->id) : !strcmp(m->cands[i].repo, x->repo);   /* an id names one application; no id: one per repo */
 			for (i = 0; i < m->n_apps; i++) dup |= x->source[0] && !strcmp(m->apps[i].source, x->source);   /* already a catalog entry */
 			if (dup) continue;
 			if (p) {
@@ -251,23 +271,31 @@ void rh_model_load_candidates(rh_model *m, const char *path)
 				if ((n = rj_get(p, "more_packages")) && n->t == '#' && n->num > 0) x->more = (int)n->num;
 			}
 			{
-				char tb[256] = ""; const rj *t = rj_get(c, "topics"); size_t tl = 0;
-				for (t = t ? t->kid : NULL; t && tl + 1 < sizeof tb; t = t->next) if (t->t == 's' && t->s) tl += snprintf(tb + tl, sizeof tb - tl, "%s ", t->s);
+				char tb[256] = ""; const rj *tp = rj_get(c, "topics"); size_t tl = 0;
+				for (tp = tp ? tp->kid : NULL; tp && tl + 1 < sizeof tb; tp = tp->next) if (tp->t == 's' && tp->s) tl += snprintf(tb + tl, sizeof tb - tl, "%s ", tp->s);
 				x->cat = rh_categorize(x->name, rj_str(c, "description", ""), tb);   /* full description, not the possibly cut copy */
 				if ((i = cat_from_id(rj_str(c, "category", ""))) && rj_str(c, "category_basis", "")[0]) {   /* reviewed category wins, only with its evidence */
 					x->cat = (rh_cat)i; CP(x->cat_basis, rj_str(c, "category_basis", ""));
 				}
 			}
 			if (cl) { CP(x->claim, rj_str(cl, "kind", "")); CP(x->claim_text, rj_str(cl, "text", "")); CP(x->claim_where, rj_str(cl, "where", "")); }
-			m->n_cands++;
+			if (!cand_grow(m)) break;
+			m->cands[m->n_cands++] = t;
 		}
 	rj_free(j);
+}
+
+void rh_model_load_candidates(rh_model *m, const char *path)
+{
+	m->n_cands = 0;
+	rh_model_add_candidates(m, path);
 }
 
 void rh_model_load_signed(rh_model *m, const char *index, size_t len, const char *src, unsigned serial, const char *expires,
 			  const char *device_id, const char *state_dir)
 {
 	char *txt = malloc(len + 1); rj *j; const rj *k;
+	free(m->cands);
 	memset(m, 0, sizeof *m);
 	load_devinfo(&m->di);
 	CP(m->cat.source, src); m->cat.serial = serial; CP(m->cat.expires, expires ? expires : "");
@@ -291,6 +319,7 @@ void rh_model_load_signed(rh_model *m, const char *index, size_t len, const char
 
 void rh_model_load_none(rh_model *m, const char *why, const char *state_dir)
 {
+	free(m->cands);
 	memset(m, 0, sizeof *m);
 	load_devinfo(&m->di);
 	CP(m->cat.status, why);

@@ -30,8 +30,8 @@ static rh_plan_fn PLAN;
 static int preview;   /* the open RH_S_CONFIRM screen is a read-only Install/Update Preview */
 static char blocked_why[40], res_msg[96];
 static int filt;                                                   /* Discover category filter: an rh_cat, RH_CAT_ALL = no filter */
-static struct { int cand, idx; } vis[RH_MAX_APPS + RH_MAX_CANDS];   /* Discover rows under the filter: approved app or candidate, index into the model */
-static int n_vis;
+static struct { int cand, idx; } *vis;   /* Discover rows under the filter: approved app or candidate, index into the model; sized to the model, no fixed limit */
+static int n_vis, vis_cap;
 static int res_rc, pending, cur_op;   /* cur_op: 0 install, 1 update, 2 uninstall, 3 download, 4 refresh catalog */
 static uint64_t prog_done, prog_total;
 void rh_ui_progress(uint64_t done, uint64_t total) { prog_done = done; prog_total = total; }
@@ -53,6 +53,11 @@ static int depth;
 static void vis_build(void)
 {
 	int i; n_vis = 0;
+	if (M->n_apps + M->n_cands > vis_cap) {
+		void *t = realloc(vis, (size_t)(M->n_apps + M->n_cands) * sizeof *vis);
+		if (!t) return;   /* out of memory: keep the old rows rather than write past them */
+		vis = t; vis_cap = M->n_apps + M->n_cands;
+	}
 	for (i = 0; i < M->n_apps; i++) if (filt == RH_CAT_ALL || M->apps[i].cat == (rh_cat)filt) { vis[n_vis].cand = 0; vis[n_vis++].idx = i; }
 	for (i = 0; i < M->n_cands; i++) if (filt == RH_CAT_ALL || M->cands[i].cat == (rh_cat)filt) { vis[n_vis].cand = 1; vis[n_vis++].idx = i; }
 }
@@ -225,14 +230,20 @@ static int details(SDL_Surface *d, int y0, const rh_app *a)
  * first on the page; the description and the reading note follow the card. */
 static int cand_details(SDL_Surface *d, int y0, const rh_cand *c)
 {
-	int y = y0 + 4; kv r[14]; int n = 0; char b[96], ev[96], sz[24];
+	int y = y0 + 4; kv r[24]; int n = 0; char b[96], ev[96], sz[24];
 #define CROW(L, ...) do { snprintf(r[n].l, sizeof r[n].l, "%s", L); snprintf(r[n++].v, sizeof r[0].v, __VA_ARGS__); } while (0)
 	gfx_rbox(d, 8, y, 40, 40, 5, C_LINE, C_CARD);
 	icon(d, IC_PACKAGE, 28, y + 20, C_GREEN);
 	gfx_text(d, f_title, gfx_ellipsize(f_title, c->name, 170, b, sizeof b), 56, y + 2, C_TXT);
 	gfx_text(d, f_title, "UNAPPROVED", 56, y + 22, C_ERR);
 	y += 48;
-	CROW("Package", "%s", c->sig_ok ? (c->zipped ? "OPK verified (ZIP)" : "OPK verified") : "Unknown");
+	if (c->wiki) {   /* three separate facts: where it is listed, whether the file was checked, and the wiki's own heading (not cached: say so) */
+		CROW("Listing", "FunKey wiki");
+		CROW("Status", "%s", c->sig_ok ? "Package verified" : "Listed / Not verified");
+		CROW("Wiki category", "%s", c->wiki_cat[0] ? c->wiki_cat : "Not recorded");
+	}
+	CROW("Package", "%s", c->sig_ok ? (c->zipped ? "OPK verified (ZIP)" : "OPK verified") : c->wiki ? "Not verified" : "Unknown");
+	CROW("Compat", "Unconfirmed");
 	CROW("Claim", "%s", !strcmp(c->claim, "rg-nano") ? "RG Nano" : !strcmp(c->claim, "family") ? "FunKey only" : "Unknown");
 	CROW("Hardware", "Not tested");
 	CROW("Approval", "UNAPPROVED");
@@ -241,15 +252,17 @@ static int cand_details(SDL_Surface *d, int y0, const rh_cand *c)
 	CROW("Evidence", "%s", ev);
 	CROW("Category", "%s", rh_cat_name(c->cat));
 	if (c->cat_basis[0]) CROW("Basis", "%s", c->cat_basis);
+	if (c->dl[0]) CROW("Download", "%s", c->dl);
+	if (c->mirror[0]) CROW("Other link", "%s", c->mirror);
 	CROW("Release", "%s", c->version[0] ? c->version : "Unknown");
 	fmt_size(sz, sizeof sz, c->size); CROW("Size", "%s", sz);
-	CROW("Source", "%s", strncmp(c->source, "https://", 8) ? or_unknown(c->source) : c->source + 8);
+	CROW("Source", "%s", c->wiki && strstr(c->source, "wiki.funkey-project.com") ? "FunKey wiki list" : strncmp(c->source, "https://", 8) ? or_unknown(c->source) : c->source + 8);
 	CROW("File", "%s", or_unknown(c->pkg_name));
 	if (c->more) CROW("Also", "%d more in repo", c->more);
 	CROW("License", "%s", or_unknown(c->license));
 	CROW("Updated", "%s", or_unknown(c->last_activity));
 	y += kv_card(d, y, r, n, C_TXT) + 8;
-	paragraph(d, 10, &y, 220, c->desc[0] ? c->desc : "No description. Unknown.", C_TXT, 0);
+	paragraph(d, 10, &y, 220, c->desc[0] ? c->desc : c->wiki ? "No description: the wiki text was not saved." : "No description. Unknown.", C_TXT, 0);
 	y += 4;
 	paragraph(d, 10, &y, 220, "Verified means the OPK file format was seen, not that it is safe or works. Claim is the project's own words. Read-only: RetroHatch cannot install or download this.", C_TXT2, 0);
 	return y + 2 - y0;
@@ -677,7 +690,10 @@ static void draw_content(SDL_Surface *d)
 		for (i = 0; i < n_vis; i++) {
 			y = ctop() + i * LIST_P - CUR.scroll;
 			if (y + LIST_RH <= ctop() || y >= CONT_B) continue;
-			if (vis[i].cand) list_row_tag(d, y, i == CUR.sel, M->cands[vis[i].idx].name, "UNAPPROVED", M->cands[vis[i].idx].version);
+			if (vis[i].cand) {
+				const rh_cand *c = &M->cands[vis[i].idx];   /* wiki listings show what was checked; the rest their release */
+				list_row_tag(d, y, i == CUR.sel, c->name, "UNAPPROVED", c->wiki ? (c->sig_ok ? "Pkg ok" : "Listed") : c->version);
+			}
 			else {
 				const rh_app *a = &M->apps[vis[i].idx]; char sub[160];   /* installed status comes from RetroHatch's own record; absent record = nothing claimed */
 				snprintf(sub, sizeof sub, "%s%s", inst_ver(vis[i].idx)[0] ? "Installed. " : "", a->desc[0] ? a->desc : "No description");
