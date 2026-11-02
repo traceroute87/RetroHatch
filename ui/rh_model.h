@@ -24,6 +24,7 @@ typedef struct {
 	uint64_t size;        /* 0 = unknown */
 	int available;        /* status == "available" */
 	int verified;         /* available AND compatibility level "verified": the only kind the UI treats as installable/updatable */
+	int signed_catalog;   /* loaded by rh_model_load_signed(), i.e. from an index whose signature, policy and rollback checks passed; 0 for loose local files */
 } rh_app;
 
 typedef struct { char id[24], name[48]; } rh_dev;

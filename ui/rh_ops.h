@@ -1,13 +1,18 @@
-/* DEV operations provider: connects the UI to the verified install engine
- * (platforms/nano/rh_install.c). Contains no install logic of its own: it only
- * gates which catalog entries may reach the engine and translates results.
+/* Operations provider: connects the UI to the verified install engine (platforms/nano/rh_install.c). Contains no install
+ * logic of its own: it only gates which catalog entries may reach the engine and translates results.
  *
- * Gates (all fail closed):
- *  - state dir must be a directory named ".retrohatch-dev" (never the production state dir) and
- *    the local cache must live inside it;
- *  - only explicitly approved (app id, destination file) pairs, see ALLOWED in rh_ops.c;
- *  - catalog entry must be verified, with a sha256, a size and the approved destination;
- *  - the OPK must already be in the local cache as <cache>/<sha256>.opk. No network. */
+ * Two modes, never mixed (rh_ops_cfg.production):
+ *  DEV         state dir named ".retrohatch-dev" (never the production state dir); only the explicitly allowed
+ *              (app id, destination file) pairs, see ALLOWED in rh_ops.c.
+ *  production  state dir named ".retrohatch" (never a ".retrohatch-dev" one); no allowlist: the signed catalog is the gate.
+ *              An app is eligible only when it came from a verified signed index (rh_app.signed_catalog) and that index
+ *              already enforced approval, licence, availability and hardware verification. Entries from loose local files
+ *              (rh_model_load) are never eligible.
+ * Both modes (all fail closed):
+ *  - the local cache lives inside the state dir;
+ *  - catalog entry must be verified, with a sha256, a size and a destination;
+ *  - the OPK must be in the local cache as <cache>/<sha256>.opk (download = size + SHA-256 from the signed entry);
+ *  - the engine repeats every file, hash, mount and space check. */
 #ifndef RH_OPS_H
 #define RH_OPS_H
 #include <stdint.h>
@@ -29,6 +34,7 @@ typedef struct {
 	const char *cache_pkg, *bundled_pkg;   /* downloaded / bundled signed catalog files */
 	const uint8_t (*keys)[32]; size_t nkeys;   /* trusted catalog keys */
 	int (*progress)(uint64_t done, uint64_t total);   /* UI hook; non-zero = user cancelled */
+	int production;                        /* 1 = production rules (see above), 0 = DEV; last member so existing positional initialisers stay valid */
 } rh_ops_cfg;
 
 /* Returns the UI ops to pass to rh_ui_set_ops(), or NULL when a gate rejects the configuration. */

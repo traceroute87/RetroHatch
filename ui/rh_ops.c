@@ -1,19 +1,22 @@
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <sys/statvfs.h>
+#include <unistd.h>
 #include "../platforms/nano/rh_install.h"
 #include "../core/rh_net.h"
 #include "rh_ops.h"
 #include "rh_source.h"
 
-/* The only things DEV may install. Exact id + exact file name. */
+/* The only things DEV may install. Exact id + exact file name. Production has no list: the signed catalog is the gate. */
 static const struct { const char *id, *dest; } ALLOWED[] = {
 	{"rhprobe", "rhprobe_funkey-s.opk"},
 };
 
 static rh_cfg eng;
+static int prod;   /* 1 = production rules for this process (set once by rh_ops_init) */
 static char cache[256];
 static void (*refresh_fn)(void);
 static rh_net_cfg net;
@@ -31,14 +34,23 @@ static int is_hex64(const char *s)
 	return 1;
 }
 
-/* shared gate for install and update: allowlist, complete verified metadata, local file present with the right size.
+/* May this catalog entry reach the engine at all? DEV: only the allowlisted (id, file) pair. Production: only an entry that came
+ * from a verified signed index and names a destination file; whether it is installable (verified, hash, size) is checked next. */
+static int approved(const rh_app *a)
+{
+	size_t i;
+	if (prod) return a->signed_catalog && a->dest_name[0];
+	for (i = 0; i < sizeof ALLOWED / sizeof *ALLOWED; i++)
+		if (!strcmp(a->id, ALLOWED[i].id) && !strcmp(a->dest_name, ALLOWED[i].dest)) return 1;
+	return 0;
+}
+
+/* shared gate for install and update: eligibility, complete verified metadata, local file present with the right size.
  * what = noun for the file in messages ("Local file" / "Update file"). */
 static int gate(const rh_app *a, const char *what, char *why, size_t n)
 {
-	char path[320]; struct stat st; size_t i;
-	for (i = 0; i < sizeof ALLOWED / sizeof *ALLOWED; i++)
-		if (!strcmp(a->id, ALLOWED[i].id) && !strcmp(a->dest_name, ALLOWED[i].dest)) break;
-	if (i == sizeof ALLOWED / sizeof *ALLOWED) { snprintf(why, n, "Not allowed in DEV"); return 0; }
+	char path[320]; struct stat st;
+	if (!approved(a)) { snprintf(why, n, "%s", prod ? (a->signed_catalog ? "Incomplete catalog data" : "Not from a signed catalog") : "Not allowed in DEV"); return 0; }
 	if (!a->verified || !is_hex64(a->sha256) || !a->size || !a->version[0]) { snprintf(why, n, "Incomplete catalog data"); return 0; }
 	snprintf(path, sizeof path, "%s/%s.opk", cache, a->sha256);
 	if (lstat(path, &st) || !S_ISREG(st.st_mode)) { snprintf(why, n, "%s missing", what); return 0; }
@@ -68,26 +80,18 @@ static int run(const rh_app *a, int upd, char *msg, size_t n)
 	return e == RH_E_RECOVER ? 2 : 1;
 }
 
-/* uninstall: only the approved (id, file) pair; the engine verifies record, hash, mount state and space */
-static int approved(const rh_app *a)
-{
-	size_t i;
-	for (i = 0; i < sizeof ALLOWED / sizeof *ALLOWED; i++)
-		if (!strcmp(a->id, ALLOWED[i].id) && !strcmp(a->dest_name, ALLOWED[i].dest)) return 1;
-	return 0;
-}
-
+/* uninstall: only an eligible entry; the engine verifies record, hash, mount state and space */
 static int can_uninstall(const rh_app *a, char *why, size_t n)
 {
 	if (approved(a)) return 1;
-	snprintf(why, n, "Not allowed in DEV");
+	snprintf(why, n, "%s", prod ? "Not from a signed catalog" : "Not allowed in DEV");
 	return 0;
 }
 
 static int uninstall(const rh_app *a, char *msg, size_t n)
 {
 	rh_err e;
-	if (!approved(a)) { snprintf(msg, n, "Not allowed in DEV"); return 1; }
+	if (!approved(a)) { snprintf(msg, n, "%s", prod ? "Not from a signed catalog" : "Not allowed in DEV"); return 1; }
 	e = rh_uninstall(&eng, a->id, a->dest_name);
 	if (e == RH_OK) return 0;
 	if (e == RH_E_UNMANAGED) snprintf(msg, n, "Not installed by RetroHatch, or changed");
@@ -114,7 +118,7 @@ static int can_download(const rh_app *a, char *why, size_t n)
 {
 	char path[320]; struct stat st;
 	if (!net_on) { snprintf(why, n, "Downloads are off"); return 0; }
-	if (!approved(a)) { snprintf(why, n, "Not allowed in DEV"); return 0; }
+	if (!approved(a)) { snprintf(why, n, "%s", prod ? "Not from a signed catalog" : "Not allowed in DEV"); return 0; }
 	if (!a->verified || !is_hex64(a->sha256) || !a->size || !a->version[0] || strncmp(a->url, "https://", 8)) { snprintf(why, n, "Incomplete catalog data"); return 0; }
 	snprintf(path, sizeof path, "%s/%s.opk", cache, a->sha256);
 	if (!lstat(path, &st)) { snprintf(why, n, "Already downloaded"); return 0; }
@@ -151,7 +155,7 @@ static int install(const rh_app *a, char *msg, size_t n) { return run(a, 0, msg,
 static int update(const rh_app *a, char *msg, size_t n) { return run(a, 1, msg, n); }
 
 static rh_ui_ops ops = {can_install, can_update, update, can_uninstall, uninstall, install, NULL, "DEV (install/update/uninstall)",
-	NULL, NULL, NULL, NULL};
+	NULL, NULL, NULL, NULL, 0};
 
 static void read_mirror(const char *path)
 {
@@ -169,8 +173,8 @@ const rh_ui_ops *rh_ops_init(const rh_ops_cfg *c)
 	if (!c || !c->apps_dir || !c->state_dir || !c->cache_dir) return NULL;
 	sn = strlen(c->state_dir);
 	base = strrchr(c->state_dir, '/');
-	if (!base || strcmp(base + 1, ".retrohatch-dev")) return NULL;       /* DEV state dir only */
-	if (!strcmp(c->state_dir, RH_NANO_STATE_DIR)) return NULL;          /* belt and braces: never production */
+	if (!base || strcmp(base + 1, c->production ? ".retrohatch" : ".retrohatch-dev")) return NULL;   /* each mode has its own state dir, never the other's */
+	if (!c->production && !strcmp(c->state_dir, RH_NANO_STATE_DIR)) return NULL;                       /* belt and braces: DEV never runs on the production state */
 	n = strlen(c->cache_dir);
 	if (n <= sn + 1 || strncmp(c->cache_dir, c->state_dir, sn) || c->cache_dir[sn] != '/' || strstr(c->cache_dir, "..")) return NULL;
 	if (n >= sizeof cache) return NULL;
@@ -180,8 +184,23 @@ const rh_ui_ops *rh_ops_init(const rh_ops_cfg *c)
 	eng.sys_block = c->sys_block ? c->sys_block : "/sys/block";
 	eng.hook = c->hook;
 	snprintf(cache, sizeof cache, "%s", c->cache_dir);
+	prod = c->production ? 1 : 0;
+	if (prod) {   /* production: the state and cache directories must exist as real directories (created once, never followed through a link), else nothing is enabled */
+		struct stat st; const char *d[2] = {c->state_dir, c->cache_dir}; int i;
+		for (i = 0; i < 2; i++) {
+			if (mkdir(d[i], 0755) && errno != EEXIST) return NULL;
+			if (lstat(d[i], &st) || !S_ISDIR(st.st_mode)) return NULL;
+		}
+	}
 	refresh_fn = c->refresh; ops.refresh = refresh_fn;
+	ops.production = prod; ops.build_label = prod ? "Production (signed catalog)" : "DEV (install/update/uninstall)";
 	net_on = c->ca_bundle && c->keys && c->nkeys && c->cache_pkg && c->base_url;
+	if (net_on && prod) {   /* production: a missing CA bundle, an all-zero key or a non-HTTPS catalog address disables the network, it is never skipped */
+		size_t k, b;
+		if (access(c->ca_bundle, R_OK) || strncmp(c->base_url, "https://", 8)) net_on = 0;
+		for (k = 0; net_on && k < c->nkeys; k++) { for (b = 0; b < 32 && !c->keys[k][b]; b++) {} if (b == 32) net_on = 0; }
+	}
+	ops.can_download = NULL; ops.download = NULL; ops.refresh_catalog = NULL; ops.net_status = NULL;   /* a second init never inherits the first one's network */
 	if (net_on) {
 		FILE *f; size_t k;
 		memset(&net, 0, sizeof net);
@@ -189,7 +208,7 @@ const rh_ui_ops *rh_ops_init(const rh_ops_cfg *c)
 		srccfg.state_dir = c->state_dir; srccfg.cache_pkg = c->cache_pkg; srccfg.bundled_pkg = c->bundled_pkg;
 		srccfg.keys = c->keys; srccfg.nkeys = c->nkeys;
 		snprintf(base_url, sizeof base_url, "%s", c->base_url);
-		if (c->base_url_file && (f = fopen(c->base_url_file, "r"))) {   /* DEV: point the build at a test server */
+		if (c->base_url_file && (f = fopen(c->base_url_file, "r"))) {   /* DEV/test seam: point the build at a test server (the production program never sets this) */
 			char l[512];
 			if (fgets(l, sizeof l, f)) { l[strcspn(l, "\r\n ")] = 0; if (!strncmp(l, "https://", 8)) snprintf(base_url, sizeof base_url, "%s", l); }
 			fclose(f);

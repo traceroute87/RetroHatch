@@ -53,6 +53,7 @@ typedef struct {
 	int (*download)(const rh_app *a, char *msg, size_t n);       /* blocking; fills the local cache only, installs nothing */
 	int (*refresh_catalog)(char *msg, size_t n);                 /* blocking; fetches and verifies a newer signed catalog */
 	const char *(*net_status)(void);                             /* last network result for Settings > Network Status */
+	int production;               /* 1 = production rules (any approved, signed, hardware-verified catalog entry); 0 = DEV (allowlist) */
 } rh_ui_ops;
 void rh_ui_set_ops(const rh_ui_ops *ops);
 /* Optional install PLANNER (read-only). Given the catalog names it returns the file an install would write, or why it would be

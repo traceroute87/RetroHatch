@@ -333,7 +333,7 @@ static int info_page(SDL_Surface *d, int y0, rh_info which)
 		break;
 	default:
 		ROW("App", "RetroHatch"); ROW("Build", "%s", OPS && OPS->build_label ? OPS->build_label : "Nano UI preview");
-		ROW("Installing", "%s", OPS ? "DEV: test app only" : "Not in this UI");
+		ROW("Installing", "%s", OPS ? (OPS->production ? "Signed, approved apps" : "DEV: test app only") : "Not in this UI");
 		ROW("Fonts", "GNU Unifont, Kode Mono"); ROW("Icons", "Lucide");
 		break;
 	}

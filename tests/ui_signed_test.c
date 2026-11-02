@@ -1,4 +1,4 @@
-/* DEV flow with a SIGNED catalog over real TLS: bundled catalog -> Download -> Install -> catalog refresh -> Download -> Update,
+/* DEV flow (or, with RH_TEST_PRODUCTION=1 in the environment, the PRODUCTION flow) with a SIGNED catalog over real TLS: bundled catalog -> Download -> Install -> catalog refresh -> Download -> Update,
  * plus the failure modes (tampered / stale / forked catalog, offline, hash mismatch, truncated, cancel, corrupt state).
  * The server and fixtures come from tests/test_signed_flow.py. Temp dirs only.
  *   ui_signed_test <repo_root> <fixture_dir> <port> <ca.pem> <pubkey_hex> */
@@ -19,6 +19,8 @@ static int fails, checks;
 #define CHECK(c) do { checks++; if (!(c)) { fails++; printf("FAIL %s:%d: %s\n", __FILE__, __LINE__, #c); } } while (0)
 
 static const char *fx, *port, *ca, *assets_dir, *repo;
+static int prod;          /* RH_TEST_PRODUCTION: production rules and state dir (.retrohatch) instead of DEV (.retrohatch-dev) */
+static char sdir[24];
 static char root[256], apps[300], state[300], cache[300], pkg[300], mounts[300], sysb[300], mirror[300], extra[300], urlf[300];
 static uint8_t key[2][32];
 static rh_model m;
@@ -62,12 +64,13 @@ static const rh_ui_ops *ops_with(const char *host_port, int fresh_dirs)
 {
 	char c[400]; static char bundled[400]; FILE *f; rh_ops_cfg oc; const rh_ui_ops *ops;
 	if (fresh_dirs) {
-		sh("rm -rf %s/* %s/.retrohatch-dev; mkdir -p %s %s/sys %s %s/.retrohatch-dev/cache", root, root, apps, root, state, root);
+		sh("rm -rf %s/* %s/%s; mkdir -p %s %s/sys %s %s/%s/cache", root, root, sdir, apps, root, state, root, sdir);
 		f = fopen(mounts, "w"); fputs("/dev/root / ext4 ro 0 0\n/dev/mmcblk0p4 /mnt vfat rw 0 0\n", f); fclose(f);
 	}
 	snprintf(c, sizeof c, "%s/bundled.pkg", fx); snprintf(bundled, sizeof bundled, "%s", c);
 	f = fopen(mirror, "w"); fprintf(f, "https://github.com/ https://%s/gh/\n", host_port); fclose(f);
 	memset(&oc, 0, sizeof oc);
+	oc.production = prod;
 	oc.apps_dir = apps; oc.state_dir = state; oc.cache_dir = cache; oc.proc_mounts = mounts; oc.sys_block = sysb; oc.refresh = reload;
 	oc.ca_bundle = ca; oc.mirror_file = mirror; oc.extra_ca = extra;
 	{ static char base[200]; snprintf(base, sizeof base, "https://%s/catalog/", host_port); oc.base_url = base; }
@@ -141,7 +144,8 @@ int main(int argc, char **argv)
 	unhex(argv[5], key[0], 32); key[1][0] = 0;
 	{ static char a[512]; snprintf(a, sizeof a, "%s/ui/assets", repo); assets_dir = a; }
 	snprintf(root, sizeof root, "/tmp/rhsig.XXXXXX"); if (!mkdtemp(root)) return 2;
-	snprintf(apps, sizeof apps, "%s/apps", root); snprintf(state, sizeof state, "%s/.retrohatch-dev", root);
+	prod = getenv("RH_TEST_PRODUCTION") != NULL; snprintf(sdir, sizeof sdir, "%s", prod ? ".retrohatch" : ".retrohatch-dev");
+	snprintf(apps, sizeof apps, "%s/apps", root); snprintf(state, sizeof state, "%s/%s", root, sdir);
 	snprintf(cache, sizeof cache, "%s/cache", state); snprintf(pkg, sizeof pkg, "%s/catalog.pkg", state);
 	snprintf(mounts, sizeof mounts, "%s/mounts", root); snprintf(sysb, sizeof sysb, "%s/sys", root);
 	snprintf(mirror, sizeof mirror, "%s/mirror.txt", state); snprintf(extra, sizeof extra, "%s/extra-ca.crt", state);
@@ -156,6 +160,7 @@ int main(int argc, char **argv)
 	/* 1. first start: bundled signed catalog, nothing downloaded yet */
 	begin(hpbuf);
 	CHECK(m.cat.ok && !strcmp(m.cat.source, "bundled") && m.cat.serial == 1 && m.n_apps == 1);
+	CHECK(m.apps[0].signed_catalog && g_ops->production == (prod ? 1 : 0));
 	CHECK(!strcmp(m.apps[0].id, "rhprobe") && !strcmp(m.apps[0].version, "1.0.0") && m.apps[0].verified && !strncmp(m.apps[0].url, "https://github.com/", 19));
 	to_app(0); v = V(); CHECK(v.screen == RH_S_DETAILS && v.action == RH_ACT_DOWNLOAD);
 	/* Cancel on the confirm screen downloads nothing */
@@ -175,9 +180,15 @@ int main(int argc, char **argv)
 	CHECK(download_ui() == 0); cpath(sha2, p, sizeof p); hash(p, h); CHECK(!strcmp(h, sha2));
 	keys_("a"); CHECK(V().action == RH_ACT_UPDATE_NOW); keys_("a"); keys_("da"); run_op(); CHECK(V().result == 0);
 	tsv_ver(ver, sizeof ver); CHECK(!strcmp(ver, "1.1.0"));
-	/* the second signed app is not on the DEV allowlist: no download, no install */
-	home(); keys_("aa"); v = V(); CHECK(v.screen == RH_S_DETAILS && v.action == RH_ACT_BLOCKED);   /* Discover is sorted by name: Other Pad first */
-	CHECK(m.n_apps == 2 && strcmp(m.apps[V().app].id, "rhprobe"));
+	/* the second signed app: DEV (allowlist) blocks it; production has no allowlist, so the signed entry is eligible, and its download
+	 * (the test server has no such file) fails cleanly and leaves nothing behind */
+	home(); keys_("aa"); v = V(); CHECK(v.screen == RH_S_DETAILS);   /* Discover is sorted by name: Other Pad first */
+	CHECK(m.n_apps == 2 && strcmp(m.apps[V().app].id, "rhprobe") && m.apps[V().app].signed_catalog);
+	if (!prod) CHECK(v.action == RH_ACT_BLOCKED);
+	else {
+		char op[400]; snprintf(op, sizeof op, "%s/%s.opk", cache, m.apps[v.app].sha256);
+		CHECK(v.action == RH_ACT_DOWNLOAD); CHECK(download_ui() == 1); CHECK(!exists(op) && !leftovers()); keys_("a"); CHECK(V().screen == RH_S_DETAILS);
+	}
 	hash(pkg, before);
 
 	/* 3. bad catalogs from the server never replace the good one or move the rollback state */

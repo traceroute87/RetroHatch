@@ -1,7 +1,14 @@
 /* RetroHatch UI program (host and RG Nano).
- *   retrohatch [--catalog dir] [--assets dir] [--state dir] [--shot out.bmp]
+ *   retrohatch [--assets dir] [--candidates file] [--wiki file] [--shot out.bmp]      production: signed catalog, install enabled
+ *   retrohatch --catalog dir --state dir ...                                           preview/test data: unsigned, READ-ONLY, no install
  * Defaults are relative to the cwd: opkrun chdir()s into the mounted OPK.
- * --shot renders the Home screen once and exits (path/asset check).
+ * --shot renders the Home screen once and exits (path/asset check); it never creates state or enables installing.
+ *
+ * Production (this file without RH_DEV): the catalog shown is the newest signed one that verified against the compiled-in
+ * production key (trusted_keys_prod.h): bundled in the OPK or downloaded earlier, refreshed over HTTPS. Install, update and
+ * uninstall go through rh_ops.c (production rules) and the same engine as DEV. Missing or invalid key, no catalog, or an
+ * unusable state directory = nothing installable: the UI stays a read-only browser. The 54 UNAPPROVED candidates are
+ * rh_cand rows: the UI has no install path for them in any build.
  *
  * Keys: fkgpiod on FunKey OS delivers the buttons as the letters u d l r a b x y m n s q
  * (same map TaraFi ships and hardware-tests): A = 'a', B = 'b', q = MENU. Arrow keys,
@@ -40,7 +47,48 @@ static int net_poll(uint64_t done, uint64_t total)
 	return cancel;
 }
 #else
-#define STATE_DEFAULT "/mnt/FunKey/.retrohatch"
+#include <stdlib.h>
+#include "rh_ops.h"
+#include "rh_source.h"
+#include "trusted_keys_prod.h"       /* the PRODUCTION key only; the DEV key header is never included here */
+#define STATE_DEFAULT RH_NANO_STATE_DIR
+#define PROD_CACHE_DIR RH_NANO_STATE_DIR "/cache"
+static rh_model m;
+static SDL_Surface *g_scr;
+static const char *cands_path = "candidates/rg-nano.json", *wiki_path = "candidates/wiki-listings.json";
+/* nkeys is set at start: 0 when the compiled-in key is missing (placeholder) or invalid (all zero), so nothing can verify */
+static rh_src_cfg src = {RH_NANO_STATE_DIR, RH_NANO_STATE_DIR "/catalog.pkg", "catalog/catalog.pkg", RH_TRUSTED_KEYS, 0};
+static size_t usable_keys(void)
+{
+	size_t k, b, n = RH_N_TRUSTED_KEYS;   /* 0 in the placeholder header of a checkout without the production key */
+	for (k = 0; k < n; k++) {
+		for (b = 0; b < 32 && !RH_TRUSTED_KEYS[k][b]; b++) {}
+		if (b == 32) return 0;   /* an all-zero key is not a key: refuse the whole list */
+	}
+	return n;
+}
+/* production: only a catalog that verified (signature, policy, rollback state) ever reaches the UI; the candidates are added after
+ * it (they are read-only rows and never replace or join the approved apps) */
+static void refresh(void)
+{
+	char *idx; size_t len; rh_src_info si;
+	if (!rh_src_load(&src, &idx, &len, &si)) {
+		rh_model_load_signed(&m, idx, len, si.source, si.serial, si.expires, RH_DEVICE_ID, RH_NANO_STATE_DIR);
+		free(idx);
+	} else rh_model_load_none(&m, si.why, RH_NANO_STATE_DIR);
+	rh_model_load_candidates(&m, cands_path);   /* UNAPPROVED discovery results: read-only, never installable */
+	rh_model_add_candidates(&m, wiki_path);     /* UNAPPROVED FunKey wiki listings, same rules; a missing file adds nothing */
+}
+/* called by the downloader every ~100 ms: show progress, let B cancel */
+static int net_poll(uint64_t done, uint64_t total)
+{
+	SDL_Event e; int cancel = 0;
+	rh_ui_progress(done, total);
+	while (SDL_PollEvent(&e))
+		if (e.type == SDL_KEYDOWN && (e.key.keysym.sym == SDLK_b || e.key.keysym.sym == SDLK_BACKSPACE)) cancel = 1;
+	rh_ui_draw(g_scr); SDL_Flip(g_scr);
+	return cancel;
+}
 #endif
 
 static int translate(SDLKey k, rh_key *o)
@@ -58,49 +106,70 @@ static int translate(SDLKey k, rh_key *o)
 
 int main(int argc, char **argv)
 {
-#ifndef RH_DEV
-	static rh_model m;
-#endif
-	const char *catalog = "catalog", *assets = "assets", *state = STATE_DEFAULT, *shot = NULL, *cands = "candidates/rg-nano.json", *wiki = "candidates/wiki-listings.json";
+	const char *catalog = "catalog", *assets = "assets", *state = STATE_DEFAULT, *shot = NULL;
 	SDL_Surface *scr; SDL_Event e; int run = 1, i;
+	int preview = 0;   /* production program given --catalog/--state: unsigned local test data, read-only, never installs */
 
 #ifdef RH_DEV
 	if (argc != 1 && !(argc == 3 && !strcmp(argv[1], "--shot"))) { fprintf(stderr, "retrohatch DEV: no path options\n"); return 2; }
 #endif
 	for (i = 1; i + 1 < argc; i += 2) {
-		if (!strcmp(argv[i], "--catalog")) catalog = argv[i + 1];
+		if (!strcmp(argv[i], "--catalog")) { catalog = argv[i + 1]; preview = 1; }
 		else if (!strcmp(argv[i], "--assets")) assets = argv[i + 1];
-		else if (!strcmp(argv[i], "--state")) state = argv[i + 1];
+		else if (!strcmp(argv[i], "--state")) { state = argv[i + 1]; preview = 1; }
 		else if (!strcmp(argv[i], "--shot")) shot = argv[i + 1];
-		else if (!strcmp(argv[i], "--candidates")) cands = argv[i + 1];
-		else if (!strcmp(argv[i], "--wiki")) wiki = argv[i + 1];
+#ifndef RH_DEV
+		else if (!strcmp(argv[i], "--candidates")) cands_path = argv[i + 1];
+		else if (!strcmp(argv[i], "--wiki")) wiki_path = argv[i + 1];
+#endif
 		else { fprintf(stderr, "retrohatch: unknown option %s\n", argv[i]); return 2; }
 	}
 #ifdef RH_DEV
-	(void)state; (void)cands; (void)wiki;
+	(void)state; (void)preview;
 	refresh();
 #else
-	rh_model_load(&m, catalog, state);
-	rh_model_load_candidates(&m, cands);   /* UNAPPROVED discovery results: read-only, never installable (not in DEV: its catalog is signed) */
-	rh_model_add_candidates(&m, wiki);     /* UNAPPROVED FunKey wiki listings, same rules; a missing file adds nothing */
+	if (preview) {   /* local unsigned catalog files: shown, never installable (no ops are set below) */
+		rh_model_load(&m, catalog, state);
+		rh_model_load_candidates(&m, cands_path);
+		rh_model_add_candidates(&m, wiki_path);
+	} else {
+		src.nkeys = usable_keys();
+		if (!src.nkeys) fprintf(stderr, "retrohatch: no usable production catalog key: nothing can be verified or installed\n");
+		refresh();
+	}
 #endif
 #ifdef RH_DEV
 	{
 		rh_ops_cfg oc = {RH_DEV_APPS_DIR, RH_DEV_STATE_DIR, RH_DEV_CACHE_DIR, NULL, NULL, NULL, refresh,
 			"certs/ca-bundle.crt", RH_DEV_STATE_DIR "/extra-ca.crt", RH_DEV_STATE_DIR "/mirror.txt", RH_CATALOG_BASE_URL,
 			RH_DEV_STATE_DIR "/catalog-url.txt", RH_DEV_STATE_DIR "/catalog.pkg", "catalog/catalog.pkg", RH_TRUSTED_KEYS,
-			RH_N_TRUSTED_KEYS, net_poll};
+			RH_N_TRUSTED_KEYS, net_poll, 0 /* DEV rules */};
 		const rh_ui_ops *ops = rh_ops_init(&oc);
 		if (!ops) { fprintf(stderr, "retrohatch DEV: ops gate rejected the configuration\n"); return 1; }
 		if (!shot) { int rc = rh_ops_recover(); if (rc) fprintf(stderr, "retrohatch DEV: recovery failed (%d)\n", rc); }
 		rh_ui_set_ops(ops);
 	}
+#else
+	if (!preview && !shot) {   /* production install path; fails closed: any problem leaves the UI a read-only browser */
+		rh_ops_cfg oc;
+		const rh_ui_ops *ops;
+		memset(&oc, 0, sizeof oc);
+		oc.production = 1;
+		oc.apps_dir = RH_NANO_APPS_DIR; oc.state_dir = RH_NANO_STATE_DIR; oc.cache_dir = PROD_CACHE_DIR; oc.refresh = refresh;
+		oc.ca_bundle = "certs/ca-bundle.crt"; oc.base_url = RH_CATALOG_BASE_URL;   /* no extra CA, no mirror, no URL override: those are DEV test seams */
+		oc.cache_pkg = src.cache_pkg; oc.bundled_pkg = src.bundled_pkg; oc.keys = RH_TRUSTED_KEYS; oc.nkeys = src.nkeys; oc.progress = net_poll;
+		ops = rh_ops_init(&oc);
+		if (!ops) fprintf(stderr, "retrohatch: install disabled (state or cache directory unusable); browsing only\n");
+		else {
+			int rc = rh_ops_recover();
+			if (rc) fprintf(stderr, "retrohatch: recovery failed (%d); installing is disabled\n", rc);
+			else rh_ui_set_ops(ops);
+		}
+	}
 #endif
 	if (SDL_Init(SDL_INIT_VIDEO)) { fprintf(stderr, "retrohatch: SDL_Init: %s\n", SDL_GetError()); return 1; }
 	if (!(scr = SDL_SetVideoMode(240, 240, 16, SDL_SWSURFACE))) { fprintf(stderr, "retrohatch: SDL_SetVideoMode: %s\n", SDL_GetError()); return 1; }
-#ifdef RH_DEV
 	g_scr = scr;
-#endif
 	rh_ui_set_planner(rh_plan_target);   /* read-only Install Preview (production); DEV has real ops, which take precedence */
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_WM_SetCaption("RetroHatch", "RetroHatch");

@@ -299,7 +299,7 @@ void rh_model_load_candidates(rh_model *m, const char *path)
 void rh_model_load_signed(rh_model *m, const char *index, size_t len, const char *src, unsigned serial, const char *expires,
 			  const char *device_id, const char *state_dir)
 {
-	char *txt = malloc(len + 1); rj *j; const rj *k;
+	char *txt = malloc(len + 1); rj *j; const rj *k; int i;
 	free(m->cands);
 	memset(m, 0, sizeof *m);
 	load_devinfo(&m->di);
@@ -316,6 +316,7 @@ void rh_model_load_signed(rh_model *m, const char *index, size_t len, const char
 		}
 	if ((k = rj_get(j, "apps")))
 		for (k = k->kid; k; k = k->next) load_app(m, k, device_id);
+	for (i = 0; i < m->n_apps; i++) m->apps[i].signed_catalog = 1;   /* only a verified index gets here */
 	rj_free(j);
 	m->cat.ok = 1; CP(m->cat.status, "Signature verified");
 	qsort(m->apps, m->n_apps, sizeof m->apps[0], app_cmp);

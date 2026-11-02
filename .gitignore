@@ -42,6 +42,7 @@ out/
 tests/nano_install_test
 tests/ui_nav_test
 tests/ui_ops_test
+tests/ui_prod_test
 tests/ui_signed_test
 tests/trust_native_test
 tests/trust_state_test

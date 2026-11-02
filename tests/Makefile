@@ -7,7 +7,7 @@ nano_install_test: nano_install_test.c ../platforms/nano/rh_install.c ../core/sh
 	$(CC) $(CFLAGS) -o $@ nano_install_test.c ../platforms/nano/rh_install.c ../core/sha256.c
 
 clean:
-	rm -f nano_install_test ui_nav_test ui_ops_test
+	rm -f nano_install_test ui_nav_test ui_ops_test ui_prod_test
 
 # Phase 4B UI test. SDL 1.2 + SDL_image prefix (static); WSL host: SDLP=$$HOME/sdlhost/inst
 SDLP ?= $(HOME)/sdlhost/inst
@@ -28,6 +28,13 @@ ui_ops_test: ui_ops_test.c $(OPS_SRC) ../ui/*.h
 
 ops-test: ui_ops_test
 	./ui_ops_test .. $(SHOTS)
+
+# production ops gates (temp dirs, no network, test-only key bytes)
+ui_prod_test: ui_prod_test.c $(OPS_SRC) ../ui/*.h
+	$(CC) -std=gnu99 -Wall -Wextra -Wno-format-truncation -O1 -g -fsanitize=address,undefined -I$(SDLP)/include -I$(MBED)/include -o $@ ui_prod_test.c $(OPS_SRC) $(UI_LIBS) -L$(MBED)/library -lmbedtls -lmbedx509 -lmbedcrypto
+
+prod-test: ui_prod_test
+	./ui_prod_test ..
 
 # Phase 6C-2: native signed-catalog verifier (Monocypher vendored under ../vendor/monocypher)
 MC = ../vendor/monocypher

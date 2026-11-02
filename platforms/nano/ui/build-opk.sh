@@ -23,6 +23,11 @@ elif [ "${DEV:-0}" = 1 ]; then NAME=RetroHatchDev; RUN=run.sh; DESK=retrohatchde
 	DEVCAT=${DEVCAT:-$ROOT/build/dev-catalog/bundled.pkg}   # signed with the DEV key: python tools/make_dev_catalog.py --key ...
 	[ -f "$DEVCAT" ] || { echo "missing $DEVCAT (run tools/make_dev_catalog.py --out build/dev-catalog --key <dev key>)" >&2; exit 1; }
 else NAME=RetroHatch; RUN=run.sh; DESK=retrohatch; fi
+if [ "${DEV:-0}" != 1 ]; then   # production (and TEST): signed catalog + the same install engine, the PRODUCTION key only (trusted_keys_prod.h; the DEV key header is not on the include path)
+	EXTRA="$ROOT/ui/rh_ops.c $ROOT/ui/rh_source.c $ROOT/core/rh_net.c $ROOT/core/rh_catalog.c $ROOT/core/rh_catalog_state.c $MC/monocypher.c $MC/monocypher-ed25519.c"
+	DEFS="-I$HERE"
+	LIBS="$SYSROOT/usr/lib/libmbedtls.a $SYSROOT/usr/lib/libmbedx509.a $SYSROOT/usr/lib/libmbedcrypto.a"
+fi
 PKG=$OUT/opk-stage-$NAME
 rm -rf "$PKG"; mkdir -p "$PKG/assets" "$PKG/catalog/apps" "$PKG/catalog/devices"
 
@@ -45,6 +50,12 @@ cp "$ROOT"/catalog/devices/*.json "$PKG/catalog/devices/"
 if [ "${DEV:-0}" = 1 ]; then   # DEV: signed catalog snapshot + trusted roots instead of loose JSON files
 	rm -rf "$PKG/catalog"; mkdir -p "$PKG/catalog" "$PKG/certs"
 	cp "$DEVCAT" "$PKG/catalog/catalog.pkg"; cp "$HERE/ca-bundle.crt" "$PKG/certs/ca-bundle.crt"
+fi
+if [ "${DEV:-0}" != 1 ]; then
+	mkdir -p "$PKG/certs"; cp "$HERE/ca-bundle.crt" "$PKG/certs/ca-bundle.crt"
+	# A signed catalog snapshot is bundled only when one is supplied: PRODCAT=<catalog.pkg made by tools/make_pkg.py from a catalog signed with the
+	# production key>. None is published yet, so by default there is none and the app can install nothing until a refresh verifies one.
+	if [ -n "${PRODCAT:-}" ]; then [ -f "$PRODCAT" ] || { echo "missing $PRODCAT" >&2; exit 1; }; mkdir -p "$PKG/catalog"; cp "$PRODCAT" "$PKG/catalog/catalog.pkg"; fi
 fi
 cp "$HERE/$RUN" "$PKG/run.sh"
 cp "$HERE/$DESK.funkey-s.desktop" "$PKG/"

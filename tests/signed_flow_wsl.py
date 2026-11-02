@@ -67,9 +67,15 @@ port = srv.server_address[1]
 r = subprocess.run(["make", "-C", str(ROOT / "tests"), "mc_host.o", "mce_host.o", "ui_signed_test"], capture_output=True, text=True)
 assert r.returncode == 0, r.stdout + r.stderr
 (FX / "variant.txt").write_text("ok")
-r = subprocess.run([str(ROOT / "tests" / "ui_signed_test"), str(ROOT), str(FX), str(port), str(W / "ca.pem"), (FX / "pubkey.hex").read_text().strip()] + sys.argv[2:3],
-                   capture_output=True, text=True, timeout=300)
-print(r.stdout.strip())
-print(r.stderr.strip()[-2000:])
+rc = 0
+for mode in ("DEV", "PRODUCTION"):   # the same signed flow under the DEV rules, then under the production rules (test-only key either way)
+    env = dict(os.environ)
+    if mode == "PRODUCTION": env["RH_TEST_PRODUCTION"] = "1"
+    (FX / "variant.txt").write_text("ok")
+    r = subprocess.run([str(ROOT / "tests" / "ui_signed_test"), str(ROOT), str(FX), str(port), str(W / "ca.pem"), (FX / "pubkey.hex").read_text().strip()] + sys.argv[2:3],
+                       capture_output=True, text=True, timeout=300, env=env)
+    print(mode + ":", r.stdout.strip())
+    print(r.stderr.strip()[-2000:])
+    rc = rc or r.returncode
 shutil.rmtree(W, ignore_errors=True)
-sys.exit(r.returncode)
+sys.exit(rc)
