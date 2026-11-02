@@ -200,7 +200,7 @@ def report_md(res, skipped, total):
           "| Comments that really describe the app (not a note or the app's own name) | %d |" % sum(1 for r in desc if not any(f.startswith("comment is") for f in r["flags"])), "| Valid icons | %d |" % len(icons), "| Entries that gain a description they lack today | %d |" % len(newdesc), "| Entries with a flag to review | %d |" % len(flagged), ""]
     fm = {}
     for r in icons: fm.setdefault("%s %sx%s" % (r["recovered"]["icon"]["format"], r["recovered"]["icon"]["width"], r["recovered"]["icon"]["height"]), []).append(r["id"])
-    L += ["Icon formats and sizes: " + "; ".join("%s x%d" % (k, len(v)) for k, v in sorted(fm.items())) + ". Icons are recorded, not imported.", "",
+    L += ["Icon formats and sizes: " + "; ".join("%s x%d" % (k, len(v)) for k, v in sorted(fm.items())) + ". Icon facts and a redistribution verdict are recorded; an icon ships only when the verdict is redistributable.", "",
           "Identity: every package used passed the squashfs signature and recorded-size check. SHA-256 values are on record only for Funkoban, SuDokuL and J2ME; the other entries are matched by signature plus size (\"medium\") and their computed hashes are kept in the JSON.", ""]
     L += ["## Per entry", "", "| ID | Status | Package Name | Comment | Categories | Icon | Flags |", "|---|---|---|---|---|---|---|"]
     for r in res:
@@ -216,7 +216,7 @@ def report_md(res, skipped, total):
     return "\n".join(L) + "\n"
 
 
-def evidence_doc(res, cands):
+def evidence_doc(res, cands, icon_sha=None):
     """the part of the probe results worth keeping in Git: identity, extracted fields and icon facts; no paths, no package or icon bytes"""
     recs = []
     for r in res:
@@ -228,12 +228,47 @@ def evidence_doc(res, cands):
                      "package": {"name": c["package"]["name"], "size": pv["package_size"], "sha256": pv["package_sha256"],
                                  "identity": "high: SHA-256 on record" if hi else "medium: squashfs signature + recorded size"},
                      "desktop": {"file": pv["file"], "name": v["name"], "comment": v["comment"], "categories": v["categories"]},
-                     "icon": {"file": ic["file"], "bytes": ic["bytes"], "format": ic["format"], "width": ic["width"], "height": ic["height"], "available": ic["valid"]},
+                     "icon": {"file": ic["file"], "bytes": ic["bytes"], "format": ic["format"], "width": ic["width"], "height": ic["height"], "available": ic["valid"],
+                              **({"sha256": icon_sha[rid]} if icon_sha and rid in icon_sha else {}),
+                              "redistribution": OM.icon_rights(rid, c.get("license") if "same_as" not in c else cands[c["same_as"]].get("license"))},
                      "comment_class": kind, **({"comment_reason": why} if why else {}),
                      **({"display_comment": OM.DISPLAY[r["id"]][0], "display_comment_reason": OM.DISPLAY[r["id"]][1]} if r["id"] in OM.DISPLAY else {}), **({"multiple_desktop_files": True} if any(".desktop files" in f for f in r["flags"]) else {})})
     return {"schema": 1, "source": "OPK package .desktop files, read with tools/opk_metadata_probe.py (squashfs signature and recorded size checked; nothing executed)",
-            "note": "Original package bytes and icons are not kept. Icons are recorded, not imported. Package categories are evidence, not a category assignment.",
+            "note": "Original package bytes and icons are not kept. Icon facts and a redistribution verdict are recorded; an icon ships only when the verdict is redistributable. Package categories are evidence, not a category assignment.",
             "records": sorted(recs, key=lambda x: x["id"])}
+
+
+def fetch_icons(a):
+    """Save the icon of every evidence record into a folder, checking each package against the recorded SHA-256 and each icon against the
+    recorded format, size and byte count. Local packages come from --local; the others are downloaded from the URL recorded for the listing."""
+    ev = json.loads(Path(a.evidence_in).read_text(encoding="utf-8"))["records"]
+    listing = {c["id"]: c for c in json.loads((ROOT / "candidates" / "wiki-listings.json").read_text(encoding="utf-8"))["candidates"]}
+    local = dict(x.split("=", 1) for x in a.local); out = Path(a.icons); out.mkdir(parents=True, exist_ok=True)
+    got, problems, total = [], [], 0
+    with tempfile.TemporaryDirectory(prefix="rh_ico_") as t:
+        for r in ev:
+            rid, lid = r["id"], r.get("listed_as", r["id"]); pkg = local.get(lid) or local.get(rid); fetched = False
+            if pkg is None:
+                dest = os.path.join(t, "pkg.opk"); why = fetch(listing[lid]["package"]["url"], dest, r["package"]["size"], MAX_TOTAL - total)
+                if why: problems.append((rid, why)); continue
+                total += r["package"]["size"]; pkg = dest; fetched = True
+            try:
+                if hashlib.sha256(Path(pkg).read_bytes()).hexdigest() != r["package"]["sha256"]: raise ValueError("package SHA-256 differs from the recorded one")
+                ic = r["icon"]
+                if ic["file"] not in regular_files(pkg): raise ValueError("icon file not in the package")
+                b = extract_one(pkg, ic["file"], t + "/i", ICON_MAX); info = image_info(b)
+                if info != (ic["format"], ic["width"], ic["height"]) or len(b) != ic["bytes"]: raise ValueError("icon differs from the recorded format, size or byte count")
+                name = rid + "." + ic["format"].lower(); (out / name).write_bytes(b)
+                got.append({"id": rid, "file": name, "format": ic["format"], "width": ic["width"], "height": ic["height"], "bytes": len(b),
+                            "sha256": hashlib.sha256(b).hexdigest(), "package_sha256": r["package"]["sha256"], "package_identity": "SHA-256 equals the recorded one"})
+            except Exception as e:   # one bad package never stops the others
+                problems.append((rid, str(e)[:100]))
+            finally:
+                if fetched and os.path.exists(pkg): os.remove(pkg)
+            if fetched: time.sleep(0.3)
+    (out / "manifest.json").write_text(json.dumps({"icons": got, "problems": problems, "downloaded_bytes": total}, indent=1) + "\n", encoding="utf-8")
+    print("%d icons saved, %d problems, %.1f MB downloaded" % (len(got), len(problems), total / 1e6), file=sys.stderr)
+    for p_ in problems: print("  PROBLEM %s: %s" % p_, file=sys.stderr)
 
 
 def main():
@@ -241,17 +276,22 @@ def main():
     ap.add_argument("--local", action="append", default=[], metavar="ID=PATH", help="a local OPK for candidate ID; repeatable")
     ap.add_argument("--fetch", action="store_true"); ap.add_argument("--json"); ap.add_argument("--report")
     ap.add_argument("--from-json", help="regenerate --report from an earlier --json file: no download, no extraction")
+    ap.add_argument("--icons", metavar="DIR", help="save each evidence record's icon into DIR (git-ignored build/ is a good place); packages are re-fetched or taken from --local")
+    ap.add_argument("--icons-manifest", help="with --evidence: manifest.json written by --icons; adds each icon's SHA-256 to the evidence")
+    ap.add_argument("--evidence-in", default=str(ROOT / "discovery" / "opk-metadata-evidence.json"), help="evidence file --icons reads")
     ap.add_argument("--evidence", help="with --from-json: write the compact, path-free evidence file (discovery/opk-metadata-evidence.json)")
     ap.add_argument("--resume", help="earlier --json output: entries it already downloaded and probed are kept, not fetched again")
     a = ap.parse_args()
     if os.geteuid() == 0: sys.exit("refusing to run as root")
+    if a.icons: return fetch_icons(a)
     cands, hashes = candidates(), recorded_hashes(); res = []; skipped = []; total = 0
     if a.from_json:
         res = json.loads(Path(a.from_json).read_text(encoding="utf-8"))
         for r in res:
             if r.get("recovered"): compare(r, cands_row(cands[r["id"]]))
         total = sum(r["provenance"]["package_size"] for r in res if r.get("downloaded") and r.get("provenance"))
-        if a.evidence: Path(a.evidence).write_bytes((json.dumps(evidence_doc(res, cands), indent=1, ensure_ascii=False) + "\n").encode("utf-8"))
+        icon_sha = {i["id"]: i["sha256"] for i in json.loads(Path(a.icons_manifest).read_text(encoding="utf-8"))["icons"]} if a.icons_manifest else None
+        if a.evidence: Path(a.evidence).write_bytes((json.dumps(evidence_doc(res, cands, icon_sha), indent=1, ensure_ascii=False) + "\n").encode("utf-8"))
         if a.json: Path(a.json).write_text(json.dumps(res, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         if a.report: Path(a.report).write_bytes(report_md(res, [], total).encode("utf-8"))
         return

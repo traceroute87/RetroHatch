@@ -85,6 +85,31 @@ for c in rows.values():                                                         
 assert {c["id"]: c["category"] for c in O if "category" in c} == {"nanocraft": "games", "funkoban": "games", "picoarch": "emulators"}   # reviewed categories untouched
 assert [c["name"] for c in O][:3] == ["j2me-funkey-rgnano", "NanoCraft", "Funkoban"]                                  # existing names kept
 
+# ---- icons: all 37 are recorded; an icon ships (tracked file, snapshot name, OPK) only with a recorded right to redistribute it -------
+import collections, hashlib
+status = collections.Counter(r["icon"]["redistribution"]["status"] for r in E)
+assert status == {"unclear": 37}, status                      # the audit found no icon-specific licence or credit; nothing is restricted by evidence either
+allowed = set()
+for r in E:
+    red = r["icon"]["redistribution"]; row = rows[r["id"]]
+    assert red["status"] in OM.STATUSES and red["evidence"] and re.fullmatch(r"[0-9a-f]{64}", r["icon"]["sha256"]) and "source_license" in red
+    assert ("icon_file" in row) == (red["status"] == "redistributable")                      # glyph for everything else
+    assert row["package_metadata"]["icon"]["redistribution"]["status"] == red["status"]     # the snapshot keeps the verdict next to the icon facts
+    if red["status"] == "redistributable":
+        allowed.add(r["id"])
+        assert hashlib.sha256((ROOT / "candidates" / row["icon_file"]).read_bytes()).hexdigest() == r["icon"]["sha256"]
+assert {p.stem for p in (ROOT / "candidates" / "icons").glob("*.png")} == allowed             # no unclear or restricted file in the distribution folder
+assert sum("icon_file" in c for c in rows.values()) == len(allowed) == 0
+assert OM.icon_rights("wiki-blips", "MIT")["status"] == "unclear" and OM.icon_rights("x", None)["source_license"] == "unknown"   # a project licence alone never clears artwork
+assert "candidates/icons/*.png" in (ROOT / ".gitignore").read_text(encoding="utf-8")        # an icon can only be tracked on purpose (git add -f)
+for status_, has in (("redistributable", True), ("unclear", False), ("restricted", False)):
+    e = copy.deepcopy(base); OM.enrich(e, dict(rec, icon=dict(rec["icon"], sha256="1" * 64, redistribution={"status": status_, "evidence": "t", "source_license": "MIT"})))
+    assert ("icon_file" in e) == has and e["package_metadata"]["icon"]["redistribution"]["status"] == status_
+    if has: assert e["icon_file"] == "icons/t.png"
+    OM.enrich(e, rec); assert "icon_file" not in e
+e = copy.deepcopy(base); OM.enrich(e, dict(rec, icon=dict(rec["icon"], redistribution={"status": "redistributable", "evidence": "t", "source_license": "MIT"})))
+assert "icon_file" not in e                                                                  # no recorded hash, no icon file claimed
+
 # ---- clean checkout: tracked files only, no build/ dir, no OPKs ----------------------------------------------------
 with tempfile.TemporaryDirectory() as t:
     t = Path(t)

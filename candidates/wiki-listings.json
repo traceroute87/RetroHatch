@@ -104,7 +104,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "af97eb8e266ee66205d3ed39e36d9e3a3a80fe2a1df20083426802b42c33c90f",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -174,7 +181,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "8828127d7fec48e3c9d9f5f6410920321034858254ebf52e2f5f281a60f2e5b5",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork. The game is a remake of another author's DOS game.",
+      "source_license": "MIT",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -244,7 +258,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "229fa926daf6a72679c1e0de4cd5835dbe896bfc89cf81d14de4c50490700fe6",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork. The game is a remake of another author's game.",
+      "source_license": "MIT",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -400,7 +421,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "d46e5bb3981cfe8fb5b080a913018b8a7e7b31a530950e17f23e518619bcaebd",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -479,7 +507,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "85e86eec4b1da4e5825d2d2262a3e3413a2311555c8c5519ee5e6387301304a1",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -591,7 +626,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "979181013971bf092e28354d45e09b275217a36e4c8bc51a2ce3ae6ddffa1397",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -661,7 +703,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "9d3fdb9a21ff6ac4324c2cd1f7dadcd58a5773e48e50d948757071515eacb998",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -741,7 +790,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "c5b63518ea72eaabfa575dcf1c375f746495215a36c18af4fabcc0eb4e640c35",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -812,7 +868,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "64384d8d7de8a351caa5682e45028b0ea49192baa0da5365bd504c44535d1c85",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -890,7 +953,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "ac45ec8401bac83f30910c0f3f19a8f075127793bfdf4d56eadd73f12f92a574",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -967,7 +1037,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "007eb7bf48c3431ca0a0e6d79423da2411a62a0f1bbb2d3f4a586b74b53d3eea",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork.",
+      "source_license": "MIT",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -1080,7 +1157,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "ea6039e10519ebf028c4eeec08b52a0cc385f772f3dc17983647686acd8eee54",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -1192,7 +1276,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "fc21e6b4e145f620dce5ad1f23feaa62c12dc974db28a098d58981da9fd929bf",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -1269,7 +1360,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "3d090ac0891fe134cd1632558d315137d6c34eeb97bcf1a7ef9c40760dc2d7cb",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -1391,7 +1489,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "1d72e3e2bbeb5662623ecdb5bef272968b7bee139cbecc83470e1f4c4a39a375",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -1557,7 +1662,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "a0bae9d4930aae858c68b5ea1d75756169e256f01ca99067b19669fbc0c55b25",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -1635,7 +1747,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "7da8dab7473e3931021a43bd0939092dd8c3ce156710004b65bc513531added0",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -1705,7 +1824,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "e4d4698f8194b8d15823166337f8938087acd58e47b0d1da2ce30a408a2638d9",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -1782,7 +1908,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "c8a2953c26b716b4cd225ac64a4180bb66627d1f305644a43ec248c1eb59b274",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "The package README credits the port author and thanks others; it states no licence for the artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": true
+     }
     }
    }
   },
@@ -1898,7 +2031,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "7ecfcbd30af5ad888a0469713af03046c55a2807bc4ccd4eb8c7928798b33f3c",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -1971,7 +2111,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "2c553c7160ee792a46cb5d1c58f1056c1d5d4bff18fc57414a38e64f70775ebb",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -2041,7 +2188,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "76bced06707bed1a94714147ccd737b746036c0dbf81fade8c270894844e74e0",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -2114,7 +2268,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "13fa31af448e36da122fe6310a427792bd9f28069b67c5359de9a7145a64d02d",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -2191,7 +2352,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "fc21e6b4e145f620dce5ad1f23feaa62c12dc974db28a098d58981da9fd929bf",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -2264,7 +2432,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "60c3b8967d58d483c2cb316a10b63d3a690e272a10e771cabab594c7847fb4dd",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -2334,7 +2509,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "7912849e026db082fa6a305d3e8164959854275e5baa43200cef613bc8bba8b7",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork.",
+      "source_license": "MIT",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -2405,7 +2587,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "b514f5d17f5962c696c20df7cb3f779026d01762523511520933349385ce3ce2",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -2485,7 +2674,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "4f10ca39bced83c58cada5d1d285587e53e58f3e755d5f19843abd7f7469e986",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -2604,7 +2800,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "1db5770a9d2470bdd9d600ffceaff901a3cd30534a1291c61b90084f6f1e5ed2",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    },
    "metadata_review": {
@@ -2726,7 +2929,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "cbbe26de4eac1ce32ecaa01acc9f0fa077f7218b03d782d441b33d64d17f63e2",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -2799,7 +3009,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "9cc21398551166ea1111adc485546db77126ac3da14ef35cfbb79164e21b2d78",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -2872,7 +3089,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "c2349f4f546b6b768aadb0f76938c284159c17bc792186fff7fc2b713e2a03e8",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork.",
+      "source_license": "unknown",
+      "package_files_inspected": false
+     }
     }
    }
   },
@@ -3026,7 +3250,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "aca247a27f9a3329d3886018cfa611ded2dd28278cf3d93f3f9a3e3dcf0a0af6",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork. The game is a remake of another author's Flash game.",
+      "source_license": "MIT",
+      "package_files_inspected": false
+     }
     }
    }
   }

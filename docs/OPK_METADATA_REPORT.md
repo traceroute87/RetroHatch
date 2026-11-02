@@ -19,7 +19,7 @@ Prototype run, read-only. Nothing was executed, mounted or installed; raw packag
 | Entries that gain a description they lack today | 33 |
 | Entries with a flag to review | 24 |
 
-Icon formats and sizes: PNG 32x32 x37. Icons are recorded, not imported.
+Icon formats and sizes: PNG 32x32 x37. Icon facts and a redistribution verdict are recorded; an icon ships only when the verdict is redistributable.
 
 Identity: every package used passed the squashfs signature and recorded-size check. SHA-256 values are on record only for Funkoban, SuDokuL and J2ME; the other entries are matched by signature plus size ("medium") and their computed hashes are kept in the JSON.
 

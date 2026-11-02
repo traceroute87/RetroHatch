@@ -1,0 +1,11 @@
+{
+ "schema": 1,
+ "device": "rg-nano",
+ "status": "TEST candidates: synthetic icons made for the UI tests, not real software",
+ "candidates": [
+  {"id": "ic-alpha", "name": "Icon Alpha", "description": "Test entry with a 32x32 icon.", "repo": "t/alpha", "icon_file": "icons/alpha.png", "approval": "unapproved", "hardware_test": "none"},
+  {"id": "ic-beta", "name": "Icon Beta", "description": "Test entry with another icon.", "repo": "t/beta", "icon_file": "icons/beta.png", "approval": "unapproved", "hardware_test": "none"},
+  {"id": "ic-gone", "name": "Icon Missing", "description": "Names an icon file that does not exist.", "repo": "t/gone", "icon_file": "icons/missing.png", "approval": "unapproved", "hardware_test": "none"},
+  {"id": "ic-none", "name": "No Icon", "description": "Names no icon.", "repo": "t/none", "approval": "unapproved", "hardware_test": "none"}
+ ]
+}

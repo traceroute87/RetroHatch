@@ -32,6 +32,9 @@ static char blocked_why[40], res_msg[96];
 static int filt;                                                   /* Discover category filter: an rh_cat, RH_CAT_ALL = no filter */
 static struct { int cand, idx; } *vis;   /* Discover rows under the filter: approved app or candidate, index into the model; sized to the model, no fixed limit */
 static int n_vis, vis_cap;
+static SDL_Surface **cand_ico;   /* candidate icons, loaded on first draw; one slot per model candidate */
+static signed char *cand_ico_st; /* 0 = not tried, 1 = loaded, -1 = missing or refused: the package glyph is drawn instead */
+static int cand_ico_n;
 static int res_rc, pending, cur_op;   /* cur_op: 0 install, 1 update, 2 uninstall, 3 download, 4 refresh catalog */
 static uint64_t prog_done, prog_total;
 void rh_ui_progress(uint64_t done, uint64_t total) { prog_done = done; prog_total = total; }
@@ -75,6 +78,7 @@ int rh_ui_init(const char *dir, const rh_model *m)
 {
 	char p[512]; int i;
 	M = m; depth = 0; memset(st, 0, sizeof st); filt = RH_CAT_ALL; vis_build();
+	cand_ico_n = m->n_cands; cand_ico = calloc(cand_ico_n ? cand_ico_n : 1, sizeof *cand_ico); cand_ico_st = calloc(cand_ico_n ? cand_ico_n : 1, 1);   /* a failed allocation just means no icons */
 	snprintf(p, sizeof p, "%s/tarafi16.fnt", dir); f_body = gfx_font_load(p);
 	snprintf(p, sizeof p, "%s/15-KodeMono-SemiBold.fnt", dir); f_title = gfx_font_load(p);
 	if (!f_title) f_title = f_body;
@@ -89,6 +93,8 @@ int rh_ui_init(const char *dir, const rh_model *m)
 void rh_ui_free(void)
 {
 	int i;
+	for (i = 0; i < cand_ico_n; i++) if (cand_ico && cand_ico[i]) SDL_FreeSurface(cand_ico[i]);
+	free(cand_ico); free(cand_ico_st); cand_ico = NULL; cand_ico_st = NULL; cand_ico_n = 0;
 	for (i = 0; i < IC_N; i++) { SDL_FreeSurface(ic[i]); ic[i] = NULL; }
 	SDL_FreeSurface(img_header); SDL_FreeSurface(img_home); SDL_FreeSurface(img_logo); SDL_FreeSurface(img_mark);
 	img_header = img_home = img_logo = img_mark = NULL;
@@ -121,24 +127,43 @@ static void row_bg(SDL_Surface *d, int x, int y, int w, int h, int sel)
 	if (sel) gfx_rfill(d, x, y, w, h, 4, C_ACC); else gfx_rbox(d, x, y, w, h, 4, C_LINE, C_ROW);
 }
 
-static void app_tile(SDL_Surface *d, int x, int y, int s, int sel)
+/* The candidate's own 32x32 icon, or NULL (none named, file missing, not 32x32, or no video yet). Decoded once, kept for the session. */
+static SDL_Surface *cand_icon(int idx)
 {
+	SDL_Surface *s;
+	if (idx < 0 || idx >= cand_ico_n || !cand_ico || !M->cands[idx].icon[0]) return NULL;
+	if (!cand_ico_st[idx]) {
+		cand_ico_st[idx] = -1;
+		if ((s = gfx_img_load(M->cands[idx].icon))) {
+			if (s->w == 32 && s->h == 32) { cand_ico[idx] = s; cand_ico_st[idx] = 1; } else SDL_FreeSurface(s);   /* only the size the packages ship */
+		}
+	}
+	return cand_ico_st[idx] > 0 ? cand_ico[idx] : NULL;
+}
+
+static void app_tile(SDL_Surface *d, int x, int y, int s, int sel, SDL_Surface *ico)
+{
+	if (ico && s == 32) {   /* frame one pixel outside the 32x32 picture so no picture pixel is lost */
+		gfx_rbox(d, x - 1, y - 1, 34, 34, 4, sel ? C_ONACC : C_LINE, C_CARD);
+		gfx_img(d, ico, x, y);
+		return;
+	}
 	gfx_rbox(d, x, y, s, s, 4, sel ? C_ONACC : C_LINE, C_CARD);
 	icon(d, IC_PACKAGE, x + s / 2, y + s / 2, C_GREEN);
 }
 
-static void list_row_tag(SDL_Surface *d, int y, int sel, const char *name, const char *tag, const char *sub)
+static void list_row_tag(SDL_Surface *d, int y, int sel, const char *name, const char *tag, const char *sub, SDL_Surface *ico)
 {
 	char b[80]; int hn = gfx_font_h(f_title), ty = y + (LIST_RH - (hn + 16)) / 2 + 1, tw = tag ? gfx_text_w(f_body, tag) + 8 : 0;
 	row_bg(d, 8, y, 224, LIST_RH, sel);
-	app_tile(d, 14, y + 5, 32, sel);
+	app_tile(d, 14, y + 5, 32, sel, ico);
 	gfx_text(d, f_title, gfx_ellipsize(f_title, name, 150, b, sizeof b), 54, ty, sel ? C_ONACC : C_TXT);
 	if (tag) gfx_text(d, f_body, tag, 54, ty + hn, sel ? C_ONACC : C_ERR);   /* e.g. UNAPPROVED: never the same colour as plain text */
 	gfx_text(d, f_body, gfx_ellipsize(f_body, sub, 150 - tw, b, sizeof b), 54 + tw, ty + hn, sel ? C_ONACC : C_TXT2);
 	icon(d, IC_CHEV, 220, y + LIST_RH / 2, sel ? C_ONACC : C_TXT2);
 }
 
-static void list_row(SDL_Surface *d, int y, int sel, const char *name, const char *sub) { list_row_tag(d, y, sel, name, NULL, sub); }
+static void list_row(SDL_Surface *d, int y, int sel, const char *name, const char *sub) { list_row_tag(d, y, sel, name, NULL, sub, NULL); }
 
 static void menu_row(SDL_Surface *d, int x, int y, int w, int h, int sel, int ico, const char *label)
 {
@@ -233,7 +258,8 @@ static int cand_details(SDL_Surface *d, int y0, const rh_cand *c)
 	int y = y0 + 4; kv r[24]; int n = 0; char b[96], ev[96], sz[24];
 #define CROW(L, ...) do { snprintf(r[n].l, sizeof r[n].l, "%s", L); snprintf(r[n++].v, sizeof r[0].v, __VA_ARGS__); } while (0)
 	gfx_rbox(d, 8, y, 40, 40, 5, C_LINE, C_CARD);
-	icon(d, IC_PACKAGE, 28, y + 20, C_GREEN);
+	if (d && cand_icon((int)(c - M->cands))) gfx_img(d, cand_icon((int)(c - M->cands)), 12, y + 4);   /* 32x32 picture inside the 40x40 card */
+	else icon(d, IC_PACKAGE, 28, y + 20, C_GREEN);
 	gfx_text(d, f_title, gfx_ellipsize(f_title, c->name, 170, b, sizeof b), 56, y + 2, C_TXT);
 	gfx_text(d, f_title, "UNAPPROVED", 56, y + 22, C_ERR);
 	y += 48;
@@ -692,7 +718,7 @@ static void draw_content(SDL_Surface *d)
 			if (y + LIST_RH <= ctop() || y >= CONT_B) continue;
 			if (vis[i].cand) {
 				const rh_cand *c = &M->cands[vis[i].idx];   /* wiki listings show what was checked; the rest their release */
-				list_row_tag(d, y, i == CUR.sel, c->name, "UNAPPROVED", c->wiki ? (c->sig_ok ? "Pkg ok" : "Listed") : c->version);
+				list_row_tag(d, y, i == CUR.sel, c->name, "UNAPPROVED", c->wiki ? (c->sig_ok ? "Pkg ok" : "Listed") : c->version, cand_icon(vis[i].idx));
 			}
 			else {
 				const rh_app *a = &M->apps[vis[i].idx]; char sub[160];   /* installed status comes from RetroHatch's own record; absent record = nothing claimed */

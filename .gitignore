@@ -64,3 +64,6 @@ Thumbs.db
 desktop.ini
 *.log
 *.swp
+
+# ---- candidate icons: only icons with a recorded right to redistribute may be tracked (git add -f after the audit says so)
+candidates/icons/*.png

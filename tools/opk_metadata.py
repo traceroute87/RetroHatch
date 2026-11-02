@@ -7,7 +7,9 @@ Rules, in order of trust:
   * `category` is never changed. The package's Categories are recorded and compared with the row's category (reviewed, or derived by
     the same word lists the Nano UI uses); a disagreement goes to `metadata_review`, and the Basis text gets a short verdict.
   * `name` is never changed. A different package Name is listed under `metadata_review.name` as a proposal only.
-  * Icons are recorded (format, size, availability inside the package); none is extracted or imported.
+  * Icons are recorded (format, size, SHA-256, availability inside the package). `icon_file` is set, and the file may sit under candidates/icons/,
+    ONLY when the icon's redistribution status is "redistributable". A project licence is not assumed to cover its artwork; "unclear" and
+    "restricted" icons keep the package glyph, stay out of Git and out of the production OPK, and live only in a local development folder.
 enrich() is idempotent: it removes its own earlier additions first, so it can be re-run on an already enriched snapshot.
 """
 import json, re
@@ -77,7 +79,7 @@ def load(path=EVIDENCE):
 def strip(c):
     """remove what enrich() added earlier, so a second run starts from the original entry"""
     if str(c.get("description_source", "")).startswith(SOURCE): c["description"] = ""
-    for k in ("description_source", "package_metadata", "metadata_review"): c.pop(k, None)
+    for k in ("description_source", "package_metadata", "metadata_review", "icon_file"): c.pop(k, None)
     if c.get("category_basis") and VERDICT_SEP in c["category_basis"]: c["category_basis"] = c["category_basis"].split(VERDICT_SEP)[0]
 
 
@@ -106,5 +108,31 @@ def enrich(c, rec):
                              **({"comment_reason": rec["comment_reason"]} if rec.get("comment_reason") else {}), "categories": d["categories"],
                              "category_evidence": {"maps_to": CAT_NAME[sec] if sec else None, "row_category": CAT_NAME[row], "row_category_reviewed": reviewed, "verdict": verdict},
                              "icon": rec["icon"], **({"multiple_desktop_files": True} if rec.get("multiple_desktop_files") else {})}
+    if rec["icon"].get("available") and rec["icon"].get("sha256") and rec["icon"].get("redistribution", {}).get("status") == "redistributable":   # recorded hash AND a clear right to ship it; the Nano UI shows it
+        c["icon_file"] = "icons/%s.%s" % (rec["id"], rec["icon"]["format"].lower())
     if review: c["metadata_review"] = review
     return {"description": "description_source" in c, "verdict": verdict, "name": "name" in review}
+
+
+# ---- icon redistribution rights ---------------------------------------------------------------------------------------
+STATUSES = ("redistributable", "unclear", "restricted")
+# Only an entry here can make an icon "redistributable"/"restricted": it needs evidence naming the icon (or its asset folder) and the licence
+# that covers it. Nothing qualifies today: no audited icon carries an icon-specific licence or credit.
+RIGHTS_OVERRIDE = {}
+_DEFAULT = "No licence, credit or notice for the icon was found, and the package contents were not kept for a second look. The package's own licence is unknown and is not assumed to cover its artwork."
+_MIT_REPO = "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork."
+_NOTES = {
+    "funkoban": _MIT_REPO + " The package ships licence notices for its fonts (Roboto, Space Mono) only, none for graphics.",
+    "cglpsdl1": _MIT_REPO, "wiki-blips": _MIT_REPO + " The game is a remake of another author's DOS game.", "wiki-blockdude": _MIT_REPO + " The game is a remake of another author's game.",
+    "wiki-formula1": _MIT_REPO, "wiki-rubido": _MIT_REPO, "wiki-znax": _MIT_REPO + " The game is a remake of another author's Flash game.",
+    "sudokul": "Repository is MIT (GitHub licence field). The package's strings point to opengameart.org for art and sound; the licence of this picture was not identified.",
+    "j2mefunkeyrgnano": "Repository declares no licence. The package's only notice (NOTICE-JavaMobileAudio.txt, GPLv2) covers a Java audio library, not this icon.",
+    "wiki-mplayer": "The package README credits the port author and thanks others; it states no licence for the artwork.",
+}
+_INSPECTED = {"funkoban", "sudokul", "j2mefunkeyrgnano", "wiki-mplayer"}   # package files still on hand when this was written; the rest were deleted after probing
+
+
+def icon_rights(rid, repo_license):
+    if rid in RIGHTS_OVERRIDE: return RIGHTS_OVERRIDE[rid]
+    return {"status": "unclear", "evidence": _NOTES.get(rid, _DEFAULT), "source_license": repo_license or "unknown",
+            "package_files_inspected": rid in _INSPECTED}

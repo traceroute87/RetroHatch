@@ -511,6 +511,71 @@ static void wiki_listings(const char *root, const char *assets)
 	rh_ui_set_planner(NULL);
 }
 
+/* ---- candidate icons: shown when the file is there and 32x32, never anything else (synthetic icons; real ones need a recorded right to redistribute) ---- */
+static unsigned long screen_hash(void)
+{
+	unsigned long h = 1469598103934665603UL; int x, y;
+	rh_ui_draw(scr);
+	for (y = 0; y < 240; y++) for (x = 0; x < 240; x++) h = (h ^ px(x, y)) * 1099511628211UL;
+	return h;
+}
+
+static void icons(const char *root, const char *assets)
+{
+	static rh_model m; char cat[512], st[512], f[512], tmp[] = "/tmp/rh_icon_XXXXXX", tmp2[] = "/tmp/rh_iconj_XXXXXX", big_bmp[64], text_file[64], none[64]; int i, n_icon = 0, fd, k;
+	unsigned long with, without, bogus; FILE *fp; SDL_Surface *s;
+	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root);
+	/* the shipped snapshots: an icon is named only when its file is there (icons ship only with a recorded right to redistribute them) */
+	rh_model_load(&m, cat, st);
+	snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root); rh_model_load_candidates(&m, f);
+	snprintf(f, sizeof f, "%s/candidates/wiki-listings.json", root); rh_model_add_candidates(&m, f);
+	CHECK(m.n_cands == 54);
+	for (i = 0; i < m.n_cands; i++) if (m.cands[i].icon[0]) {
+		n_icon++; fp = fopen(m.cands[i].icon, "rb"); CHECK(fp != NULL); if (fp) fclose(fp);
+	}
+	CHECK(n_icon <= m.n_cands);
+
+	/* the feature, on synthetic icons made for these tests */
+	snprintf(f, sizeof f, "%s/tests/ui_fixture/candidates-icons.json", root);
+	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, f);
+	CHECK(m.n_cands == 4 && m.cands[0].icon[0] && m.cands[1].icon[0] && m.cands[2].icon[0] && !m.cands[3].icon[0]);
+	CHECK(rh_ui_init(assets, &m) == 0);
+	keys("a"); for (i = 0; i < m.n_apps; i++) keys("d");                                         /* first candidate: Icon Alpha */
+	CHECK(V().sel_visible); shot("icon_1_browse_selected");
+	with = screen_hash(); keys("a"); CHECK(V().screen == RH_S_CAND && V().app == 0 && V().action == RH_ACT_NONE); shot("icon_2_details_alpha"); keys("b");
+	keys("d"); shot("icon_3_browse_beta"); keys("d"); shot("icon_4_browse_missing_file");         /* a named but missing file: glyph, no crash */
+	keys("a"); shot("icon_5_details_missing_file"); keys("b"); keys("d"); keys("a"); CHECK(V().screen == RH_S_CAND && V().app == 3); shot("icon_6_details_no_icon"); keys("b"); rh_ui_free();
+	/* the same screen with the icon names removed differs: the pictures really are drawn */
+	for (i = 0; i < m.n_cands; i++) m.cands[i].icon[0] = 0;
+	CHECK(rh_ui_init(assets, &m) == 0); keys("a"); for (i = 0; i < m.n_apps; i++) keys("d");
+	without = screen_hash(); CHECK(with != without); rh_ui_free();
+	/* missing file, wrong size and not-an-image all fall back to the glyph, which is exactly the no-icon screen */
+	fd = mkstemp(tmp); CHECK(fd >= 0); close(fd); remove(tmp);
+	snprintf(big_bmp, sizeof big_bmp, "%s.big", tmp); snprintf(text_file, sizeof text_file, "%s.txt", tmp); snprintf(none, sizeof none, "%s.none", tmp);
+	s = SDL_CreateRGBSurface(SDL_SWSURFACE, 64, 64, 32, 0, 0, 0, 0); CHECK(s != NULL); SDL_FillRect(s, NULL, 0xff00ff); SDL_SaveBMP(s, big_bmp); SDL_FreeSurface(s);   /* a 64x64 picture */
+	fp = fopen(text_file, "wb"); fputs("this is not an image", fp); fclose(fp);
+	for (k = 0; k < 3; k++) {
+		const char *p = k == 0 ? big_bmp : k == 1 ? text_file : none;
+		for (i = 0; i < m.n_cands; i++) snprintf(m.cands[i].icon, sizeof m.cands[i].icon, "%s", p);
+		CHECK(rh_ui_init(assets, &m) == 0); keys("a"); for (i = 0; i < m.n_apps; i++) keys("d");
+		bogus = screen_hash(); CHECK(bogus == without); keys("a"); CHECK(V().screen == RH_S_CAND); screen_hash(); rh_ui_free();
+	}
+	remove(big_bmp); remove(text_file);
+	/* the loader keeps only a plain relative .png name next to the candidate file */
+	fd = mkstemp(tmp2); CHECK(fd >= 0);
+	fp = fdopen(fd, "w");
+	fprintf(fp, "{\"candidates\":[");
+	{
+		static const char *const NAMES[] = {"icons/ok.png", "../up.png", "/abs.png", "a b.png", "x.jpg", "icons/x.png.", "icons/..png", ""};
+		for (i = 0; i < 8; i++) fprintf(fp, "%s{\"id\":\"i%d\",\"name\":\"I%d\",\"icon_file\":\"%s\",\"approval\":\"unapproved\",\"hardware_test\":\"none\"}", i ? "," : "", i, i, NAMES[i]);
+	}
+	fprintf(fp, "]}"); fclose(fp);
+	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, tmp2);
+	CHECK(m.n_cands == 8 && !strncmp(m.cands[0].icon, "/tmp/icons/ok.png", 18) && m.cands[0].icon[17] == 0);
+	for (i = 1; i < 8; i++) CHECK(m.cands[i].icon[0] == 0);
+	remove(tmp2);
+}
+
 int main(int argc, char **argv)
 {
 	char assets[512];
@@ -526,6 +591,7 @@ int main(int argc, char **argv)
 	candidates(argv[1], assets);
 	categories(argv[1], assets);
 	wiki_listings(argv[1], assets);
+	icons(argv[1], assets);
 	scenario(argv[1], assets, "populated"); scenario(argv[1], assets, "noupdates"); scenario(argv[1], assets, "empty");
 	SDL_Quit();
 	printf("%d checks, %d failed\n", checks, fails);

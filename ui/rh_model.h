@@ -41,6 +41,7 @@ typedef struct {
 	int more;             /* other packages found in the same repository */
 	int wiki;             /* the FunKey wiki list of third-party OPK applications links to it */
 	char wiki_cat[40];    /* the wiki's own category heading; "" = not recorded (the crawler kept links, not page text) */
+	char icon[192];       /* PNG next to the candidate file (candidates/icons/<id>.png): "icon_file" of the entry, or "" when it has none or names an unsafe path */
 	char dl[48];          /* wiki listings: what the file link gave when it was crawled ("Found...", "Unavailable (HTTP 403)", ...); "" = n/a */
 	char mirror[64];      /* wiki listings: result of the page's other link(s) to the same application, "" = none */
 } rh_cand;

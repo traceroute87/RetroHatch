@@ -57,7 +57,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "ab3aa1bf9baa75101b488f1f754a2cd117bbb43ecdfdf9062046152e49457d75",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository declares no licence. The package's only notice (NOTICE-JavaMobileAudio.txt, GPLv2) covers a Java audio library, not this icon.",
+      "source_license": "unknown",
+      "package_files_inspected": true
+     }
     }
    },
    "metadata_review": {
@@ -183,7 +190,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "6e6c3bcdfbc68022fd9b2c961a46019a842d8da65d18c2eba0bc794a410cb3ed",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork. The package ships licence notices for its fonts (Roboto, Space Mono) only, none for graphics.",
+      "source_license": "MIT",
+      "package_files_inspected": true
+     }
     }
    }
   },
@@ -247,7 +261,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "6cecff5750e1c0053c49c1362fd7ab46c7b8779e8660bee698dc5047083ed123",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork.",
+      "source_license": "MIT",
+      "package_files_inspected": false
+     }
     },
     "multiple_desktop_files": true
    },
@@ -409,7 +430,14 @@
      "format": "PNG",
      "width": 32,
      "height": 32,
-     "available": true
+     "available": true,
+     "sha256": "c4a1101747f32164c694c0a732706251f5212319b47d6a5690dd5d460341cea8",
+     "redistribution": {
+      "status": "unclear",
+      "evidence": "Repository is MIT (GitHub licence field). The package's strings point to opengameart.org for art and sound; the licence of this picture was not identified.",
+      "source_license": "MIT",
+      "package_files_inspected": true
+     }
     }
    },
    "metadata_review": {

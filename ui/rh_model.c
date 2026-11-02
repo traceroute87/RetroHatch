@@ -254,6 +254,11 @@ void rh_model_add_candidates(rh_model *m, const char *path)
 			CP(x->repo, rj_str(c, "repo", "")); CP(x->source, rj_str(c, "source", "")); CP(x->license, rj_str(c, "license", ""));
 			CP(x->last_activity, rj_str(c, "last_activity", ""));
 			if (!x->name[0] || (!x->repo[0] && !x->id[0])) continue;
+			{   /* "icon_file": a plain relative .png name under the candidate file's own folder; anything else (absolute, "..", odd characters) is ignored */
+				const char *f = rj_str(c, "icon_file", ""), *sl = strrchr(path, '/'); size_t n = strlen(f), k; int ok = n > 4 && n < 64 && !strcmp(f + n - 4, ".png") && f[0] != '/' && !strstr(f, "..");
+				for (k = 0; ok && k < n; k++) ok = isalnum((unsigned char)f[k]) || f[k] == '.' || f[k] == '_' || f[k] == '-' || f[k] == '/';
+				if (ok) snprintf(x->icon, sizeof x->icon, "%.*s%s", (int)(sl ? sl - path + 1 : 0), path, f);
+			}
 			x->wiki = !strcmp(rj_str(ls, "source", ""), "wiki");
 			if (x->wiki) { CP(x->wiki_cat, rj_str(ls, "wiki_category", "")); CP(x->dl, rj_str(ls, "download", "")); CP(x->mirror, rj_str(ls, "mirror", "")); }
 			if (rj_str(c, "same_as", "")[0]) {   /* the wiki lists something already loaded: mark it, never a second row */
