@@ -842,9 +842,12 @@ assert C.read_sources("")[0] == [] and C.read_sources("# only a comment\n") == (
 assert C.read_sources("repo https://github.com/a/b gba", {"gba"})[0][0][3] == ["gba"]       # a device list can be passed (profiles.json by default)
 big_ = C.read_sources("\n".join(f"repo https://github.com/o/r{i} rg-nano" for i in range(C.SOURCES_MAX + 1)))
 assert len(big_[0]) == C.SOURCES_MAX and [(n, w) for n, _, w in big_[1]] == [(C.SOURCES_MAX + 1, f"over the limit of {C.SOURCES_MAX} sources")]
-# the shipped file is comments only: valid, no sources; its commented examples are valid once uncommented
+# the shipped file is valid and lists only the verified FunKey wiki index; its commented examples are valid once uncommented
 real_txt = (Path(__file__).resolve().parent.parent / "discovery/sources.txt").read_text(encoding="utf-8")
-assert C.read_sources(real_txt) == ([], [])
+real_ok, real_bad = C.read_sources(real_txt)
+assert not real_bad and [(k, key, devs) for k, key, _, devs, _ in real_ok] == [("index", "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications", ["rg-nano"])], (real_ok, real_bad)
+comments_only = "\n".join(l for l in real_txt.splitlines() if l.startswith("#"))
+assert C.read_sources(comments_only) == ([], [])
 ex_ = [l[2:] for l in real_txt.splitlines() if l.startswith(("# repo ", "# index "))]
 ex_ok, ex_bad = C.read_sources("\n".join(ex_)); assert [k for k, *_ in ex_ok] == ["repo", "index"] and not ex_bad, (ex_ok, ex_bad)
 
@@ -881,6 +884,14 @@ assert got == [("repo", "sub/game"), ("opk", "https://dl.example.org/tool.opk"),
                ("forge", "gitlab.com/g%2Fp|g/p")] and not len(c.pq), got                      # no page, no owner, no image
 assert all(d == C.MAXD for k, _, _, d in c.q if k in ("repo", "forge")) and all(v["index"] == IDX for _, _, v, _ in c.q)
 assert c.indexes[IDX]["status"] == 200 and (c.indexes[IDX]["packages"], c.indexes[IDX]["repos"]) == (2, 3)
+WIKI_HTML = (b'<a href="https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk">Download</a> <a href="https://static.miraheze.org/funkeywiki/e/e6/Databases.zip">Databases</a> '
+             b'<a href="https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/heboris_funkey-s.opk">Download</a> <a href="https://github.com/DrUm78/tyrquake">src</a> '
+             b'<a href="https://wiki.funkey-project.com/wiki/Main_Page">Main</a>')
+C.fetch = lambda url, rng=None, limit=0: (200, {"Content-Type": "text/html; charset=UTF-8"}, WIKI_HTML, url)
+c = C.Crawl(); c.do_index("https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications", {"from": C.COMMUNITY}, 0)
+assert [(k, key) for k, key, _, _ in c.q] == [("opk", "https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk"), ("zip", "https://static.miraheze.org/funkeywiki/e/e6/Databases.zip"),
+        ("opk", "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/heboris_funkey-s.opk"), ("repo", "DrUm78/tyrquake")] and not len(c.pq), list(c.q)
+C.fetch = lambda url, rng=None, limit=0: (200, {"Content-Type": "text/html"}, IDX_HTML, url)
 C.INDEX_REPO_MAX, C.INDEX_PKG_MAX = 1, 1                                                      # bounded: the rest is counted, not queued
 c = C.Crawl(); c.do_index(IDX, {"from": C.COMMUNITY}, 0)
 assert [(k, key) for k, key, _, _ in c.q] == [("repo", "sub/game"), ("opk", "https://dl.example.org/tool.opk")] and c.dropped == {"index link limit": 3}, (list(c.q), c.dropped)
@@ -927,7 +938,7 @@ with tempfile.TemporaryDirectory() as td:
     assert "## Community sources" in md and "index https://idx.example.org/apps: reached (HTTP 200), 1 package link(s) and 1 repository root(s) queued" in md
     assert "1 source(s) for other devices not crawled" in md and "- rejected" in md and "nothing here is approved" in md
     assert not [u for u in so_calls if any(x in u for x in ("wiki.example.org", "someowner", "other/repo", "o/other", "tab=repositories"))], so_calls   # no further link-following
-    (td / "empty.txt").write_text(real_txt, encoding="utf-8"); run_main("--sources", str(td / "empty.txt"))   # comments-only file: the crawl runs as without --sources
+    (td / "empty.txt").write_text(comments_only, encoding="utf-8"); run_main("--sources", str(td / "empty.txt"))   # comments-only file: the crawl runs as without --sources
     res3 = json.loads((td / "o/discovery-results.json").read_text(encoding="utf-8"))
     assert res3["community_sources"] == {"accepted": [], "rejected": [], "other_device": 0} and res3["requests"] == 0 and "## Community sources" not in (td / "o/discovery-results.md").read_text(encoding="utf-8")
     run_main(); res2 = json.loads((td / "o/discovery-results.json").read_text(encoding="utf-8"))   # without --sources nothing changes for normal discovery

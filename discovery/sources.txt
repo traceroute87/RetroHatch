@@ -17,3 +17,7 @@
 # Examples (remove the leading "# " to use one):
 # repo   https://github.com/owner/name        rg-nano    # one repository, or a repository holding many apps
 # index  https://example.org/software-list    rg-nano    # one page of download links
+
+# FunKey wiki, "List of third-party OPK applications": 64 package links (OPK and ZIP, hosted on the wiki CDN, GitLab and GitHub) and 19
+# repository roots. Reached with HTTP 200 on 2026-11-04. Packages it lists count as community-source finds, not autonomous ones.
+index  https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications  rg-nano
