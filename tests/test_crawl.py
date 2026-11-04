@@ -872,3 +872,149 @@ c.readme_seeds.add("s/two"); c.do_repo("s/two", {"from": "t"}, 0)
 assert "s/two" in c.repos
 C.MAX_REPOS, C.fetch, C.api, C.time.sleep = saved_max, real_fetch, saved_api, saved_sleep
 print("readme search tests OK")
+
+# ---- community sources (discovery/sources.txt): offline validation, one-page indexes, separate provenance, nothing approved -------------
+import socket
+SRC = """# comment, then a blank line
+
+repo   https://github.com/a/b                    rg-nano     # ok
+repo   https://github.com/A/B                    rg-nano
+index  https://example.org/apps                  rg-nano
+index  https://EXAMPLE.org/apps/                 rg-nano
+repo   https://gitlab.com/g/p                    rg-nano,rg-nano
+repo   http://github.com/c/d                     rg-nano
+repo   https://github.com/c/d
+feed   https://x.org/                            rg-nano
+repo   https://github.com/c/d                    nope
+repo   https://github.com/c/e                    rg-nano,
+repo   https://github.com/topics/x               rg-nano
+repo   https://github.com/a/b#readme             rg-nano
+index  https://127.0.0.1/x                       rg-nano
+index  https://[::1]/x                           rg-nano
+index  https://localhost/x                       rg-nano
+index  https://intranet/x                        rg-nano
+index  https://github.com/a/b                    rg-nano
+index  http://example.org/                       rg-nano
+index  https://user:pw@example.org/              rg-nano
+index  https://example.org:8443/                 rg-nano
+index  https://example.org/a#b                   rg-nano
+index  https://facebook.com/x                    rg-nano
+index  https://exämple.org/                      rg-nano
+"""
+ok_s, bad_s = C.read_sources(SRC)
+assert [(k, key, devs, n) for k, key, _, devs, n in ok_s] == [("repo", "a/b", ["rg-nano"], 3), ("index", "https://example.org/apps", ["rg-nano"], 5),
+                                                              ("forge", "gitlab.com/g%2Fp|g/p", ["rg-nano"], 7)], ok_s
+why_ = {n: w for n, _, w in bad_s}
+WANT = {4: "duplicate of line 3", 6: "duplicate of line 5", 8: "not https", 9: "expected: repo|index URL device[,device]", 10: "unknown kind 'feed'",
+        11: "unknown device 'nope'", 12: "empty device in list", 13: "not a repository root", 14: "fragment not allowed", 15: "IP address not allowed",
+        16: "IP address not allowed", 17: "unsupported host", 18: "unsupported host", 19: "forge host", 20: "not https", 21: "credentials not allowed",
+        22: "port not allowed", 23: "fragment not allowed", 24: "unsupported host", 25: "ASCII"}
+assert {n: w for n, w in why_.items() if n in WANT and WANT[n] in w} == why_ and set(why_) == set(WANT), why_
+assert C.read_sources("")[0] == [] and C.read_sources("# only a comment\n") == ([], [])
+assert C.read_sources("repo https://github.com/a/b gba", {"gba"})[0][0][3] == ["gba"]       # a device list can be passed (profiles.json by default)
+big_ = C.read_sources("\n".join(f"repo https://github.com/o/r{i} rg-nano" for i in range(C.SOURCES_MAX + 1)))
+assert len(big_[0]) == C.SOURCES_MAX and [(n, w) for n, _, w in big_[1]] == [(C.SOURCES_MAX + 1, f"over the limit of {C.SOURCES_MAX} sources")]
+# the shipped file is comments only: valid, no sources; its commented examples are valid once uncommented
+real_txt = (Path(__file__).resolve().parent.parent / "discovery/sources.txt").read_text(encoding="utf-8")
+assert C.read_sources(real_txt) == ([], [])
+ex_ = [l[2:] for l in real_txt.splitlines() if l.startswith(("# repo ", "# index "))]
+ex_ok, ex_bad = C.read_sources("\n".join(ex_)); assert [k for k, *_ in ex_ok] == ["repo", "index"] and not ex_bad, (ex_ok, ex_bad)
+
+# --check-sources: exit code and messages, and not one request, DNS lookup or file write
+def forbid(*a, **k): raise AssertionError("--check-sources touched the network")
+saved = C.fetch, C.OPENER.open, socket.getaddrinfo
+C.fetch, C.OPENER.open, socket.getaddrinfo = forbid, forbid, forbid
+def check_main(path):
+    err, old = io.StringIO(), sys.argv; sys.argv = ["crawl.py", "--check-sources", str(path)]
+    try:
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(err): C.main()
+        return 0, out.getvalue(), err.getvalue()
+    except SystemExit as e: return e.code, "", err.getvalue()
+    finally: sys.argv = old
+with tempfile.TemporaryDirectory() as td:
+    td = Path(td); (td / "good.txt").write_text("repo https://github.com/a/b rg-nano\r\nindex https://example.org/apps rg-nano\r\n", encoding="utf-8")
+    (td / "bad.txt").write_text("repo https://github.com/a/b rg-nano\nindex http://example.org/ rg-nano\n", encoding="utf-8")
+    code, out, err = check_main(td / "good.txt"); assert code == 0 and "2 source(s) OK (1 index), 0 error(s)" in out and not err, (code, out, err)
+    code, out, err = check_main(td / "bad.txt"); assert code == 1 and f"{td / 'bad.txt'}:2: index http://example.org/ rg-nano: not https" in err, (code, err)
+    assert check_main(td / "missing.txt")[0] not in (0, None)
+    assert sorted(p.name for p in td.iterdir()) == ["bad.txt", "good.txt"]                    # nothing written
+C.fetch, C.OPENER.open, socket.getaddrinfo = saved
+
+# an index is ONE page: its package links and repository roots are queued (bounded); pages, owners and everything else are ignored
+IDX = "https://idx.example.org/apps"
+IDX_HTML = ('<a href="https://github.com/sub/game">game</a> <a href="https://dl.example.org/tool.opk">tool</a> <a href="https://x.example.org/pack.zip">pack</a> '
+            '<a href="https://wiki.example.org/wiki/Other">more apps</a> <a href="https://github.com/someowner">owner</a> <a href="https://x.example.org/p.png">img</a> '
+            '<a href="https://github.com/o/r2">r2</a> <a href="https://gitlab.com/g/p">gl</a>').encode()
+saved_fetch, saved_caps = C.fetch, (C.INDEX_REPO_MAX, C.INDEX_PKG_MAX)
+C.fetch = lambda url, rng=None, limit=0: (200, {"Content-Type": "text/html"}, IDX_HTML, url)
+c = C.Crawl(); c.do_index(IDX, {"from": C.COMMUNITY, "anchor": IDX}, 0)
+got = [(k, key) for k, key, _, _ in c.q]
+assert got == [("repo", "sub/game"), ("opk", "https://dl.example.org/tool.opk"), ("zip", "https://x.example.org/pack.zip"), ("repo", "o/r2"),
+               ("forge", "gitlab.com/g%2Fp|g/p")] and not len(c.pq), got                      # no page, no owner, no image
+assert all(d == C.MAXD for k, _, _, d in c.q if k in ("repo", "forge")) and all(v["index"] == IDX for _, _, v, _ in c.q)
+assert c.indexes[IDX]["status"] == 200 and (c.indexes[IDX]["packages"], c.indexes[IDX]["repos"]) == (2, 3)
+C.INDEX_REPO_MAX, C.INDEX_PKG_MAX = 1, 1                                                      # bounded: the rest is counted, not queued
+c = C.Crawl(); c.do_index(IDX, {"from": C.COMMUNITY}, 0)
+assert [(k, key) for k, key, _, _ in c.q] == [("repo", "sub/game"), ("opk", "https://dl.example.org/tool.opk")] and c.dropped == {"index link limit": 3}, (list(c.q), c.dropped)
+C.INDEX_REPO_MAX, C.INDEX_PKG_MAX = saved_caps
+C.fetch = lambda url, rng=None, limit=0: (200, {"Content-Type": "image/png"}, IDX_HTML, url)   # not a page: nothing queued
+c = C.Crawl(); c.do_index(IDX, {"from": C.COMMUNITY}, 0); assert not len(c.q) and c.indexes[IDX]["status"] == 200
+C.fetch = saved_fetch
+saved_lim = C.NREQ, C.MAX_REQ, C.T0; C.NREQ, C.MAX_REQ, C.T0 = 0, 10**6, time.time()
+c = C.Crawl(); c.do_index("https://127.0.0.1/apps", {"from": C.COMMUNITY}, 0)                  # the real fetch() refuses non-public hosts: no request made or counted
+assert c.indexes["https://127.0.0.1/apps"]["status"] == -1 and C.NREQ == 0 and not len(c.q) and not len(c.pq)
+C.NREQ, C.MAX_REQ, C.T0 = saved_lim
+
+# end to end (offline): sources are crawled as leads, reported apart, never counted as autonomous, never approved; the index is followed one page deep only
+def ix_fetch(url, rng=None, limit=0):
+    if url == IDX: C.NREQ += 1; so_calls.append(url); return 200, {"Content-Type": "text/html"}, (
+        b'<a href="https://github.com/sub/game">g</a> <a href="https://dl.example.org/tool.opk">t</a> <a href="https://wiki.example.org/wiki/Other">w</a> '
+        b'<a href="https://github.com/someowner">o</a>'), url
+    if url == "https://dl.example.org/tool.opk": C.NREQ += 1; so_calls.append(url); return 206, {"Content-Range": "bytes 0-3/500"}, b"hsqs", url
+    return so_fetch(url, rng, limit)
+saved = C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed_multi, C.seed_packages, C.read_sources
+C.fetch, C.DELAY, C.seed_multi, C.seed_packages = ix_fetch, 0, (lambda c: []), (lambda c, store: 0)
+real_read = C.read_sources; C.read_sources = lambda t: real_read(t, {"rg-nano", "gba"})
+catdir = Path(__file__).resolve().parent.parent / "catalog"; cat_before = {p: p.read_bytes() for p in catdir.rglob("*") if p.is_file()}
+with tempfile.TemporaryDirectory() as td:
+    td = Path(td); (td / "s.txt").write_text(f"index {IDX} rg-nano\nrepo https://gitlab.com/someone/player rg-nano\nrepo https://github.com/o/other gba\n"
+                                              "repo http://github.com/a/b rg-nano\n", encoding="utf-8")
+    def run_main(*extra):
+        so_calls.clear(); C.NREQ, C.T0 = 0, time.time(); C.FAILS.clear(); C.STOP.clear(); old = sys.argv
+        sys.argv = ["crawl.py", "--out", str(td / "o"), "--no-github-seed", "--no-freeserp", "--max-req", "500", "--deadline", "500", *extra]
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()): C.main()
+        finally: sys.argv = old
+    run_main("--sources", str(td / "s.txt"))
+    res = json.loads((td / "o/discovery-results.json").read_text(encoding="utf-8")); md = (td / "o/discovery-results.md").read_text(encoding="utf-8")
+    cs = res["community_sources"]; ix, gl = cs["accepted"]
+    assert [x["kind"] for x in cs["accepted"]] == ["index", "forge"] and cs["other_device"] == 1 and [r["reason"] for r in cs["rejected"]] == ["not https"], cs
+    assert ix["reached"] and ix["index_status"] == 200 and (ix["queued_packages"], ix["queued_repos"]) == (1, 1) and gl["reached"]
+    inst = {p["name"] for p in ix["packages"] if p["judgement"] == "installable"}
+    assert inst == {"tool.opk", "game.opk", "player.opk"}, inst                                # the index's own link, plus the repo it queued (release asset, README ZIP)
+    assert res["unique_installable_apps"] == [] and res["submitted_leads"]["accepted"] == []   # apart from autonomous discovery and from submitted leads
+    assert all(p["via"][0]["from"] == C.COMMUNITY for p in res["packages"] if p["kind"] != "zip-container")
+    store = json.loads((td / "o/package-leads.json").read_text(encoding="utf-8"))
+    assert len(store) == 3 and all(v["via"][0]["from"] == C.COMMUNITY for v in store.values()), store   # provenance is kept for later rechecks
+    assert "## Community sources" in md and "index https://idx.example.org/apps: reached (HTTP 200), 1 package link(s) and 1 repository root(s) queued" in md
+    assert "1 source(s) for other devices not crawled" in md and "- rejected" in md and "nothing here is approved" in md
+    assert not [u for u in so_calls if any(x in u for x in ("wiki.example.org", "someowner", "other/repo", "o/other", "tab=repositories"))], so_calls   # no further link-following
+    (td / "empty.txt").write_text(real_txt, encoding="utf-8"); run_main("--sources", str(td / "empty.txt"))   # comments-only file: the crawl runs as without --sources
+    res3 = json.loads((td / "o/discovery-results.json").read_text(encoding="utf-8"))
+    assert res3["community_sources"] == {"accepted": [], "rejected": [], "other_device": 0} and res3["requests"] == 0 and "## Community sources" not in (td / "o/discovery-results.md").read_text(encoding="utf-8")
+    run_main(); res2 = json.loads((td / "o/discovery-results.json").read_text(encoding="utf-8"))   # without --sources nothing changes for normal discovery
+    assert res2["community_sources"] == {"accepted": [], "rejected": [], "other_device": 0} and "## Community sources" not in (td / "o/discovery-results.md").read_text(encoding="utf-8")
+    old = sys.argv; sys.argv = ["crawl.py", "--submitted-only", "--sources", "x"]
+    try:
+        with contextlib.redirect_stderr(io.StringIO()): C.main()
+        raise AssertionError("must exit")
+    except SystemExit as e: assert e.code == 2
+    finally: sys.argv = old
+C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed_multi, C.seed_packages, C.read_sources = saved
+assert cat_before == {p: p.read_bytes() for p in catdir.rglob("*") if p.is_file()}             # catalog/ and approvals.json untouched
+# provenance also survives the package store's rechecks
+st = {}; pkg = {"kind": "direct", "name": "t.opk", "url": "https://dl.example.org/t.opk", "container": None, "size": 5, "magic_squashfs": True, "status": 206, "repo": None,
+                "host": "dl.example.org", "via": [{"from": C.COMMUNITY, "anchor": IDX}], "judgement": "installable"}
+C.update_packages(st, [pkg], "2026-11-04"); c = C.Crawl(); C.seed_packages(c, st, "2026-11-20")
+assert c.q[0][2]["first_found_via"] == C.COMMUNITY and C.is_submitted({"via": [c.q[0][2]]})
+print("community source tests OK")

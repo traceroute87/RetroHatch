@@ -1,0 +1,19 @@
+# Community software sources. One per line:   kind  URL  device[,device]    # optional note
+#
+#   repo   a GitHub, GitLab or Codeberg repository ROOT (https://github.com/owner/name). A repository that
+#          holds many apps (a collection) is still one line.
+#   index  ONE https page that lists downloads. Its .opk/.zip links and repository roots are checked;
+#          no other link on it is followed. Not for forge hosts (use repo) or IP addresses.
+#   device an id that exists in discovery/profiles.json (rg-nano). A new device needs its profile first.
+#
+# To add one: edit this file on GitHub, add a line, open a pull request. The "sources" check validates it
+# without crawling. After a maintainer merges it, the weekly crawl inspects it.
+# Listing a source only lets the crawler LOOK at it. Everything found stays an UNAPPROVED candidate: nothing
+# here reaches catalog/, approvals or the installer. Only a hardware-tested, approved, signed entry does.
+#
+# Check locally, offline:   python discovery/crawl.py --check-sources
+# One line per URL: list several devices as  rg-nano,other-device  instead of repeating the line.
+#
+# Examples (remove the leading "# " to use one):
+# repo   https://github.com/owner/name        rg-nano    # one repository, or a repository holding many apps
+# index  https://example.org/software-list    rg-nano    # one page of download links
