@@ -1018,3 +1018,33 @@ st = {}; pkg = {"kind": "direct", "name": "t.opk", "url": "https://dl.example.or
 C.update_packages(st, [pkg], "2026-11-04"); c = C.Crawl(); C.seed_packages(c, st, "2026-11-20")
 assert c.q[0][2]["first_found_via"] == C.COMMUNITY and C.is_submitted({"via": [c.q[0][2]]})
 print("community source tests OK")
+
+# ---- crawl.py is the one discovery pipeline: summary.json drives the weekly issue (errors = real failures; a spent budget is not one) ----
+import re as _re
+def summary_run(*args, seed=None, rl=False):
+    saved = C.fetch, C.DELAY, C.seed_multi, C.seed_packages, C.MAX_REQ
+    def f(url, rng=None, limit=0):
+        if rl: C.FAILS.append(["https://api.github.com/search/repositories", 403])
+        return so_fetch(url, rng, limit)
+    C.fetch, C.DELAY, C.seed_packages = f, 0, (lambda c, store: 0)
+    C.seed_multi = seed or (lambda c: c.push("repo", "sub/game", {"from": "github-search", "anchor": "t"}, 0) or [])
+    with tempfile.TemporaryDirectory() as td:
+        so_calls.clear(); C.NREQ, C.T0 = 0, time.time(); C.FAILS.clear(); C.STOP.clear(); old = sys.argv
+        sys.argv = ["crawl.py", "--out", td + "/o", "--no-github-seed", "--no-freeserp", *args]
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()): C.main()
+        finally: sys.argv = old; C.fetch, C.DELAY, C.seed_multi, C.seed_packages, C.MAX_REQ = saved
+        return json.loads((Path(td) / "o/summary.json").read_text(encoding="utf-8")), (Path(td) / "o/discovery-results.md").read_text(encoding="utf-8")
+def boom(c): raise RuntimeError("boom")
+sm, md = summary_run("--max-req", "500", "--deadline", "500")                        # healthy run: autonomous OPKs counted, no errors, digest for the issue marker
+assert sm["errors"] == [] and sm["apps"] >= 2 and _re.fullmatch(r"[0-9a-f]{12}", sm["digest"]) and sm["complete"] == (sm["reasons"] == []), sm
+assert "# Crawl discovery:" in md and "## Unique OPKs" in md                          # the issue body is this report
+sm, _ = summary_run("--max-req", "2", "--deadline", "500")                           # budget spent: partial and labelled so, but NOT an error
+assert not sm["complete"] and any(k in r for k in C.BUDGET_REASONS for r in sm["reasons"]) and sm["errors"] == [], sm
+sm, _ = summary_run("--max-req", "500", "--deadline", "500", rl=True)                # GitHub rate limit: an error, the issue is left unchanged
+assert len(sm["errors"]) == 1 and sm["errors"][0].startswith("rate limited"), sm
+sm, _ = summary_run("--max-req", "500", "--deadline", "500", seed=boom)              # crash inside the crawl: still a summary, reported as an error
+assert len(sm["errors"]) == 1 and sm["errors"][0].startswith("crawl error: RuntimeError: boom") and not sm["complete"], sm
+sm, _ = summary_run("--max-req", "500", "--deadline", "500", seed=lambda c: ["codeberg.org search 'x': HTTP 500"])   # failed seed search: an error
+assert sm["errors"] == ["codeberg.org search 'x': HTTP 500"], sm
+print("one discovery pipeline tests OK")

@@ -696,6 +696,9 @@ def inaccessible(pages):
     return out
 
 
+BUDGET_REASONS = ("stopped early", "queued items", "coverage-limited")   # assess() reasons that mean the budget ran out, not that something failed
+
+
 def assess(notes, queue_left, stop, fails, dropped=None):
     """Reasons this run must NOT be treated as authoritative (empty list = complete)."""
     why = list(notes)
@@ -1192,7 +1195,8 @@ def main():
     md = report(res, c)
     (out / "discovery-results.md").write_text(md, encoding="utf-8")
     digest = hashlib.sha256("\n".join(sorted(f"{x['name'].lower()}:{x['size']}" for x in uniq)).encode()).hexdigest()[:12]
-    (out / "summary.json").write_text(json.dumps({"complete": not why, "reasons": why, "caps_hit": caps, "skipped": c.dropped, "apps": len(uniq), "digest": digest, "authenticated": res["authenticated"],
+    errors = [w for w in why if not any(k in w for k in BUDGET_REASONS)]   # failures (crash, rate limit, failed seed searches); a spent budget is normal, not an error
+    (out / "summary.json").write_text(json.dumps({"complete": not why, "reasons": why, "errors": errors, "caps_hit": caps, "skipped": c.dropped, "apps": len(uniq), "digest": digest, "authenticated": res["authenticated"],
                                                   "requests": NREQ, "seconds": res["seconds"]}) + "\n")
     print(md.split("## Unique")[0])   # the status header goes to the step summary
     print(stats_md(res, store))

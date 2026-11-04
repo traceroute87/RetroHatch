@@ -5,7 +5,7 @@ Not connected to the Nano UI. Nothing here downloads, installs or runs an app.
 ## Pipeline
 
 ```
-discovery/discover.py      candidate report            level: discovered | claimed   (author's words)
+discovery/crawl.py         candidate report            level: discovered | claimed   (author's words)
   -> human review          write catalog/apps/<id>.json by hand, unavailable/untested
   -> tools/artifact_verify.py  local file vs entry      integrity, source URL, license, compat, destination, package
   -> hardware test         on the exact sha256         level: verified + evidence[sha256] in the entry

@@ -27,24 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 tests/test_discover.py
-      - run: python3 -I discovery/discover.py --out out
-      - uses: actions/upload-artifact@v4
-        with: {name: discovery, path: out}
-      - name: Create or update the single discovery issue
-        run: |
-          S=out/summary-rg-nano.json
-          field() { python3 -c "import json,sys;print(json.load(open('$S'))[sys.argv[1]])" "$1"; }
-          [ "$(field complete)" = "True" ] || { echo "::warning::incomplete run (API limits/failures); issue left unchanged"; exit 0; }
-          [ "$(field actionable)" != "0" ] || { echo "no actionable candidates"; exit 0; }
-          MARK="$(field marker)"
-          # same candidate set already filed (open or closed): do nothing
-          if gh issue list --label discovery --state all --limit 30 --json body --jq '.[].body' | grep -qF "$MARK"; then echo "unchanged"; exit 0; fi
-          gh label create discovery --color 0e8a16 --description "Automated candidate discovery" 2>/dev/null || true
-          N=$(gh issue list --label discovery --state open --json number --jq '.[0].number // empty')
-          if [ -n "$N" ]; then gh issue edit "$N" --body-file out/issue-rg-nano.md   # edit, not comment: no notification spam
-          else gh issue create --label discovery --title "Discovery: rg-nano candidates" --body-file out/issue-rg-nano.md; fi
-      # Link-following crawler: separate artifact only. It never files or edits the issue (discover.py still owns that) and
-      # cannot fail the workflow. An incomplete crawl labels itself INCOMPLETE, NOT AUTHORITATIVE in its report.
+      # discovery/crawl.py is the one discovery pipeline: GitHub and forge search, README mentions, link-following, community sources, package
+      # checks. Its summary.json feeds the issue below. An incomplete crawl labels itself INCOMPLETE, NOT AUTHORITATIVE in its report.
       - name: Crawl tests
         if: always()
         continue-on-error: true
@@ -59,7 +43,7 @@ jobs:
           restore-keys: freeserp-leads-
       - name: Crawl discovery
         if: always()
-        continue-on-error: true
+        shell: bash   # pipefail: a crawl that exits non-zero must fail the job, not be hidden by tee
         timeout-minutes: 16
         env:
           SUBMITTED_LEADS: ${{ inputs.lead_urls }}   # via env only, never interpolated into the script; empty on scheduled runs
@@ -73,6 +57,23 @@ jobs:
         with:
           path: .cache/leads
           key: freeserp-leads-${{ github.run_id }}
+      # The single issue is driven by the crawl's summary.json: skipped on a crawl that reported failures (rate limits, crash, failed
+      # searches; a spent request budget is normal), when no autonomous OPK was verified, or when the same OPK set was already filed.
+      - name: Create or update the single discovery issue
+        run: |
+          S=out-crawl/summary.json
+          [ -s "$S" ] || { echo "::warning::no crawl summary; issue left unchanged"; exit 0; }
+          field() { python3 -c "import json,sys;print(json.load(open('$S'))[sys.argv[1]])" "$1"; }
+          [ "$(field errors)" = "[]" ] || { echo "::warning::crawl reported failures (API limits/errors); issue left unchanged: $(field errors)"; exit 0; }
+          [ "$(field apps)" != "0" ] || { echo "no actionable candidates"; exit 0; }
+          MARK="rh-discovery:rg-nano:$(field digest)"
+          # same candidate set already filed (open or closed): do nothing
+          if gh issue list --label discovery --state all --limit 30 --json body --jq '.[].body' | grep -qF "$MARK"; then echo "unchanged"; exit 0; fi
+          { head -c 60000 out-crawl/discovery-results.md; printf '\n<!-- %s -->\n' "$MARK"; } > out-crawl/issue.md   # issue bodies are limited to 65536 characters
+          gh label create discovery --color 0e8a16 --description "Automated candidate discovery" 2>/dev/null || true
+          N=$(gh issue list --label discovery --state open --json number --jq '.[0].number // empty')
+          if [ -n "$N" ]; then gh issue edit "$N" --body-file out-crawl/issue.md   # edit, not comment: no notification spam
+          else gh issue create --label discovery --title "Discovery: rg-nano candidates" --body-file out-crawl/issue.md; fi
   # Submitted leads only: just the supplied repositories (no search, FreeSerp, owner/page crawling or stored-URL rechecks), small
   # request budget, no caches restored or saved, no issue touched. Report in the job summary + artifact; nothing is approved or published.
   submitted:
