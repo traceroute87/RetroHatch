@@ -210,7 +210,7 @@ def pscore(anchor, u):
 
 class PQ:
     """Page queue: seed leads (depth 0, independently found by a search) first, then best score first (FIFO among equals).
-    Seeds are bounded (FS_MAX_PAGES), so derived links cannot starve them and they cannot starve derived links."""
+    Seeds are bounded, so derived links cannot starve them and they cannot starve derived links."""
     def __init__(self): self.h, self.n = [], 0
     def append(self, item): heapq.heappush(self.h, (item[3] > 0, -(item[2].get("score") or 0), self.n, item)); self.n += 1
     def popleft(self): return heapq.heappop(self.h)[-1]
@@ -548,7 +548,7 @@ def seed_readme(c):
 
 
 def seed_multi(c):
-    """Non-GitHub seeds from public search APIs: Codeberg (Gitea), GitLab, Internet Archive. Terms come from profiles.json."""
+    """Non-GitHub seeds from public search APIs: Codeberg (Gitea) and GitLab. Terms come from profiles.json."""
     notes = []
     terms = sorted({re.sub(r"\s+", "-", t) for t in PROF["direct"] + PROF["family"]} | {t.replace(" ", "") for t in PROF["direct"]})
     for t in terms:
@@ -563,28 +563,10 @@ def seed_multi(c):
                 key = f"{host}/{full}" if host == "codeberg.org" else f"{host}/{urllib.parse.quote(full, safe='')}|{full}"   # same key as a link to it
                 c.pending_meta[key.lower()] = {"description": x.get("description"), "topics": x.get("topics") or x.get("tag_list") or []}
                 c.push("forge", key, {"from": f"{host}-search", "anchor": t}, 0)
-    for qq in ('"rg nano"', "funkey", "rgnano", '"funkey s" opk'):
-        st, _, b, _ = fetch(f"https://archive.org/advancedsearch.php?q={urllib.parse.quote(qq)}&fl[]=identifier&fl[]=title&rows=30&output=json")
-        if st != 200:
-            notes.append(f"archive.org search {qq!r}: HTTP {st}"); continue
-        for d in ((J(b) or {}).get("response") or {}).get("docs") or []:
-            if DRE.search(D.norm(d.get("title", ""))) or FRE.search(D.norm(d.get("title", ""))):
-                c.push("ia", d["identifier"], {"from": "archive.org-search", "anchor": qq}, 0)
     return notes
 
 
-# ---- optional channel: FreeSerp (documented keyless JSON search API) -----------------------------------------------
-FS_URL, FS_MAX_REQ, FS_MAX_PAGES, CACHE_DAYS, CACHE_MAX = "https://freeserp.ai/api.php?index=web&size=10&q=", 16, 25, 90, 500
-
-
-def walk(x, out):
-    """Every dict carrying an http(s) url, whatever the envelope looks like."""
-    if isinstance(x, dict):
-        if isinstance(x.get("url"), str) and x["url"].startswith("http"): out.append(x)
-        for v in x.values(): walk(v, out)
-    elif isinstance(x, list):
-        for v in x: walk(v, out)
-    return out
+CACHE_DAYS = 90   # package leads: days without a successful check before an entry turns stale
 
 
 def load_leads(path, field="last_seen"):
@@ -593,85 +575,6 @@ def load_leads(path, field="last_seen"):
     if not isinstance(d, dict): return {}
     ok = lambda u, v: isinstance(u, str) and u.startswith(("http://", "https://")) and isinstance(v, dict) and isinstance(v.get(field), str) and re.fullmatch(r"\d{4}-\d\d-\d\d", v[field])
     return {u: v for u, v in d.items() if ok(u, v)}   # a corrupt cache entry is dropped, never trusted; survivors still go through classify/check()/fetch like fresh results
-
-
-def save_leads(path, leads, today):
-    keep = {u: v for u, v in leads.items() if (date.fromisoformat(today) - date.fromisoformat(v["last_seen"])).days <= CACHE_DAYS}
-    keep = dict(sorted(keep.items(), key=lambda kv: kv[1]["last_seen"], reverse=True)[:CACHE_MAX])
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    Path(path).write_text(json.dumps(keep, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-
-
-def seed_freeserp(c, cache_path=None, today=None):
-    """Optional web-search seeds. Queries are built from profile terms, results feed the normal queue (relevance gate, SSRF guard,
-    link-following, dedup). Never raises and never marks the run incomplete: -> status dict reported as an optional channel."""
-    today = today or date.today().isoformat()
-    st_out = {"status": "ok", "requests": 0, "queries": 0, "results": 0, "new_leads": 0, "cached_leads": 0, "error": None}
-    leads = load_leads(cache_path) if cache_path else {}
-    cand = {}   # page url -> [score, hits, first-seen order, via]; admitted after all queries, best first (not first-come)
-
-    def feed(url, title, snippet, query, cached, hits=1):
-        text = D.norm(" ".join([url, title, snippet]))
-        kind, key = classify(url)
-        via = {"from": "freeserp-search", "anchor": query + (" [cached lead]" if cached else ""), "title": title[:80]}
-        if kind in ("opk", "zip", "repo", "forge"): c.push(kind, key, via, 0)
-        elif kind == "page" and (DRE.search(text) or FRE.search(text)):
-            cand.setdefault(key, [max(GOOD + 1, pscore(title, url)), 0, len(cand), {**via, "score": max(GOOD + 1, pscore(title, url))}])[1] += hits
-
-    def admit():
-        """FS_MAX_PAGES distinct pages, ranked by score then by how many queries found them. A URL hit by several queries
-        takes one slot, and leads from late queries compete with early ones on equal terms."""
-        for _, _, _, key, via in sorted((-sc, -n, i, k, v) for k, (sc, n, i, v) in cand.items())[:FS_MAX_PAGES]:
-            c.push("page", key, via, 0)
-        st_out["pages_admitted"], st_out["pages_not_admitted"] = min(len(cand), FS_MAX_PAGES), max(0, len(cand) - FS_MAX_PAGES)
-
-    for url, v in leads.items():
-        feed(url, v.get("title", ""), "", (v.get("queries") or ["cache"])[0], True, len(v.get("queries") or []) or 1); st_out["cached_leads"] += 1
-    try:
-        return _search(leads, st_out, feed, cache_path, today)
-    finally:
-        admit()   # every exit path, including FreeSerp down: cached leads still get admitted
-
-
-def fs_queries(today):
-    """Device terms x profile search categories (software, applications, ports, ... not only games). When there are more queries
-    than FS_MAX_REQ, a different window is used each day so every category is searched over consecutive runs."""
-    terms = [t for t in PROF["direct"] + PROF["family"] if " " in t or t in PROF["family"]]   # "rg nano", "funkey os", "funkey s", "funkey"
-    qs = [f"{t} {sfx}" for sfx in PROF.get("search_suffixes") or ("opk download", "opk", "homebrew games", "emulators") for t in terms]
-    if len(qs) <= FS_MAX_REQ: return qs
-    k = date.fromisoformat(today).toordinal() * FS_MAX_REQ % len(qs)
-    return (qs[k:] + qs[:k])[:FS_MAX_REQ]
-
-
-def _search(leads, st_out, feed, cache_path, today):
-    retried = False
-    for q in fs_queries(today):
-        js = None
-        while st_out["requests"] < FS_MAX_REQ:
-            st_out["requests"] += 1
-            st, _, b, _ = fetch(FS_URL + urllib.parse.quote_plus(q))
-            js = J(b) if st == 200 and b else None
-            if st != 200 or not isinstance(js, dict):
-                st_out.update(status="unavailable", error=f"HTTP {st}" + (" (not JSON)" if st == 200 else "")); return st_out
-            if not (js.get("engine_error") or js.get("engine_fallback") or js.get("ok") is False): break   # a real search happened
-            if retried or st_out["requests"] >= FS_MAX_REQ:   # HTTP 200 but no real search happened, even after the one retry
-                st_out.update(status="degraded", error=str(js.get("engine_error") or "engine_fallback")[:80]); return st_out
-            retried, st_out["retried"], js = True, q, None   # one delayed retry per run, inside FS_MAX_REQ and the fetch() limits
-            time.sleep(2)
-        if js is None: break   # request budget spent
-        st_out["queries"] += 1
-        for h in walk(js.get("results"), []):
-            u, title = h["url"].split("#")[0], str(h.get("title") or "")
-            st_out["results"] += 1
-            new = u not in leads
-            rec = leads.setdefault(u, {"first_seen": today, "queries": [], "title": title[:100]})
-            rec["last_seen"] = today
-            if q not in rec["queries"]: rec["queries"] = (rec["queries"] + [q])[:5]
-            st_out["new_leads"] += new
-            feed(u, title, str(h.get("snippet") or h.get("description") or ""), q, False)
-        time.sleep(0.4)
-    if cache_path and st_out["results"]: save_leads(cache_path, leads, today)
-    return st_out
 
 
 def judge(p, c):
@@ -726,7 +629,6 @@ def report(res, c):
         L.append(f"| {a['name']}{' (in ZIP)' if a['kind'] == 'zip' else ''} | {a['size']} | {a.get('license') or '?'} | {a['url']} | {v['from'][:80]} |")
     bad = [p for p in res["packages"] if p.get("judgement") == "false-positive"]
     L += ["", "## Excluded", ""] + [f"- {p['name']}: {p['reason']} <{p['url']}>" for p in bad] + ([] if bad else ["None."])
-    L += ["", "## Optional channels (a failure here never makes the run incomplete)", ""] + [f"- {k}: {v}" for k, v in res.get("optional_channels", {}).items()]
     pl = res.get("package_leads")
     if pl: L += ["", "## Package lead store (candidates only, separate from catalog/)", "",
                  f"- {pl['stored_before']} stored before, {pl['stored_after']} after; {pl['verified']} verified this run ({pl['new']} new), "
@@ -911,7 +813,7 @@ def stats_md(res, store):
     apps, today = res["unique_installable_apps"], res["as_of"]
     gh = sum("github" in (a.get("host") or "") for a in apps)
     st = collections.Counter(v.get("state") or "verified" for v in store.values())
-    pl, fs = res.get("package_leads") or {}, (res.get("optional_channels") or {}).get("freeserp") or {}
+    pl = res.get("package_leads") or {}
     sub, com = res.get("submitted_leads") or {}, res.get("community_sources") or {}
     new, fresh = pl.get("new", 0), pl.get("verified", 0)   # this run's own counts, not dates (several runs can share a date)
     L = ["## Crawl statistics", "", "| | |", "|---|---|",
@@ -927,8 +829,6 @@ def stats_md(res, store):
          f"{sum(p['judgement'] == 'installable' for s in sub.get('accepted', []) for p in s['packages'])} |",
          f"| Community sources (sources.txt, separate from the counts above): accepted / rejected / installable packages | {len(com.get('accepted', []))} / {len(com.get('rejected', []))} / "
          f"{sum(p['judgement'] == 'installable' for s in com.get('accepted', []) for p in s['packages'])} |",
-         f"| FreeSerp | {fs.get('status', 'n/a')}: {fs.get('queries', 0)}/{fs.get('requests', 0)} queries ok, {fs.get('results', 0)} results, "
-         f"{fs.get('new_leads', 0)} new leads, {fs.get('cached_leads', 0)} cached{', error ' + str(fs['error']) if fs.get('error') else ''} |",
          f"| Inaccessible sources | {', '.join(sorted(res.get('inaccessible_sources') or {})) or 'none'} |", ""]
     for state in ("changed", "unreachable", "stale", "rejected"):
         rows = sorted((u, v) for u, v in store.items() if v.get("state") == state)
@@ -1086,7 +986,7 @@ def submitted_report(res):
 
 def submitted_only(a):
     """Targeted run for --submitted: only the supplied repositories, their README, releases, repository files and the package links
-    they contain. No seed searches, FreeSerp, owner or page crawling, no other repositories, no stored-URL rechecks, and no read or
+    they contain. No seed searches, owner or page crawling, no other repositories, no stored-URL rechecks, and no read or
     write of any persistent cache (package leads, tree scans, lead cache): history and provenance stay exactly as they were."""
     global MAX_REQ, DEADLINE_S
     MAX_REQ, DEADLINE_S = min(a.max_req or SUBMITTED_MAX_REQ, SUBMITTED_MAX_REQ), min(a.deadline or SUBMITTED_DEADLINE_S, SUBMITTED_DEADLINE_S)
@@ -1122,8 +1022,6 @@ def main():
     ap.add_argument("--out", default=str(D.ROOT / "build" / "discovery"))
     ap.add_argument("--no-github-seed", action="store_true", help="seed only from non-GitHub search APIs")
     ap.add_argument("--max-req", type=int); ap.add_argument("--deadline", type=int)
-    ap.add_argument("--no-freeserp", action="store_true", help="skip the optional FreeSerp web-search seeds")
-    ap.add_argument("--lead-cache", default=None, help="JSON file of FreeSerp leads kept between runs")
     ap.add_argument("--package-leads", default=None, help="JSON store of verified download URLs, revalidated and updated each run")
     ap.add_argument("--package-seed", default=None, help="read-only JSON store merged in first (e.g. a committed snapshot)")
     ap.add_argument("--submitted", default="", help=f"up to {SUBMIT_MAX} GitHub/GitLab/Codeberg repository URLs (unapproved leads, reported separately)")
@@ -1137,7 +1035,7 @@ def main():
     global MAX_REQ, DEADLINE_S
     MAX_REQ, DEADLINE_S = a.max_req or MAX_REQ, a.deadline or DEADLINE_S
     c = Crawl()
-    notes, optional = [], {}
+    notes = []
     store, rechecked = {}, 0
     c.recheck = []
     for f in (a.package_seed, a.package_leads):
@@ -1159,7 +1057,6 @@ def main():
         c.stored_repos = {v["repo"].lower() for v in store.values() if isinstance(v.get("repo"), str)}
         rechecked = seed_packages(c, store)
         notes = ([] if a.no_github_seed else seed(c)) + seed_multi(c)
-        optional["freeserp"] = {"status": "disabled"} if a.no_freeserp else seed_freeserp(c, a.lead_cache)
         c.run()
     except Exception as e:   # a crash must still leave a report that says INCOMPLETE
         notes.append(f"crawl error: {type(e).__name__}: {e}"[:200])
@@ -1176,7 +1073,7 @@ def main():
            "unique_installable_apps": uniq,
            "packages": [p for p in c.pkgs.values()],
            "repos": list(c.repos.values()), "pages": list(c.pages.values()), "owners": list(c.owners.values()),
-           "relevant_sites": sites, "inaccessible_sources": inaccessible(c.pages.values()), "skipped": c.dropped, "failures": FAILS[:60], "optional_channels": optional}
+           "relevant_sites": sites, "inaccessible_sources": inaccessible(c.pages.values()), "skipped": c.dropped, "failures": FAILS[:60]}
     res.update(complete=not why, incomplete_reasons=why, caps_hit=caps)
     res["submitted_leads"] = {"accepted": sub, "rejected": [{"url": u, "reason": r} for u, r in rejected]}
     res["community_sources"] = {"accepted": com, "rejected": comm_bad, "other_device": other_dev}
@@ -1191,7 +1088,6 @@ def main():
     for f in [scans_path, out / "tree-scans.json"] if scans_path else [out / "tree-scans.json"]:
         f.write_text(json.dumps(scans, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     (out / "discovery-results.json").write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    if a.lead_cache and Path(a.lead_cache).is_file(): (out / "freeserp-leads.json").write_bytes(Path(a.lead_cache).read_bytes())   # artifact carries the cache the next run will restore
     md = report(res, c)
     (out / "discovery-results.md").write_text(md, encoding="utf-8")
     digest = hashlib.sha256("\n".join(sorted(f"{x['name'].lower()}:{x['size']}" for x in uniq)).encode()).hexdigest()[:12]

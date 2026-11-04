@@ -33,8 +33,9 @@ jobs:
         if: always()
         continue-on-error: true
         run: python3 tests/test_crawl.py
-      # restore + save split so the cache is written even when an earlier step failed (the combined action saves only on success)
-      - name: Restore FreeSerp lead cache
+      # restore + save split so the cache is written even when an earlier step failed (the combined action saves only on success). The cache holds
+      # the package lead store and tree-scan progress between runs; its key keeps the historical "freeserp-leads-" prefix so existing history is restored.
+      - name: Restore package lead cache
         if: always()
         uses: actions/cache/restore@v4
         with:
@@ -47,11 +48,11 @@ jobs:
         timeout-minutes: 16
         env:
           SUBMITTED_LEADS: ${{ inputs.lead_urls }}   # via env only, never interpolated into the script; empty on scheduled runs
-        run: python3 -I discovery/crawl.py --out out-crawl --max-req 1200 --deadline 780 --lead-cache .cache/leads/freeserp.json --package-leads .cache/leads/packages.json --package-seed discovery/package-leads.json --sources discovery/sources.txt --submitted="$SUBMITTED_LEADS" | tee -a "$GITHUB_STEP_SUMMARY"
+        run: python3 -I discovery/crawl.py --out out-crawl --max-req 1200 --deadline 780 --package-leads .cache/leads/packages.json --package-seed discovery/package-leads.json --sources discovery/sources.txt --submitted="$SUBMITTED_LEADS" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: crawl-discovery, path: out-crawl, if-no-files-found: ignore}
-      - name: Save FreeSerp lead cache
+      - name: Save package lead cache
         if: always() && hashFiles('.cache/leads/*.json') != ''
         uses: actions/cache/save@v4
         with:
@@ -74,7 +75,7 @@ jobs:
           N=$(gh issue list --label discovery --state open --json number --jq '.[0].number // empty')
           if [ -n "$N" ]; then gh issue edit "$N" --body-file out-crawl/issue.md   # edit, not comment: no notification spam
           else gh issue create --label discovery --title "Discovery: rg-nano candidates" --body-file out-crawl/issue.md; fi
-  # Submitted leads only: just the supplied repositories (no search, FreeSerp, owner/page crawling or stored-URL rechecks), small
+  # Submitted leads only: just the supplied repositories (no search, owner/page crawling or stored-URL rechecks), small
   # request budget, no caches restored or saved, no issue touched. Report in the job summary + artifact; nothing is approved or published.
   submitted:
     if: ${{ inputs.submitted_only }}

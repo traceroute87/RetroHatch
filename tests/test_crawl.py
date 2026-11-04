@@ -73,57 +73,19 @@ C.MAX_REQ = C.NREQ
 assert C.fetch("https://example.org/y")[0] == -1 and len(sent) == 2 and C.STOP == ["request cap"]
 print("crawl tests OK")
 
-# ---- FreeSerp optional channel (offline: fetch is faked) ---------------------------------------------------------------
+# ---- query-style download links, hostile lead files, host revalidation at fetch time (offline) ---------------------------------
 import json, tempfile
 assert C.classify("https://www.willemssoft.be/index.php?main=59&sub=60&action=download&file=Funkoban.opk")[0] == "opk"   # query-style download link
 assert C.links_of("[d](https://w.be/i.php?action=download&file=X.opk)", "https://w.be/")   # real downloads are not wiki noise
 
-SHOT = {"ok": True, "results": [
-    {"url": "https://www.willemssoft.be/index.php?main=59&action=download&file=Funkoban.opk", "title": "Funkoban", "snippet": "Funkey Nano"},
-    {"url": "https://rgnano.com/applications/", "title": "RG Nano Applications", "snippet": ""},
-    {"url": "https://github.com/someone/funkey-game", "title": "game", "snippet": ""},
-    {"url": "https://hotels.example.com/funky", "title": "Cheap hotels", "snippet": "book now"},
-]}
-calls = []
-def fs_fetch(url, rng=None, limit=0):
-    calls.append(url); return 200, {}, json.dumps(SHOT).encode(), url
-C.fetch = fs_fetch
-c = C.Crawl()
-cache = os.path.join(tempfile.mkdtemp(), "leads.json")
-r = C.seed_freeserp(c, cache, "2026-10-27")
-assert r["status"] == "ok" and r["requests"] == C.FS_MAX_REQ == len(calls), r                       # bounded
-assert any(u.endswith("q=funkey+opk+download") for u in calls), calls                             # queries come from profile terms
-queued = {(k, key) for k, key, via, d in list(c.q) + list(c.pq)}
-assert ("opk", "https://www.willemssoft.be/index.php?main=59&action=download&file=Funkoban.opk") in queued
-assert ("page", "https://rgnano.com/applications/") in queued and ("repo", "someone/funkey-game") in queued
-assert not any("hotels" in key for _, key in queued)                                                   # irrelevant page never queued
-v = [via for k, key, via, d in c.pq if "rgnano.com" in key][0]
-assert v["from"] == "freeserp-search" and v["anchor"].startswith("rg nano") and v["title"], v          # provenance kept
-leads = json.load(open(cache)); assert len(leads) == 4 and leads["https://rgnano.com/applications/"]["queries"], leads
-# a later run with FreeSerp down still replays the cached leads and reports the outage as an optional-channel status
-C.fetch = lambda url, rng=None, limit=0: (429, {}, b"", url)
-c2 = C.Crawl(); r2 = C.seed_freeserp(c2, cache, "2026-10-28")
-assert r2["status"] == "unavailable" and r2["error"] == "HTTP 429" and r2["cached_leads"] == 4 and r2["requests"] == 1, r2   # one request, no retry
-assert any(k == "opk" for k, *_ in list(c2.q))
-# HTTP 200 with a fallback engine is NOT a successful search
-C.fetch = lambda url, rng=None, limit=0: (200, {}, b'{"ok":true,"results":[],"engine_fallback":true,"engine_error":"engine_unavailable"}', url)
-r3 = C.seed_freeserp(C.Crawl(), None); assert r3["status"] == "degraded" and r3["requests"] == 2 and r3["retried"], r3   # one retry, then stop
-# network error / bad JSON: still no exception
-C.fetch = lambda url, rng=None, limit=0: (0, {}, b"", url); assert C.seed_freeserp(C.Crawl(), None)["status"] == "unavailable"
-C.fetch = lambda url, rng=None, limit=0: (200, {}, b"<html>", url); assert C.seed_freeserp(C.Crawl(), None)["status"] == "unavailable"
-# cache pruning: entries older than CACHE_DAYS drop
-C.save_leads(cache, {"https://old.example/x": {"first_seen": "2026-01-01", "last_seen": "2026-01-01", "queries": [], "title": ""},
-                     "https://new.example/x": {"first_seen": "2026-10-27", "last_seen": "2026-10-27", "queries": [], "title": ""}}, "2026-10-27")
-assert list(json.load(open(cache))) == ["https://new.example/x"]
-# corrupt / hostile cache entries are dropped on load; a valid file:// or private-IP lead can never be fetched
+# corrupt / hostile lead-file entries are dropped on load; a valid file:// or private-IP lead can never be fetched
 bad = os.path.join(tempfile.mkdtemp(), "bad.json")
 open(bad, "w").write(json.dumps({"file:///etc/passwd": {"last_seen": "2026-10-27"}, "https://ok.example/x": {"last_seen": "2026-10-27"}, "https://nodate.example/": {}, "https://str.example/": "x"}))
 assert list(C.load_leads(bad)) == ["https://ok.example/x"]
 C.HOSTOK["169.254.169.254"] = False; C.STOP.clear(); C.MAX_REQ = 10**6
 assert real_fetch("http://169.254.169.254/latest/meta-data")[0] == -1 and real_fetch("file:///etc/passwd")[0] == -1   # revalidated at fetch time
-# an optional-channel failure never makes the run incomplete (it is not in `notes`)
 assert C.assess([], 0, [], []) == []
-print("freeserp tests OK")
+print("lead file / fetch safety tests OK")
 
 # ---- a link that makes http.client raise (e.g. a space in the URL) is a failed fetch, not a crash --------------------
 import http.client
@@ -190,22 +152,8 @@ assert C.judge({**pk("x.opk", magic=None), "status": 403}, FakeCrawl) == ("unver
 C.fetch = real_fetch
 print("reach fix tests OK")
 
-# ---- cached/search lead starvation: late-query leads get admitted, duplicates take one slot, seeds beat derived links -----------
-def fs_many(url, rng=None, limit=0):
-    q = urllib.parse.unquote_plus(url.split("q=")[1])
-    late = q.endswith("emulators")
-    res = [{"url": "https://dup.example/funkey", "title": "FunKey"}]                                    # same lead in every query
-    res += [{"url": f"https://p-{q.replace(' ', '-')}-{i}.example/funkey", "title": "FunKey"} for i in range(2)]
-    if late: res.append({"url": "https://docs.example/manual/software/add_roms/", "title": "Add New ROMs - FunKey docs"})
-    return 200, {}, json.dumps({"ok": True, "results": res}).encode(), url
+# ---- seed pages before derived links; share endpoints are never queued ----------------------------------------------------------
 import urllib.parse
-C.fetch, sleep = fs_many, C.time.sleep; C.time.sleep = lambda s: None
-c = C.Crawl(); r = C.seed_freeserp(c, None, "2026-10-27")
-admitted = [key for _, key, _, _ in c.pq]
-assert len(admitted) == C.FS_MAX_PAGES and admitted.count("https://dup.example/funkey") == 1, admitted   # one slot per distinct URL
-assert "https://docs.example/manual/software/add_roms/" in admitted, admitted                       # late-query lead not starved
-assert r["pages_not_admitted"] == 1 + 2 * C.FS_MAX_REQ + 1 - C.FS_MAX_PAGES, r                          # what was left out is reported
-C.time.sleep, C.fetch = sleep, real_fetch
 q = C.PQ()
 q.append(("page", "https://derived.example/share?t=rg+nano", {"score": 12}, 3)); q.append(("page", "https://seed.example/docs", {"score": 4}, 0))
 assert q.popleft()[1] == "https://seed.example/docs"                                                     # independent seed before derived link
@@ -215,7 +163,7 @@ for u in ("https://www.reddit.com/submit?url=https%3A%2F%2Fx.example%2Frg-nano",
 for u in ("https://www.reddit.com/r/RGNano/comments/abc/opk_list/", "https://www.reddit.com/r/FunKey/", "https://flipboard.com/@x/funkey-apps",
           "https://getpocket.com/explore/item/homebrew", "https://example.org/submit-your-opk/", "https://example.org/save-states/"):
     assert C.classify(u)[0] == "page", u                                                                 # discussions and software pages kept
-print("lead starvation tests OK")
+print("page queue / share endpoint tests OK")
 
 # ---- sources that refuse the runner are reported as inaccessible, not silently dropped -----------------------------------------
 B = C.inaccessible([{"url": "https://wiki.example.org/wiki/Apps", "status": 403}, {"url": "https://wiki.example.org/wiki/Main", "status": 403},
@@ -273,14 +221,13 @@ print("package lead store tests OK")
 
 # ---- job summary statistics (reviewable without downloading the artifact) ---------------------------------------------------
 res = {"as_of": "2026-10-27", "unique_installable_apps": [{"host": "github.com"}, {"host": "static.miraheze.org"}, {"host": "static.miraheze.org"}],
-       "package_leads": {"rechecked": 7, "new": 1, "verified": 2}, "inaccessible_sources": {"wiki.example.org": []},
-       "optional_channels": {"freeserp": {"status": "ok", "queries": 16, "requests": 16, "results": 160, "new_leads": 3, "cached_leads": 92, "error": None}}}
+       "package_leads": {"rechecked": 7, "new": 1, "verified": 2}, "inaccessible_sources": {"wiki.example.org": []}}
 store = {"https://a/x.opk": {"name": "x.opk", "first_seen": "2026-10-27", "last_verified": "2026-10-27", "state": "verified"},
          "https://a/y.opk": {"name": "y.opk", "first_seen": "2026-10-01", "last_verified": "2026-10-27", "state": "changed", "last_status": "ok"},
          "https://a/z.opk": {"name": "z.opk", "first_seen": "2026-10-01", "last_verified": "2026-10-01", "state": "unreachable", "last_status": "HTTP 403"}}
 md = C.stats_md(res, store)
 for want in ("| Verified OPKs (unique) | 3 |", "| GitHub-hosted / other hosts | 1 / 2 |", "changed 1, unreachable 1, verified 1",
-             "| 1 / 1 / 1 |", "ok: 16/16 queries ok", "wiki.example.org", "**Changed packages (1)**", "z.opk (HTTP 403): https://a/z.opk"):
+             "| 1 / 1 / 1 |", "wiki.example.org", "**Changed packages (1)**", "z.opk (HTTP 403): https://a/z.opk"):
     assert want in md, (want, md)
 print("job summary tests OK")
 
@@ -390,26 +337,7 @@ assert c2.repos["gitlab.com/someone%2fplayer|someone/player"]["verdict"] == "non
 C.fetch = real_fetch
 print("forge reach tests OK")
 
-# ---- search categories from the profile, rotated within FS_MAX_REQ; one FreeSerp retry; diverse harvest slots ------------------
-qa, qb = C.fs_queries("2026-10-27"), C.fs_queries("2026-10-28")
-allq = {f"{t} {s}" for s in C.PROF["search_suffixes"] for t in ("rg nano", "funkey os", "funkey s", "funkey")}
-assert len(qa) == len(qb) == C.FS_MAX_REQ and set(qa) | set(qb) == allq, (len(allq), sorted(allq - set(qa) - set(qb)))   # 2 days cover all
-assert {"software", "applications", "ports"} <= set(C.PROF["search_suffixes"])
-saved = C.PROF.pop("search_suffixes"); assert C.fs_queries("2026-10-27")[0] == "rg nano opk download" and len(C.fs_queries("2026-10-27")) == 16
-C.PROF["search_suffixes"] = saved                                                                       # profile without categories: old queries
-sleep_, C.time.sleep = C.time.sleep, (lambda s: None)
-OKJ = json.dumps({"ok": True, "results": [{"url": "https://w.example/rg-nano-apps", "title": "RG Nano apps"}]}).encode()
-BAD = b'{"ok":true,"results":[],"engine_fallback":true,"engine_error":"engine_unavailable"}'
-def seq(*bodies):
-    it = iter(bodies)
-    def f(url, rng=None, limit=0): return 200, {}, next(it, OKJ), url
-    return f
-C.fetch = seq(BAD, OKJ)                                                                                 # degraded once, then fine
-r = C.seed_freeserp(C.Crawl(), None, "2026-10-27")
-assert r["status"] == "ok" and r["retried"] and r["requests"] == C.FS_MAX_REQ and r["queries"] == C.FS_MAX_REQ - 1, r   # retry costs a query slot
-C.fetch = seq(BAD, OKJ, BAD)                                                                            # only one retry per run
-r = C.seed_freeserp(C.Crawl(), None, "2026-10-27"); assert r["status"] == "degraded" and r["requests"] == 3 and r["queries"] == 1, r
-C.time.sleep = sleep_
+# ---- diverse harvest slots: near-identical links cannot take every page slot ---------------------------------------------------
 # harvest: six near-identical high-scoring links take at most 2 slots; distinct links keep theirs
 assert C.link_template("https://t.example/download.php?themeid=3860") == C.link_template("https://t.example/download.php?themeid=3861")
 assert C.link_template("https://w.example/wiki/Apps") != C.link_template("https://w.example/wiki/Ports")
@@ -419,7 +347,7 @@ c = C.Crawl(); c.harvest(H, "https://themes.example.org/index.php?target=rgnano"
 pushed = [key for _, key, _, _ in c.pq]
 assert sum("themeid" in u for u in pushed) == 2 and "https://www.example.org/download/rg-nano" in pushed and "https://www.example.org/manual/rg-nano" in pushed, pushed
 C.fetch = real_fetch
-print("search category / retry / diversity tests OK")
+print("harvest diversity tests OK")
 
 # ---- repository tree discovery: pinned commit URLs, repo provenance, wrong-device exclusion, bounded ---------------------------
 SHA = "a" * 40
@@ -515,7 +443,7 @@ lim["https://x/rej.opk"] = {"kind": "opk", "last_verified": "2025-01-01", "state
 C.update_packages(lim, [], "2026-10-02"); assert len(lim) == C.PKG_MAX and "https://x/stale.opk" not in lim and "https://x/gone.opk" not in lim and "https://x/rej.opk" in lim
 # same-day reporting: earlier runs that day are not "new"; this run's counts come from update_packages
 same = {f"https://h/{i}.opk": {"first_seen": "2026-10-27", "last_verified": "2026-10-27", "state": "verified"} for i in range(197)}
-md = C.stats_md({"as_of": "2026-10-27", "unique_installable_apps": [], "package_leads": {"new": 45, "verified": 193, "rechecked": 36}, "optional_channels": {}}, same)
+md = C.stats_md({"as_of": "2026-10-27", "unique_installable_apps": [], "package_leads": {"new": 45, "verified": 193, "rechecked": 36}}, same)
 assert "| 45 / 148 / 4 |" in md, md
 C.fetch = real_fetch
 print("large tree coverage tests OK")
@@ -753,18 +681,18 @@ def so_main(*args):
         with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(io.StringIO()): C.main()
     finally: sys.argv = old
     return buf.getvalue()
-saved = C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed, C.seed_multi, C.seed_freeserp, C.seed_packages
+saved = C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed, C.seed_multi, C.seed_packages
 def forbidden(*a, **k): raise AssertionError("general discovery or historical recheck started in submitted-only mode")
 C.fetch, C.DELAY = so_fetch, 0
-C.seed = C.seed_multi = C.seed_freeserp = C.seed_packages = forbidden
+C.seed = C.seed_multi = C.seed_packages = forbidden
 with tempfile.TemporaryDirectory() as td:
     td = Path(td); (td / "cache").mkdir()
     keep = {"packages.json": json.dumps({"https://old.example.org/old.opk": {"kind": "opk", "state": "verified", "first_seen": "2026-01-01", "last_verified": "2026-01-01",
                                                                             "last_checked": "2026-01-01", "via": [{"from": "https://old.example.org/"}], "members": []}}),
-            "freeserp.json": json.dumps({"https://x.example.org/p": {"last_seen": "2026-01-01", "queries": ["q"]}}), "seed.json": "{}"}
+            "seed.json": "{}"}
     for n, t in keep.items(): (td / "cache" / n).write_text(t, encoding="utf-8")
     def untouched(): return all((td / "cache" / n).read_text(encoding="utf-8") == t for n, t in keep.items()) and sorted(p.name for p in (td / "cache").iterdir()) == sorted(keep)
-    caches = ["--package-leads", str(td / "cache/packages.json"), "--package-seed", str(td / "cache/seed.json"), "--lead-cache", str(td / "cache/freeserp.json")]
+    caches = ["--package-leads", str(td / "cache/packages.json"), "--package-seed", str(td / "cache/seed.json")]
     md = so_main("--out", str(td / "o"), "--max-req", "99999", "--deadline", "99999", *caches,
                  "--submitted=https://github.com/sub/game https://gitlab.com/someone/player https://example.org/x")
     res = json.loads((td / "o/submitted-results.json").read_text(encoding="utf-8"))
@@ -773,7 +701,7 @@ with tempfile.TemporaryDirectory() as td:
     # nothing but the submitted repos and the package links they carry was requested
     hosts = {urllib.parse.urlsplit(u).netloc for u in so_calls}
     assert hosts <= {"raw.githubusercontent.com", "github.com", "api.github.com", "gitlab.com", "builds.example.org"}, hosts
-    assert not [u for u in so_calls if any(x in u for x in ("freeserp", "/search", "advancedsearch", "tab=repositories", "other/repo", "otherowner", "wiki.example.org", "old.example.org", "codeberg.org"))], so_calls
+    assert not [u for u in so_calls if any(x in u for x in ("/search", "advancedsearch", "tab=repositories", "other/repo", "otherowner", "wiki.example.org", "old.example.org", "codeberg.org"))], so_calls
     assert 0 < res["requests"] <= C.SUBMITTED_MAX_REQ and res["requests"] == len(so_calls)
     assert res["out_of_scope"] >= 3 and res["complete"], (res["out_of_scope"], res["incomplete_reasons"])   # skipped on purpose: not "incomplete"
     # per-lead report: README status, packages, OPK inside the ZIP, verification
@@ -796,7 +724,7 @@ with tempfile.TemporaryDirectory() as td:
         try: so_main("--out", str(td / "o3"), *caches, f"--submitted={bad}"); raise AssertionError("must exit")
         except SystemExit as e: assert "no valid" in str(e)
         assert not so_calls and C.NREQ == 0 and not (td / "o3").exists() and untouched()
-C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed, C.seed_multi, C.seed_freeserp, C.seed_packages = saved
+C.fetch, C.MAX_REQ, C.DEADLINE_S, C.DELAY, C.seed, C.seed_multi, C.seed_packages = saved
 # the scope exists only in submitted-only mode: a normal crawl still queues pages, owners and other repos
 assert C.Crawl().scope is None
 c = C.Crawl(); c.push("page", "https://wiki.example.org/wiki/Apps", {"from": "t"}, 0); c.push("owner", "someone", {"from": "t"}, 0); c.push("repo", "a/b", {"from": "t"}, 0)
@@ -981,7 +909,7 @@ with tempfile.TemporaryDirectory() as td:
                                               "repo http://github.com/a/b rg-nano\n", encoding="utf-8")
     def run_main(*extra):
         so_calls.clear(); C.NREQ, C.T0 = 0, time.time(); C.FAILS.clear(); C.STOP.clear(); old = sys.argv
-        sys.argv = ["crawl.py", "--out", str(td / "o"), "--no-github-seed", "--no-freeserp", "--max-req", "500", "--deadline", "500", *extra]
+        sys.argv = ["crawl.py", "--out", str(td / "o"), "--no-github-seed", "--max-req", "500", "--deadline", "500", *extra]
         try:
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()): C.main()
         finally: sys.argv = old
@@ -1030,7 +958,7 @@ def summary_run(*args, seed=None, rl=False):
     C.seed_multi = seed or (lambda c: c.push("repo", "sub/game", {"from": "github-search", "anchor": "t"}, 0) or [])
     with tempfile.TemporaryDirectory() as td:
         so_calls.clear(); C.NREQ, C.T0 = 0, time.time(); C.FAILS.clear(); C.STOP.clear(); old = sys.argv
-        sys.argv = ["crawl.py", "--out", td + "/o", "--no-github-seed", "--no-freeserp", *args]
+        sys.argv = ["crawl.py", "--out", td + "/o", "--no-github-seed", *args]
         try:
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()): C.main()
         finally: sys.argv = old; C.fetch, C.DELAY, C.seed_multi, C.seed_packages, C.MAX_REQ = saved
