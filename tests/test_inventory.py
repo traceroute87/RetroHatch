@@ -42,6 +42,11 @@ assert len([s for s in by["eduke32"]["sources"] if s["type"] == "repo"]) == 2   
 assert sum(e["name"] in ("Funkoban", "Cglpsdl1") for e in snap) == 2                                              # the wiki's listing of them merged, not duplicated
 assert sum("listing" in e for e in snap) == 46                                                                    # every FunKey wiki listing kept (44 own rows + 2 merged)
 
+# ---- TaraFi: a catalog app (invisible on the device until a signed catalog exists) is also a candidate, deduplicated by source URL, never approved ----
+tf = by["tarafi"]; cat_tf = json.loads((ROOT / "catalog" / "apps" / "tarafi.json").read_text(encoding="utf-8"))
+assert tf["status"] == "source-only" and not tf["packages"] and tf["category"] == "media" and tf["sources"][0]["url"] == cat_tf["source"]
+assert next(e for e in snap if e["id"] == "tarafi")["source"] == cat_tf["source"] and next(e for e in snap if e["id"] == "tarafi")["approval"] == "unapproved"
+
 # ---- cores, support files and system add-ons are distinguished; source-only and unverified are labeled ----
 kinds = {a["id"]: a["kind"] for a in apps}
 assert kinds["gambattesdlretrocore"] == kinds["vicesdlretrocore"] == "core" and kinds["gmenu2x"] == "system"
@@ -66,7 +71,7 @@ assert sorted(a["packages"][0]["name"] for a in b32) == sorted(m[0] for m in g) 
 assert all(a["status"] == "package-verified" and a["license"] == "unknown" and a["category"] == "games" and "sha256" not in a["packages"][0] for a in b32)
 assert all((a["packages"][0]["container_name"], a["packages"][0]["container_size"], a["packages"][0]["size"]) == (m[2], m[3], m[1]) for a in b32 for m in g if m[0] == a["packages"][0]["name"])
 assert all(a["packages"][0]["url"].endswith("/releases/download/v1.0/" + a["packages"][0]["container_name"]) and a["packages"][0]["mirrors"][0].split("/releases/")[1].startswith("latest/download/") for a in b32)
-assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 127
+assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 128
 pc = col["picoarch-cores"]
 assert len(pc["members"]) == 29 and sum(m[2] == "squashfs" for m in pc["members"]) == 11 and pc["frontend"][0] == "picoarch.opk" and len(pc["containers"]) == 2
 assert len(pe["crawl_only"]["members"]) == 11 and all(m[2].startswith("https://") for m in pe["crawl_only"]["members"])

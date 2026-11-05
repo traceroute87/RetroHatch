@@ -426,6 +426,10 @@ static void paging(const char *root, const char *assets)
 	static rh_model m; char cat[512], st[512], f[512]; rh_ui_view v; int i, n, sc, max, last = 0, steps = 0; unsigned h0;
 	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root); snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root);
 	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, f); n = m.n_apps + m.n_cands;
+	CHECK(find_cand(&m, "TaraFi") < 0 && n == 129);                            /* with the catalog loaded, its TaraFi row replaces the TaraFi candidate (same source URL) */
+	{ static rh_model b; snprintf(cat, sizeof cat, "%s/tests/ui_fixture/no-such-catalog", root); rh_model_load(&b, cat, st); rh_model_load_candidates(&b, f);   /* the Nano today: no signed catalog */
+	  CHECK(b.n_apps == 0 && b.n_cands == 128 && find_cand(&b, "TaraFi") >= 0 && b.cands[find_cand(&b, "TaraFi")].cat == RH_CAT_MEDIA); }
+	snprintf(cat, sizeof cat, "%s/catalog", root);
 	CHECK(n > 100 && rh_ui_init(assets, &m) == 0);
 	keys("a"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.count == n && v.sel == 0);
 	rh_ui_draw(scr); h0 = chip_hash(); shot("pg_1_discover_counter_1");

@@ -624,6 +624,35 @@
    ]
   },
   {
+   "id": "tarafi",
+   "name": "TaraFi",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Music player. By traceroute87.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "catalog/apps/tarafi.json: artifact for device rg-nano, firmware funkeyos-drum78",
+    "where": "catalog"
+   },
+   "category": "media",
+   "category_basis": "catalog/apps/tarafi.json description: Music player.",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/traceroute87/TaraFi"
+    }
+   ],
+   "packages": [],
+   "notes": "Also a catalog entry (status unavailable: no published release recorded, licence not declared in the repo). When a signed catalog lists it, that row replaces this one: the browser skips a candidate whose source URL equals a catalog entry's.",
+   "evidence": {
+    "catalog": "catalog/apps/tarafi.json"
+   }
+  },
+  {
    "id": "3doh",
    "name": "3DOh",
    "kind": "app",
