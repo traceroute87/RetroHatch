@@ -13,7 +13,7 @@
   },
   {
    "id": "collections",
-   "note": "Only the collection members with tracked per-item evidence are itemized as applications (funkey_sdl2_games: 7). The 43 games of joyrider3774/32blit_funkey and the 29 picoarch core OPKs are NOT applications yet: their package identities (names, sizes, ZIP names, URL forms) are preserved in package_evidence. Still missing for them: sha256 (never hashed, needs a download), per-game licence/upstream, and per-game hardware tests."
+   "note": "Only the collection members with tracked per-item evidence are itemized as applications (funkey_sdl2_games: 7). The 43 games of joyrider3774/32blit_funkey are itemized (one application each, from package_evidence). The 29 picoarch core OPKs are NOT applications: they stay grouped under picoarch (package_evidence). Still missing for the 43 games: sha256 (never hashed, needs a download), per-game licence/upstream and description, and hardware tests."
   },
   {
    "id": "audit-entries",
@@ -3975,6 +3975,1941 @@
     "anchors": [
      "here"
     ]
+   }
+  },
+  {
+   "id": "2048",
+   "name": "2048",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "2048.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/2048.-.32blit.-.Funkey-s.zip",
+     "size": 18771968,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "2048.-.32blit.-.Funkey-s.zip",
+     "container_size": 18671016,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/2048.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "32blox",
+   "name": "32blox",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "32blox.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/32blox.-.32blit.-.Funkey-s.zip",
+     "size": 18939904,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "32blox.-.32blit.-.Funkey-s.zip",
+     "container_size": 18841748,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/32blox.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "4inrow",
+   "name": "4inrow",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "4inrow.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/4inrow.-.32blit.-.Funkey-s.zip",
+     "size": 18747392,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "4inrow.-.32blit.-.Funkey-s.zip",
+     "container_size": 18646830,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/4inrow.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "alienattack",
+   "name": "Alienattack",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "alienattack.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/alienattack.-.32blit.-.Funkey-s.zip",
+     "size": 18743296,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "alienattack.-.32blit.-.Funkey-s.zip",
+     "container_size": 18644767,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/alienattack.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "amaze",
+   "name": "Amaze",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "amaze.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/amaze.-.32blit.-.Funkey-s.zip",
+     "size": 18780160,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "amaze.-.32blit.-.Funkey-s.zip",
+     "container_size": 18681061,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/amaze.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "armadillo",
+   "name": "Armadillo",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "armadillo.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/armadillo.-.32blit.-.Funkey-s.zip",
+     "size": 20054016,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "armadillo.-.32blit.-.Funkey-s.zip",
+     "container_size": 19955812,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/armadillo.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "asteroids",
+   "name": "Asteroids",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "asteroids.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/asteroids.-.32blit.-.Funkey-s.zip",
+     "size": 18755584,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "asteroids.-.32blit.-.Funkey-s.zip",
+     "container_size": 18655739,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/asteroids.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "blitkart",
+   "name": "Blit Kart",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "blit-kart.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/blit-kart.-.32blit.-.Funkey-s.zip",
+     "size": 18817024,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "blit-kart.-.32blit.-.Funkey-s.zip",
+     "container_size": 18717170,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/blit-kart.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "blitracers",
+   "name": "Blit Racers",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "blit-racers.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/blit-racers.-.32blit.-.Funkey-s.zip",
+     "size": 18784256,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "blit-racers.-.32blit.-.Funkey-s.zip",
+     "container_size": 18682936,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/blit-racers.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "bounce",
+   "name": "Bounce",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "bounce.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/bounce.-.32blit.-.Funkey-s.zip",
+     "size": 18747392,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "bounce.-.32blit.-.Funkey-s.zip",
+     "container_size": 18649152,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/bounce.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "cannonhead",
+   "name": "Cannonhead",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "cannonhead.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/cannonhead.-.32blit.-.Funkey-s.zip",
+     "size": 18755584,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "cannonhead.-.32blit.-.Funkey-s.zip",
+     "container_size": 18656393,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/cannonhead.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "carsprint",
+   "name": "Carsprint",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "carsprint.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/carsprint.-.32blit.-.Funkey-s.zip",
+     "size": 20373504,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "carsprint.-.32blit.-.Funkey-s.zip",
+     "container_size": 20270992,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/carsprint.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "castle",
+   "name": "Castle",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "castle.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/castle.-.32blit.-.Funkey-s.zip",
+     "size": 18751488,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "castle.-.32blit.-.Funkey-s.zip",
+     "container_size": 18651206,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/castle.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "dino",
+   "name": "Dino",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "dino.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/dino.-.32blit.-.Funkey-s.zip",
+     "size": 18747392,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "dino.-.32blit.-.Funkey-s.zip",
+     "container_size": 18648907,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/dino.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "dodgeem",
+   "name": "Dodgeem",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "dodgeem.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/dodgeem.-.32blit.-.Funkey-s.zip",
+     "size": 18751488,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "dodgeem.-.32blit.-.Funkey-s.zip",
+     "container_size": 18652598,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/dodgeem.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "dots",
+   "name": "Dots",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "dots.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/dots.-.32blit.-.Funkey-s.zip",
+     "size": 18759680,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "dots.-.32blit.-.Funkey-s.zip",
+     "container_size": 18661277,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/dots.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "dune2",
+   "name": "Dune2",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "dune2.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/dune2.-.32blit.-.Funkey-s.zip",
+     "size": 20373504,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "dune2.-.32blit.-.Funkey-s.zip",
+     "container_size": 20270920,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/dune2.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "fourblockdescent",
+   "name": "Fourblock Descent",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "fourblock-descent.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/fourblock-descent.-.32blit.-.Funkey-s.zip",
+     "size": 18755584,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "fourblock-descent.-.32blit.-.Funkey-s.zip",
+     "container_size": 18657167,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/fourblock-descent.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "geometry",
+   "name": "Geometry",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "geometry.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/geometry.-.32blit.-.Funkey-s.zip",
+     "size": 22556672,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "geometry.-.32blit.-.Funkey-s.zip",
+     "container_size": 22454247,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/geometry.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "gol",
+   "name": "Gol",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "gol.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/gol.-.32blit.-.Funkey-s.zip",
+     "size": 18743296,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "gol.-.32blit.-.Funkey-s.zip",
+     "container_size": 18646492,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/gol.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "harry",
+   "name": "Harry",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "harry.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/harry.-.32blit.-.Funkey-s.zip",
+     "size": 18759680,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "harry.-.32blit.-.Funkey-s.zip",
+     "container_size": 18659099,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/harry.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "indy",
+   "name": "Indy",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "indy.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/indy.-.32blit.-.Funkey-s.zip",
+     "size": 18743296,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "indy.-.32blit.-.Funkey-s.zip",
+     "container_size": 18642450,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/indy.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "invader",
+   "name": "Invader",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "invader.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/invader.-.32blit.-.Funkey-s.zip",
+     "size": 18755584,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "invader.-.32blit.-.Funkey-s.zip",
+     "container_size": 18653874,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/invader.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "jetpac",
+   "name": "Jetpac",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "jetpac.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/jetpac.-.32blit.-.Funkey-s.zip",
+     "size": 20373504,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "jetpac.-.32blit.-.Funkey-s.zip",
+     "container_size": 20270837,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/jetpac.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "jumpysquirrel",
+   "name": "Jumpy Squirrel",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Jumpy-Squirrel.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/Jumpy-Squirrel.-.32blit.-.Funkey-s.zip",
+     "size": 18751488,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "Jumpy-Squirrel.-.32blit.-.Funkey-s.zip",
+     "container_size": 18650571,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/Jumpy-Squirrel.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "knightlore",
+   "name": "Knightlore",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "knightlore.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/knightlore.-.32blit.-.Funkey-s.zip",
+     "size": 20373504,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "knightlore.-.32blit.-.Funkey-s.zip",
+     "container_size": 20270559,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/knightlore.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "match3",
+   "name": "Match3",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "match3.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/match3.-.32blit.-.Funkey-s.zip",
+     "size": 18763776,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "match3.-.32blit.-.Funkey-s.zip",
+     "container_size": 18665537,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/match3.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "minesweeper",
+   "name": "Minesweeper",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "minesweeper.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/minesweeper.-.32blit.-.Funkey-s.zip",
+     "size": 18751488,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "minesweeper.-.32blit.-.Funkey-s.zip",
+     "container_size": 18651854,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/minesweeper.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "missile",
+   "name": "Missile",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "missile.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/missile.-.32blit.-.Funkey-s.zip",
+     "size": 18751488,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "missile.-.32blit.-.Funkey-s.zip",
+     "container_size": 18652529,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/missile.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "ping",
+   "name": "Ping",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Ping.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/Ping.-.32blit.-.Funkey-s.zip",
+     "size": 18743296,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "Ping.-.32blit.-.Funkey-s.zip",
+     "container_size": 18644851,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/Ping.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "raycaster",
+   "name": "Raycaster",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "raycaster.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/raycaster.-.32blit.-.Funkey-s.zip",
+     "size": 22556672,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "raycaster.-.32blit.-.Funkey-s.zip",
+     "container_size": 22454328,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/raycaster.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "rocksanddiamonds",
+   "name": "Rocks And Diamonds",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "rocks-and-diamonds.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/rocks-and-diamonds.-.32blit.-.Funkey-s.zip",
+     "size": 18751488,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "rocks-and-diamonds.-.32blit.-.Funkey-s.zip",
+     "container_size": 18652937,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/rocks-and-diamonds.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "scrollytile",
+   "name": "Scrolly Tile",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "scrolly-tile.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/scrolly-tile.-.32blit.-.Funkey-s.zip",
+     "size": 22556672,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "scrolly-tile.-.32blit.-.Funkey-s.zip",
+     "container_size": 22454369,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/scrolly-tile.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "simon",
+   "name": "Simon",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "simon.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/simon.-.32blit.-.Funkey-s.zip",
+     "size": 18747392,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "simon.-.32blit.-.Funkey-s.zip",
+     "container_size": 18647692,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/simon.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "snake",
+   "name": "Snake",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Snake.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/Snake.-.32blit.-.Funkey-s.zip",
+     "size": 18743296,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "Snake.-.32blit.-.Funkey-s.zip",
+     "container_size": 18645078,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/Snake.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "snake2",
+   "name": "Snake2",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "snake2.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/snake2.-.32blit.-.Funkey-s.zip",
+     "size": 18771968,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "snake2.-.32blit.-.Funkey-s.zip",
+     "container_size": 18670405,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/snake2.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "sokoblit",
+   "name": "Sokoblit",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "sokoblit.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/sokoblit.-.32blit.-.Funkey-s.zip",
+     "size": 18755584,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "sokoblit.-.32blit.-.Funkey-s.zip",
+     "container_size": 18656497,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/sokoblit.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "solitaire",
+   "name": "Solitaire",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Solitaire.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/Solitaire.-.32blit.-.Funkey-s.zip",
+     "size": 18751488,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "Solitaire.-.32blit.-.Funkey-s.zip",
+     "container_size": 18653625,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/Solitaire.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "supersquarebros",
+   "name": "Super Square Bros",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Super-Square-Bros.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/Super-Square-Bros.-.32blit.-.Funkey-s.zip",
+     "size": 18878464,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "Super-Square-Bros.-.32blit.-.Funkey-s.zip",
+     "container_size": 18778045,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/Super-Square-Bros.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "tower",
+   "name": "Tower",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "tower.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/tower.-.32blit.-.Funkey-s.zip",
+     "size": 18747392,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "tower.-.32blit.-.Funkey-s.zip",
+     "container_size": 18647648,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/tower.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "towerdefense",
+   "name": "TowerDefense",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "TowerDefense.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/TowerDefense.-.32blit.-.Funkey-s.zip",
+     "size": 18763776,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "TowerDefense.-.32blit.-.Funkey-s.zip",
+     "container_size": 18663413,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/TowerDefense.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "wakkawakka",
+   "name": "Wakkawakka",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "wakkawakka.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/wakkawakka.-.32blit.-.Funkey-s.zip",
+     "size": 20377600,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "wakkawakka.-.32blit.-.Funkey-s.zip",
+     "container_size": 20274119,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/wakkawakka.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
+   }
+  },
+  {
+   "id": "willy",
+   "name": "Willy",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "32blit Games Collection for Funkey-S / RG-Nano",
+    "where": "readme"
+   },
+   "category": "games",
+   "category_basis": "repository README: a collection of 32blit games; per-game description not recorded",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/32blit_funkey"
+    }
+   ],
+   "packages": [
+    {
+     "name": "willy.opk",
+     "url": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/willy.-.32blit.-.Funkey-s.zip",
+     "size": 20373504,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "willy.-.32blit.-.Funkey-s.zip",
+     "container_size": 20271190,
+     "mirrors": [
+      "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/willy.-.32blit.-.Funkey-s.zip"
+     ]
+    }
+   ],
+   "also_in_repo": 42,
+   "notes": "ZIP of exactly one OPK (squashfs signature read in the crawl, file never hashed). Port repository licence MIT; this game's upstream licence is not checked. Mirror is the unpinned latest alias.",
+   "evidence": {
+    "package_evidence": "package_evidence.collections[32blit_funkey] in this file (crawl 2026-10-26)"
    }
   }
  ]

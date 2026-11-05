@@ -469,8 +469,8 @@ static void wiki_listings(const char *root, const char *assets)
 		CHECK(!m.cands[find_cand(&m, "Clock App")].sig_ok && m.cands[find_cand(&m, "Gambatte")].sig_ok);
 	}
 	{   /* inventory entries that are not wiki listings: a ZIP collection member, an uninspected package, a source-only entry, a core, a system add-on */
-		const char *pick[] = {"Checkers", "Handheld Link", "FK-TD", "Gambatte (SDL Retro core)", "GMenu2X"}, *tag[] = {"zip_member", "unverified", "source_only", "core", "system"}, *lead[] = {"", "Package not inspected", "Source only", "Emulator core", "System add-on"};
-		for (j = 0; j < 5; j++) {
+		const char *pick[] = {"Checkers", "Handheld Link", "FK-TD", "Gambatte (SDL Retro core)", "GMenu2X", "Match3", "Super Square Bros", "2048"}, *tag[] = {"zip_member", "unverified", "source_only", "core", "system", "blit_match3", "blit_longname", "blit_2048"}, *lead[] = {"", "Package not inspected", "Source only", "Emulator core", "System add-on", "32blit game", "32blit game", "32blit game"};
+		for (j = 0; j < 8; j++) {
 			int idx = find_cand(&m, pick[j]), k; char nm[64];
 			CHECK(idx >= 0 && !strncmp(m.cands[idx].desc, lead[j], strlen(lead[j])));        /* the label is the first thing the description says */
 			CHECK(rh_ui_init(assets, &m) == 0);
@@ -482,6 +482,7 @@ static void wiki_listings(const char *root, const char *assets)
 			rh_ui_free();
 		}
 		CHECK(m.cands[find_cand(&m, "Checkers")].sig_ok && m.cands[find_cand(&m, "Checkers")].zipped && !m.cands[find_cand(&m, "Checkers")].wiki);
+		CHECK(m.cands[find_cand(&m, "Match3")].sig_ok && m.cands[find_cand(&m, "Match3")].zipped && !m.cands[find_cand(&m, "Match3")].wiki && m.cands[find_cand(&m, "Match3")].cat == RH_CAT_GAMES);   /* 32blit game: ZIP member, games, no approval */
 		CHECK(!m.cands[find_cand(&m, "FK-TD")].sig_ok && !m.cands[find_cand(&m, "FK-TD")].pkg_name[0] && !m.cands[find_cand(&m, "Handheld Link")].sig_ok);
 	}
 	{   /* every candidate page opens, scrolls to its end and comes back under the sanitizers: row buffers and text wrapping stay in bounds */

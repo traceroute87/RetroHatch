@@ -29,7 +29,7 @@ assert len(M.snapshot(big)["candidates"]) == 300            # no artificial limi
 # ---- every entry is read-only and UNAPPROVED; audit detail never reaches the device snapshot ----
 assert all(e["approval"] == "unapproved" and e["hardware_test"] == "none" for e in snap)
 assert not any(k in e for e in snap for k in ("evidence", "sources", "packages", "package_metadata", "metadata_review", "notes", "kind", "status"))
-assert len(snap_text) < 80_000, len(snap_text)               # the small device-facing file (the old pair was 117,545 bytes)
+assert len(snap_text) < 117_545, len(snap_text)              # still smaller than the old two-file pair (117,545 bytes)
 
 # ---- applications are deduplicated, not repositories: collection members stay separate, multi-source apps stay one ----
 by = {a["id"]: a for a in apps}
@@ -61,12 +61,17 @@ assert "41921300975" in lim["wiki-index-actions-run"] and "actions/runs/41921300
 pe = inv["package_evidence"]; col = {c["id"]: c for c in pe["collections"]}
 g = col["32blit_funkey"]["members"]
 assert len(g) == 43 and len({m[0] for m in g}) == 43 and all(m[2].endswith(".zip") and m[1] > 0 and m[3] > 0 for m in g)
-assert not any("32blit_funkey" in s["url"] for a in apps for s in a["sources"])                                  # the 43 games are not itemized yet
+b32 = [a for a in apps if any(s["url"] == col["32blit_funkey"]["source"] for s in a["sources"])]
+assert sorted(a["packages"][0]["name"] for a in b32) == sorted(m[0] for m in g) and len(b32) == 43                       # every game is its own application
+assert all(a["status"] == "package-verified" and a["license"] == "unknown" and a["category"] == "games" and "sha256" not in a["packages"][0] for a in b32)
+assert all((a["packages"][0]["container_name"], a["packages"][0]["container_size"], a["packages"][0]["size"]) == (m[2], m[3], m[1]) for a in b32 for m in g if m[0] == a["packages"][0]["name"])
+assert all(a["packages"][0]["url"].endswith("/releases/download/v1.0/" + a["packages"][0]["container_name"]) and a["packages"][0]["mirrors"][0].split("/releases/")[1].startswith("latest/download/") for a in b32)
+assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 127
 pc = col["picoarch-cores"]
 assert len(pc["members"]) == 29 and sum(m[2] == "squashfs" for m in pc["members"]) == 11 and pc["frontend"][0] == "picoarch.opk" and len(pc["containers"]) == 2
 assert len(pe["crawl_only"]["members"]) == 11 and all(m[2].startswith("https://") for m in pe["crawl_only"]["members"])
 assert "sha256" not in json.dumps(pe["collections"] + [pe["crawl_only"]])                                              # nothing was hashed: no hash is claimed
-assert "picoarch-bluemsx" not in snap_text and "match3" not in snap_text                                               # absent from the browser snapshot
+assert not any(e["package"]["name"].startswith("picoarch-") for e in snap)                                      # the picoarch cores are not browser entries
 assert len(pe["collections"]) == 2 and sum(a["kind"] == "app" and "picoarch" in a["id"] for a in apps) == 1                  # cores stay grouped: one picoarch application
 
 # ---- package identity matches the raw metadata evidence it cites ----
