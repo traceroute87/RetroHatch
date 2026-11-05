@@ -251,46 +251,59 @@ static int details(SDL_Surface *d, int y0, const rh_app *a)
 	return y + 2 - y0;
 }
 
-/* UNAPPROVED candidate page: read-only facts from discovery. Package format, device claim, hardware test and approval are separate rows,
- * first on the page; the description and the reading note follow the card. */
+/* UNAPPROVED candidate page: read-only facts from discovery. Order: name + UNAPPROVED, what it is (description), the essentials card
+ * (package format, device claim, hardware test), the read-only note, then the technical card (evidence, source, file, licence...) and the
+ * "what verified means" text last. The page's UNAPPROVED line stands for the approval status; nothing else was dropped. */
 static int cand_details(SDL_Surface *d, int y0, const rh_cand *c)
 {
-	int y = y0 + 4; kv r[24]; int n = 0; char b[96], ev[96], sz[24];
-#define CROW(L, ...) do { snprintf(r[n].l, sizeof r[n].l, "%s", L); snprintf(r[n++].v, sizeof r[0].v, __VA_ARGS__); } while (0)
+	int y = y0 + 4; kv r[8], t[24]; int n = 0, nt = 0, long_desc; char b[96], ev[96], sz[24];
+#define CROW(R, N, L, ...) do { snprintf(R[N].l, sizeof R[N].l, "%s", L); snprintf(R[N++].v, sizeof R[0].v, __VA_ARGS__); } while (0)
 	gfx_rbox(d, 8, y, 40, 40, 5, C_LINE, C_CARD);
 	if (d && cand_icon((int)(c - M->cands))) gfx_img(d, cand_icon((int)(c - M->cands)), 12, y + 4);   /* 32x32 picture inside the 40x40 card */
 	else icon(d, IC_PACKAGE, 28, y + 20, C_GREEN);
 	gfx_text(d, f_title, gfx_ellipsize(f_title, c->name, 170, b, sizeof b), 56, y + 2, C_TXT);
 	gfx_text(d, f_title, "UNAPPROVED", 56, y + 22, C_ERR);
 	y += 48;
-	if (c->wiki) {   /* three separate facts: where it is listed, whether the file was checked, and the wiki's own heading (not cached: say so) */
-		CROW("Listing", "FunKey wiki");
-		CROW("Status", "%s", c->sig_ok ? "Package verified" : "Listed / Not verified");
-		CROW("Wiki category", "%s", c->wiki_cat[0] ? c->wiki_cat : "Not recorded");
+	{   /* at most 3 lines up here so the essentials stay on the first screen; a longer description continues in full below the facts */
+		const char *dsc = c->desc[0] ? c->desc : c->wiki ? "No description: the wiki text was not saved." : "No description. Unknown.", *s_[12]; int ln[12], k, lines = gfx_wrap(f_body, dsc, 220, s_, ln, 12);
+		for (k = 0; k < (lines < 3 ? lines : 3); k++) {
+			char one[160], cut[160];
+			if (lines > 3 && k == 2) gfx_text(d, f_body, gfx_ellipsize(f_body, s_[k], 220, cut, sizeof cut), 10, y, C_TXT);   /* rest of the text, cut to the line with "..." */
+			else { snprintf(one, sizeof one, "%.*s", ln[k], s_[k]); gfx_text(d, f_body, one, 10, y, C_TXT); }
+			y += 18;
+		}
+		long_desc = lines > 3;
 	}
-	CROW("Package", "%s", c->sig_ok ? (c->zipped ? "OPK verified (ZIP)" : "OPK verified") : c->wiki ? "Not verified" : "Unknown");
-	CROW("Compat", "Unconfirmed");
-	CROW("Claim", "%s", !strcmp(c->claim, "rg-nano") ? "RG Nano" : !strcmp(c->claim, "family") ? "FunKey only" : "Unknown");
-	CROW("Hardware", "Not tested");
-	CROW("Approval", "UNAPPROVED");
+	y += 4;
+	if (c->wiki) {   /* where it is listed and whether the file was checked are essentials; the wiki's own heading (not cached: say so) is detail */
+		CROW(r, n, "Listing", "FunKey wiki");
+		CROW(r, n, "Status", "%s", c->sig_ok ? "Package verified" : "Listed / Not verified");
+	}
+	CROW(r, n, "Package", "%s", c->sig_ok ? (c->zipped ? "OPK verified (ZIP)" : "OPK verified") : c->wiki ? "Not verified" : "Unknown");
+	CROW(r, n, "Compat", "Unconfirmed");
+	CROW(r, n, "Claim", "%s", !strcmp(c->claim, "rg-nano") ? "RG Nano" : !strcmp(c->claim, "family") ? "FunKey only" : "Unknown");
+	CROW(r, n, "Hardware", "Not tested");
+	y += kv_card(d, y, r, n, C_TXT) + 6;
+	paragraph(d, 10, &y, 220, "Read-only: RetroHatch cannot install or download this.", C_TXT2, 0);
+	y += 4;
+	if (c->wiki) CROW(t, nt, "Wiki category", "%s", c->wiki_cat[0] ? c->wiki_cat : "Not recorded");
 	if (!c->claim_text[0] || !strcmp(c->claim_text, "Unknown")) snprintf(ev, sizeof ev, "Unknown");
 	else snprintf(ev, sizeof ev, "%.64s%s (%s)", c->claim_text, strlen(c->claim_text) > 64 ? "..." : "", c->claim_where[0] ? c->claim_where : "unknown");
-	CROW("Evidence", "%s", ev);
-	CROW("Category", "%s", rh_cat_name(c->cat));
-	if (c->cat_basis[0]) CROW("Basis", "%s", c->cat_basis);
-	if (c->dl[0]) CROW("Download", "%s", c->dl);
-	if (c->mirror[0]) CROW("Other link", "%s", c->mirror);
-	CROW("Release", "%s", c->version[0] ? c->version : "Unknown");
-	fmt_size(sz, sizeof sz, c->size); CROW("Size", "%s", sz);
-	CROW("Source", "%s", c->wiki && strstr(c->source, "wiki.funkey-project.com") ? "FunKey wiki list" : strncmp(c->source, "https://", 8) ? or_unknown(c->source) : c->source + 8);
-	CROW("File", "%s", or_unknown(c->pkg_name));
-	if (c->more) CROW("Also", "%d more in repo", c->more);
-	CROW("License", "%s", or_unknown(c->license));
-	CROW("Updated", "%s", or_unknown(c->last_activity));
-	y += kv_card(d, y, r, n, C_TXT) + 8;
-	paragraph(d, 10, &y, 220, c->desc[0] ? c->desc : c->wiki ? "No description: the wiki text was not saved." : "No description. Unknown.", C_TXT, 0);
-	y += 4;
-	paragraph(d, 10, &y, 220, "Verified means the OPK file format was seen, not that it is safe or works. Claim is the project's own words. Read-only: RetroHatch cannot install or download this.", C_TXT2, 0);
+	CROW(t, nt, "Evidence", "%s", ev);
+	CROW(t, nt, "Category", "%s", rh_cat_name(c->cat));
+	if (c->cat_basis[0]) CROW(t, nt, "Basis", "%s", c->cat_basis);
+	if (c->dl[0]) CROW(t, nt, "Download", "%s", c->dl);
+	if (c->mirror[0]) CROW(t, nt, "Other link", "%s", c->mirror);
+	CROW(t, nt, "Release", "%s", c->version[0] ? c->version : "Unknown");
+	fmt_size(sz, sizeof sz, c->size); CROW(t, nt, "Size", "%s", sz);
+	CROW(t, nt, "Source", "%s", c->wiki && strstr(c->source, "wiki.funkey-project.com") ? "FunKey wiki list" : strncmp(c->source, "https://", 8) ? or_unknown(c->source) : c->source + 8);
+	CROW(t, nt, "File", "%s", or_unknown(c->pkg_name));
+	if (c->more) CROW(t, nt, "Also", "%d more in repo", c->more);
+	CROW(t, nt, "License", "%s", or_unknown(c->license));
+	CROW(t, nt, "Updated", "%s", or_unknown(c->last_activity));
+	y += kv_card(d, y, t, nt, C_TXT) + 8;
+	if (long_desc) { paragraph(d, 10, &y, 220, c->desc, C_TXT, 0); y += 4; }
+	paragraph(d, 10, &y, 220, "Verified means the OPK file format was seen, not that it is safe or works. Claim is the project's own words.", C_TXT2, 0);
 	return y + 2 - y0;
 }
 
