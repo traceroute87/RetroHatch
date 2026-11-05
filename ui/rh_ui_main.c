@@ -99,6 +99,8 @@ static int translate(SDLKey k, rh_key *o)
 	case SDLK_r: case SDLK_RIGHT: *o = RH_K_RIGHT; return 1;
 	case SDLK_a: case SDLK_RETURN: *o = RH_K_A; return 1;
 	case SDLK_b: case SDLK_BACKSPACE: *o = RH_K_B; return 1;
+	case SDLK_x: case SDLK_PAGEUP: *o = RH_K_PGUP; return 1;      /* X = page up, Y = page down (the x/y letters fkgpiod delivers) */
+	case SDLK_y: case SDLK_PAGEDOWN: *o = RH_K_PGDN; return 1;
 	default: return 0;
 	}
 }

@@ -6,7 +6,8 @@
 #include <SDL/SDL.h>
 #include "rh_model.h"
 
-typedef enum { RH_K_UP, RH_K_DOWN, RH_K_LEFT, RH_K_RIGHT, RH_K_A, RH_K_B } rh_key;
+typedef enum { RH_K_UP, RH_K_DOWN, RH_K_LEFT, RH_K_RIGHT, RH_K_A, RH_K_B,
+	RH_K_PGUP, RH_K_PGDN } rh_key;   /* PGUP/PGDN: one screen of list rows or details text per press, clamped at both ends */
 typedef enum { RH_S_HOME, RH_S_DISCOVER, RH_S_DETAILS, RH_S_INSTALLED, RH_S_UPDATES, RH_S_SETTINGS, RH_S_INFO,
 	RH_S_CONFIRM, RH_S_WORKING, RH_S_RESULT,   /* CONFIRM/WORKING/RESULT: install flow (DEV builds only) */
 	RH_S_CAND } rh_screen;   /* read-only page of an UNAPPROVED candidate (app = index into the model's cands) */

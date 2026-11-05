@@ -596,6 +596,21 @@ void rh_ui_key(rh_key k)
 		}
 		return;
 	}
+	if (k == RH_K_PGUP || k == RH_K_PGDN) {   /* a screenful: whole visible rows in lists (3 in Discover), view height less one text line elsewhere */
+		int dn = k == RH_K_PGDN;
+		if (is_list()) {
+			int pg = view_h() / row_p(); if (pg < 1) pg = 1;
+			CUR.sel += dn ? pg : -pg;
+			if (CUR.sel > n - 1) CUR.sel = n - 1;
+			if (CUR.sel < 0) CUR.sel = 0;
+			ensure_visible();
+		} else if (CUR.s == RH_S_DETAILS || CUR.s == RH_S_INFO || CUR.s == RH_S_CAND) {
+			CUR.scroll += dn ? view_h() - STEP : STEP - view_h();
+			if (CUR.scroll > max_scroll()) CUR.scroll = max_scroll();
+			if (CUR.scroll < 0) CUR.scroll = 0;
+		}
+		return;
+	}
 	if (k != RH_K_A) return;
 	switch (CUR.s) {
 	case RH_S_HOME: go((rh_screen[]){RH_S_DISCOVER, RH_S_INSTALLED, RH_S_UPDATES, RH_S_SETTINGS}[CUR.sel], 0, 0); break;
@@ -697,11 +712,12 @@ static void draw_action(SDL_Surface *d, rh_action act)
 	gfx_text(d, f_title, A[act].txt ? A[act].txt : blocked_why, 44, cy + (CTA_H - gfx_font_h(f_title)) / 2, tx_c);
 }
 
-/* category chip: < Games (3) >, LEFT/RIGHT change it; counts include approved apps and unapproved candidates */
+/* category chip: < Games 12/67 >, LEFT/RIGHT change it; position and total count the chosen category (approved apps and unapproved candidates); empty: < Utilities (0) > */
 static void draw_filter(SDL_Surface *d)
 {
 	char b[48]; int y = CONT_Y + 1, ty = y + (22 - gfx_font_h(f_title)) / 2;
-	snprintf(b, sizeof b, "%s (%d)", rh_cat_name((rh_cat)filt), cat_count(filt));
+	if (n_vis) snprintf(b, sizeof b, "%s %d/%d", rh_cat_name((rh_cat)filt), CUR.sel + 1, n_vis);   /* position within the chosen category */
+	else snprintf(b, sizeof b, "%s (%d)", rh_cat_name((rh_cat)filt), cat_count(filt));
 	gfx_rbox(d, 8, y, 224, 22, 4, C_LINE, C_CARD);
 	gfx_text(d, f_title, "<", 16, ty, C_ACC);
 	gfx_text(d, f_title, ">", 216, ty, C_ACC);

@@ -32,9 +32,9 @@ static void shot(const char *name)
 	SDL_SaveBMP(scr, p);
 }
 
-static void keys(const char *s)   /* u d l r a b */
+static void keys(const char *s)   /* u d l r a b; x = page up, y = page down */
 {
-	for (; *s; s++) rh_ui_key(*s == 'u' ? RH_K_UP : *s == 'd' ? RH_K_DOWN : *s == 'l' ? RH_K_LEFT : *s == 'r' ? RH_K_RIGHT : *s == 'a' ? RH_K_A : RH_K_B);
+	for (; *s; s++) rh_ui_key(*s == 'u' ? RH_K_UP : *s == 'd' ? RH_K_DOWN : *s == 'l' ? RH_K_LEFT : *s == 'r' ? RH_K_RIGHT : *s == 'a' ? RH_K_A : *s == 'x' ? RH_K_PGUP : *s == 'y' ? RH_K_PGDN : RH_K_B);
 }
 
 static int app_idx(const rh_model *m, const char *id)
@@ -413,6 +413,51 @@ static void categories(const char *root, const char *assets)
 }
 
 /* ---- FunKey wiki listings: the whole inventory, no fixed limit, all UNAPPROVED and read-only ---- */
+/* Page keys (x up, y down) and the Discover position counter, on the real catalog + the real candidate snapshot */
+static unsigned chip_hash(void)   /* the category chip row: y 37..58 */
+{
+	unsigned h = 2166136261u; int x, y;
+	for (y = 37; y < 59; y++) for (x = 8; x < 232; x++) h = (h ^ px(x, y)) * 16777619u;
+	return h;
+}
+
+static void paging(const char *root, const char *assets)
+{
+	static rh_model m; char cat[512], st[512], f[512]; rh_ui_view v; int i, n, sc, max, last = 0, steps = 0; unsigned h0;
+	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root); snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root);
+	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, f); n = m.n_apps + m.n_cands;
+	CHECK(n > 100 && rh_ui_init(assets, &m) == 0);
+	keys("a"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.count == n && v.sel == 0);
+	rh_ui_draw(scr); h0 = chip_hash(); shot("pg_1_discover_counter_1");
+	keys("y"); v = V(); CHECK(v.sel == 3 && v.sel_visible);                    /* three visible rows per press */
+	CHECK(chip_hash() != h0 || (rh_ui_draw(scr), chip_hash() != h0));         /* the counter text changed */
+	keys("yy"); CHECK(V().sel == 9); keys("x"); CHECK(V().sel == 6); keys("xxxx"); CHECK(V().sel == 0 && V().scroll == 0);   /* clamped at the start */
+	keys("x"); CHECK(V().sel == 0);
+	for (i = 0; i < 15; i++) keys("y");
+	keys("d"); v = V(); CHECK(v.sel == 46 && v.sel_visible); shot("pg_2_discover_counter_47");      /* "47/129" */
+	keys("a"); CHECK(V().screen == RH_S_CAND); keys("b"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.sel == 46 && v.sel_visible);   /* Back keeps the selection */
+	keys("y"); CHECK(V().sel == 49); keys("ll"); v = V(); CHECK(v.count < n);  /* category switch: counter now counts that category */
+	keys("rr"); CHECK(V().count == n);
+	for (; steps < 100 && V().sel != n - 1; steps++) keys("y");
+	v = V(); CHECK(v.sel == n - 1 && v.sel_visible && steps <= (n + 2) / 3); shot("pg_3_discover_counter_end");   /* clamped at the end */
+	keys("yy"); CHECK(V().sel == n - 1);
+	keys("r"); v = V(); CHECK(v.count < n && v.sel < v.count); shot("pg_4_games_counter");        /* Willy is also in Games: the selection stays on it, now counted as 67/67 */
+	for (i = 0; i < 100; i++) keys("y");
+	v = V(); CHECK(v.sel == v.count - 1 && v.sel_visible); shot("pg_5_games_counter_end");
+	for (i = 0; i < 100; i++) keys("x");
+	CHECK(V().sel == 0);
+	keys("yy"); keys("a"); v = V(); CHECK(v.screen == RH_S_CAND);   /* candidate page (Games starts with approved apps: skip them); one screen per press, clamped both ends */
+	for (i = 0; i < 200; i++) keys("d");
+	max = V().scroll; CHECK(max > 300); keys("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); CHECK(V().scroll == 0);
+	keys("y"); sc = V().scroll; CHECK(sc > 100 && sc < 177); shot("pg_6_details_page_1");
+	keys("y"); CHECK(V().scroll > sc && V().scroll > 2 * 100); shot("pg_7_details_page_2");
+	for (i = 0; i < 30; i++) { last = V().scroll; keys("y"); }
+	CHECK(V().scroll == max && last <= max); keys("x"); CHECK(V().scroll < max); shot("pg_8_details_page_back");
+	keys("b"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.sel == 6);
+	keys("b"); CHECK(V().screen == RH_S_HOME); keys("yx"); CHECK(V().screen == RH_S_HOME && V().sel == 0);   /* Home ignores the page keys */
+	rh_ui_free();
+}
+
 static void wiki_listings(const char *root, const char *assets)
 {
 	static rh_model m; char cat[512], st[512], f[512], tmp[] = "/tmp/rh_wiki_XXXXXX"; rh_ui_view v; int i, j, n_apps, n_wiki = 0, n_unver = 0, n_ver = 0, fd, last;
@@ -618,6 +663,7 @@ int main(int argc, char **argv)
 	preview(argv[1], assets);
 	candidates(argv[1], assets);
 	categories(argv[1], assets);
+	paging(argv[1], assets);
 	wiki_listings(argv[1], assets);
 	icons(argv[1], assets);
 	scenario(argv[1], assets, "populated"); scenario(argv[1], assets, "noupdates"); scenario(argv[1], assets, "empty");
