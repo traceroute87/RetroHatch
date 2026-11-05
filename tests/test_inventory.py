@@ -47,6 +47,11 @@ tf = by["tarafi"]; cat_tf = json.loads((ROOT / "catalog" / "apps" / "tarafi.json
 assert tf["status"] == "source-only" and not tf["packages"] and tf["category"] == "media" and tf["sources"][0]["url"] == cat_tf["source"]
 assert next(e for e in snap if e["id"] == "tarafi")["source"] == cat_tf["source"] and next(e for e in snap if e["id"] == "tarafi")["approval"] == "unapproved"
 
+kc = by["kishmishnano"]; cat_k = json.loads((ROOT / "catalog" / "apps" / "kishmish-nano.json").read_text(encoding="utf-8"))["artifacts"][0]
+assert kc["status"] == "listed" and kc["license"] == "MIT" and kc["category"] == "games" and kc["sources"][0]["url"] == "https://github.com/Alialhashemi23/kishmish-nano"
+assert (kc["packages"][0]["url"], kc["packages"][0]["sha256"], kc["packages"][0]["size"]) == (cat_k["url"], cat_k["sha256"], cat_k["size"]) and not kc["packages"][0]["signature"]   # copied from the catalog, no format check claimed
+ke = next(e for e in snap if e["id"] == "kishmishnano"); assert ke["approval"] == "unapproved" and ke["hardware_test"] == "none" and ke["package"]["signature"] == "" and "sha256" not in ke["package"]
+
 # ---- cores, support files and system add-ons are distinguished; source-only and unverified are labeled ----
 kinds = {a["id"]: a["kind"] for a in apps}
 assert kinds["gambattesdlretrocore"] == kinds["vicesdlretrocore"] == "core" and kinds["gmenu2x"] == "system"
@@ -71,7 +76,7 @@ assert sorted(a["packages"][0]["name"] for a in b32) == sorted(m[0] for m in g) 
 assert all(a["status"] == "package-verified" and a["license"] == "unknown" and a["category"] == "games" and "sha256" not in a["packages"][0] for a in b32)
 assert all((a["packages"][0]["container_name"], a["packages"][0]["container_size"], a["packages"][0]["size"]) == (m[2], m[3], m[1]) for a in b32 for m in g if m[0] == a["packages"][0]["name"])
 assert all(a["packages"][0]["url"].endswith("/releases/download/v1.0/" + a["packages"][0]["container_name"]) and a["packages"][0]["mirrors"][0].split("/releases/")[1].startswith("latest/download/") for a in b32)
-assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 128
+assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 129
 pc = col["picoarch-cores"]
 assert len(pc["members"]) == 29 and sum(m[2] == "squashfs" for m in pc["members"]) == 11 and pc["frontend"][0] == "picoarch.opk" and len(pc["containers"]) == 2
 assert len(pe["crawl_only"]["members"]) == 11 and all(m[2].startswith("https://") for m in pe["crawl_only"]["members"])

@@ -426,9 +426,11 @@ static void paging(const char *root, const char *assets)
 	static rh_model m; char cat[512], st[512], f[512]; rh_ui_view v; int i, n, sc, max, last = 0, steps = 0; unsigned h0;
 	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root); snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root);
 	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, f); n = m.n_apps + m.n_cands;
-	CHECK(find_cand(&m, "TaraFi") < 0 && n == 129);                            /* with the catalog loaded, its TaraFi row replaces the TaraFi candidate (same source URL) */
+	CHECK(find_cand(&m, "TaraFi") < 0 && find_cand(&m, "Kishmish Nano") < 0 && n == 129);   /* with the catalog loaded, its TaraFi and Kishmish rows replace the candidates (same source URL) */
+	{ int a, k = 0; for (a = 0; a < m.n_apps; a++) k += !strcmp(m.apps[a].name, "TaraFi") || !strcmp(m.apps[a].name, "Kishmish Nano"); CHECK(k == 2); }
 	{ static rh_model b; snprintf(cat, sizeof cat, "%s/tests/ui_fixture/no-such-catalog", root); rh_model_load(&b, cat, st); rh_model_load_candidates(&b, f);   /* the Nano today: no signed catalog */
-	  CHECK(b.n_apps == 0 && b.n_cands == 128 && find_cand(&b, "TaraFi") >= 0 && b.cands[find_cand(&b, "TaraFi")].cat == RH_CAT_MEDIA); }
+	  CHECK(b.n_apps == 0 && b.n_cands == 129 && find_cand(&b, "TaraFi") >= 0 && b.cands[find_cand(&b, "TaraFi")].cat == RH_CAT_MEDIA
+	        && find_cand(&b, "Kishmish Nano") >= 0 && b.cands[find_cand(&b, "Kishmish Nano")].cat == RH_CAT_GAMES && !b.cands[find_cand(&b, "Kishmish Nano")].sig_ok); }
 	snprintf(cat, sizeof cat, "%s/catalog", root);
 	CHECK(n > 100 && rh_ui_init(assets, &m) == 0);
 	keys("a"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.count == n && v.sel == 0);

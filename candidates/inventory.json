@@ -653,6 +653,47 @@
    }
   },
   {
+   "id": "kishmishnano",
+   "name": "Kishmish Nano",
+   "kind": "app",
+   "status": "listed",
+   "description": "A tiny Siamese virtual pet. Feed him, pet him, nap, play the star minigame. By Alialhashemi23.",
+   "topics": [],
+   "version": "0.1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "catalog/apps/kishmish-nano.json: artifact for device rg-nano, firmware funkeyos-drum78 (the author reports a stock Anbernic RG Nano firmware)",
+    "where": "catalog"
+   },
+   "category": "games",
+   "category_basis": "catalog/apps/kishmish-nano.json description: virtual pet with a minigame",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/Alialhashemi23/kishmish-nano"
+    }
+   ],
+   "packages": [
+    {
+     "name": "kishmish-nano.opk",
+     "url": "https://github.com/Alialhashemi23/kishmish-nano/releases/download/v0.1.0/kishmish-nano.opk",
+     "size": 692224,
+     "sha256": "3dfa9fa77242d46743611c5f281fca0e3df40a481b86e857dac13c932abae2f9",
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "catalog"
+    }
+   ],
+   "notes": "Also a catalog entry (status unavailable, compatibility untested). URL, size and SHA-256 are copied from that entry; the format check and the hardware test are NOT claimed here (docs/KISHMISH_REVIEW.md has the static review; it needs a test on this firmware). When a signed catalog lists it, that row replaces this one: the browser skips a candidate whose source URL equals a catalog entry's.",
+   "evidence": {
+    "catalog": "catalog/apps/kishmish-nano.json",
+    "review": "docs/KISHMISH_REVIEW.md"
+   }
+  },
+  {
    "id": "3doh",
    "name": "3DOh",
    "kind": "app",
