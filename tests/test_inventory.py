@@ -57,6 +57,18 @@ assert {a["status"] for a in apps} == set(M.STATUS)
 lim = {l["id"]: l["note"] for l in inv["known_limits"]}
 assert "41921300975" in lim["wiki-index-actions-run"] and "actions/runs/41921300975" in lim["wiki-index-actions-run"] and "collections" in lim
 
+# ---- raw package identities kept from the (git-ignored) crawls: never snapshot data, never applications, never hashed ----
+pe = inv["package_evidence"]; col = {c["id"]: c for c in pe["collections"]}
+g = col["32blit_funkey"]["members"]
+assert len(g) == 43 and len({m[0] for m in g}) == 43 and all(m[2].endswith(".zip") and m[1] > 0 and m[3] > 0 for m in g)
+assert not any("32blit_funkey" in s["url"] for a in apps for s in a["sources"])                                  # the 43 games are not itemized yet
+pc = col["picoarch-cores"]
+assert len(pc["members"]) == 29 and sum(m[2] == "squashfs" for m in pc["members"]) == 11 and pc["frontend"][0] == "picoarch.opk" and len(pc["containers"]) == 2
+assert len(pe["crawl_only"]["members"]) == 11 and all(m[2].startswith("https://") for m in pe["crawl_only"]["members"])
+assert "sha256" not in json.dumps(pe["collections"] + [pe["crawl_only"]])                                              # nothing was hashed: no hash is claimed
+assert "picoarch-bluemsx" not in snap_text and "match3" not in snap_text                                               # absent from the browser snapshot
+assert len(pe["collections"]) == 2 and sum(a["kind"] == "app" and "picoarch" in a["id"] for a in apps) == 1                  # cores stay grouped: one picoarch application
+
 # ---- package identity matches the raw metadata evidence it cites ----
 rec = {r["id"]: r for r in json.loads((ROOT / "discovery" / "opk-metadata-evidence.json").read_text(encoding="utf-8"))["records"]}
 n_checked = 0

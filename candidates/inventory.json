@@ -13,7 +13,7 @@
   },
   {
    "id": "collections",
-   "note": "Only the collection members with tracked per-item evidence are itemized (funkey_sdl2_games: 7). The 43 games of joyrider3774/32blit_funkey and the 29 picoarch core launchers are known from untracked crawl results and are not listed. BEFORE IMPORT: that evidence lives only under the git-ignored build/crawl*/ directories (per-game names, ZIP members, sizes, tag URLs). Copy it into a tracked file first, or it is lost with the build directory."
+   "note": "Only the collection members with tracked per-item evidence are itemized as applications (funkey_sdl2_games: 7). The 43 games of joyrider3774/32blit_funkey and the 29 picoarch core OPKs are NOT applications yet: their package identities (names, sizes, ZIP names, URL forms) are preserved in package_evidence. Still missing for them: sha256 (never hashed, needs a download), per-game licence/upstream, and per-game hardware tests."
   },
   {
    "id": "audit-entries",
@@ -24,6 +24,127 @@
    "note": "System add-ons named in the audit (SimpleMenu for RG Nano, FunKey Add-on, AdvanceMAME bundle) have no tracked URL and are not listed."
   }
  ],
+ "package_evidence": {
+  "note": "Raw package identities from the 2026-10-26 crawls, kept here because build/ is git-ignored. NOT applications and NOT in the snapshot: this section is never read by tools/make_inventory.py. Sizes are bytes as reported by the server (Range reads); the crawler did not hash these files, so NO sha256 exists for any row below. A hash needs a download, which is deliberately not done here. Import = turn a row into an `applications` entry (one per game / one per core group) and compute the hash then.",
+  "collections": [
+   {
+    "id": "32blit_funkey",
+    "source": "https://github.com/joyrider3774/32blit_funkey",
+    "claim": "README: 32blit Games Collection for Funkey-S / RG-Nano; topics rg-nano, rgnano. Port repository: each game's upstream licence is not checked (repository licence MIT).",
+    "crawl": "build/crawl-full and build/crawl (2026-10-26, identical rows)",
+    "url_forms": {"latest": "https://github.com/joyrider3774/32blit_funkey/releases/latest/download/<zip>", "tag": "https://github.com/joyrider3774/32blit_funkey/releases/download/v1.0/<zip>"},
+    "note": "43 distinct games, each a ZIP of exactly 1 entry (1 OPK, squashfs signature read). Both URL forms were seen for every game with identical sizes; the `latest` alias is not pinned, prefer the tag form. Not itemized as applications yet.",
+    "columns": ["opk", "opk_size", "zip", "zip_size"],
+    "members": [
+     ["2048.opk", 18771968, "2048.-.32blit.-.Funkey-s.zip", 18671016],
+     ["32blox.opk", 18939904, "32blox.-.32blit.-.Funkey-s.zip", 18841748],
+     ["4inrow.opk", 18747392, "4inrow.-.32blit.-.Funkey-s.zip", 18646830],
+     ["alienattack.opk", 18743296, "alienattack.-.32blit.-.Funkey-s.zip", 18644767],
+     ["amaze.opk", 18780160, "amaze.-.32blit.-.Funkey-s.zip", 18681061],
+     ["armadillo.opk", 20054016, "armadillo.-.32blit.-.Funkey-s.zip", 19955812],
+     ["asteroids.opk", 18755584, "asteroids.-.32blit.-.Funkey-s.zip", 18655739],
+     ["blit-kart.opk", 18817024, "blit-kart.-.32blit.-.Funkey-s.zip", 18717170],
+     ["blit-racers.opk", 18784256, "blit-racers.-.32blit.-.Funkey-s.zip", 18682936],
+     ["bounce.opk", 18747392, "bounce.-.32blit.-.Funkey-s.zip", 18649152],
+     ["cannonhead.opk", 18755584, "cannonhead.-.32blit.-.Funkey-s.zip", 18656393],
+     ["carsprint.opk", 20373504, "carsprint.-.32blit.-.Funkey-s.zip", 20270992],
+     ["castle.opk", 18751488, "castle.-.32blit.-.Funkey-s.zip", 18651206],
+     ["dino.opk", 18747392, "dino.-.32blit.-.Funkey-s.zip", 18648907],
+     ["dodgeem.opk", 18751488, "dodgeem.-.32blit.-.Funkey-s.zip", 18652598],
+     ["dots.opk", 18759680, "dots.-.32blit.-.Funkey-s.zip", 18661277],
+     ["dune2.opk", 20373504, "dune2.-.32blit.-.Funkey-s.zip", 20270920],
+     ["fourblock-descent.opk", 18755584, "fourblock-descent.-.32blit.-.Funkey-s.zip", 18657167],
+     ["geometry.opk", 22556672, "geometry.-.32blit.-.Funkey-s.zip", 22454247],
+     ["gol.opk", 18743296, "gol.-.32blit.-.Funkey-s.zip", 18646492],
+     ["harry.opk", 18759680, "harry.-.32blit.-.Funkey-s.zip", 18659099],
+     ["indy.opk", 18743296, "indy.-.32blit.-.Funkey-s.zip", 18642450],
+     ["invader.opk", 18755584, "invader.-.32blit.-.Funkey-s.zip", 18653874],
+     ["jetpac.opk", 20373504, "jetpac.-.32blit.-.Funkey-s.zip", 20270837],
+     ["Jumpy-Squirrel.opk", 18751488, "Jumpy-Squirrel.-.32blit.-.Funkey-s.zip", 18650571],
+     ["knightlore.opk", 20373504, "knightlore.-.32blit.-.Funkey-s.zip", 20270559],
+     ["match3.opk", 18763776, "match3.-.32blit.-.Funkey-s.zip", 18665537],
+     ["minesweeper.opk", 18751488, "minesweeper.-.32blit.-.Funkey-s.zip", 18651854],
+     ["missile.opk", 18751488, "missile.-.32blit.-.Funkey-s.zip", 18652529],
+     ["Ping.opk", 18743296, "Ping.-.32blit.-.Funkey-s.zip", 18644851],
+     ["raycaster.opk", 22556672, "raycaster.-.32blit.-.Funkey-s.zip", 22454328],
+     ["rocks-and-diamonds.opk", 18751488, "rocks-and-diamonds.-.32blit.-.Funkey-s.zip", 18652937],
+     ["scrolly-tile.opk", 22556672, "scrolly-tile.-.32blit.-.Funkey-s.zip", 22454369],
+     ["simon.opk", 18747392, "simon.-.32blit.-.Funkey-s.zip", 18647692],
+     ["Snake.opk", 18743296, "Snake.-.32blit.-.Funkey-s.zip", 18645078],
+     ["snake2.opk", 18771968, "snake2.-.32blit.-.Funkey-s.zip", 18670405],
+     ["sokoblit.opk", 18755584, "sokoblit.-.32blit.-.Funkey-s.zip", 18656497],
+     ["Solitaire.opk", 18751488, "Solitaire.-.32blit.-.Funkey-s.zip", 18653625],
+     ["Super-Square-Bros.opk", 18878464, "Super-Square-Bros.-.32blit.-.Funkey-s.zip", 18778045],
+     ["tower.opk", 18747392, "tower.-.32blit.-.Funkey-s.zip", 18647648],
+     ["TowerDefense.opk", 18763776, "TowerDefense.-.32blit.-.Funkey-s.zip", 18663413],
+     ["wakkawakka.opk", 20377600, "wakkawakka.-.32blit.-.Funkey-s.zip", 20274119],
+     ["willy.opk", 20373504, "willy.-.32blit.-.Funkey-s.zip", 20271190]
+    ]
+   },
+   {
+    "id": "picoarch-cores",
+    "source": "https://github.com/sdhizumi/picoarch",
+    "release": "build-231226",
+    "claim": "repository description: Build for FunKey-OS (I only tested with RG Nano)",
+    "crawl": "build/crawl-full and build/crawl (2026-10-26, identical rows)",
+    "containers": [
+     {"url": "https://github.com/sdhizumi/picoarch/releases/download/build-231226/cores-funkey-s.zip", "size": 57041066, "entries": 29, "opks": 0},
+     {"url": "https://github.com/sdhizumi/picoarch/releases/download/build-231226/picoarch-funkey-s.zip", "size": 114809160, "entries": 30, "opks": 30}
+    ],
+    "note": "Emulator cores of the one `picoarch` application (the frontend picoarch.opk is already the `picoarch` entry). Group as cores: never count them as standalone apps. 29 core OPKs sit in picoarch-funkey-s.zip (30 entries = frontend + 29); cores-funkey-s.zip holds 29 entries and no OPK. squashfs signature read for the frontend and 11 cores only; the other 18 are `unread` (ZIP member read limit), not failures.",
+    "frontend": ["picoarch.opk", 57540608, "squashfs"],
+    "columns": ["opk", "opk_size", "signature"],
+    "members": [
+     ["picoarch-beetle-pce-fast.opk", 536576, "squashfs"],
+     ["picoarch-bluemsx.opk", 778240, "squashfs"],
+     ["picoarch-dosbox-pure.opk", 1400832, "unread"],
+     ["picoarch-fake-08.opk", 466944, "unread"],
+     ["picoarch-fbalpha2012.opk", 4636672, "unread"],
+     ["picoarch-fceumm.opk", 577536, "squashfs"],
+     ["picoarch-fmsx.opk", 212992, "squashfs"],
+     ["picoarch-gambatte.opk", 417792, "squashfs"],
+     ["picoarch-gme.opk", 352256, "squashfs"],
+     ["picoarch-gpsp.opk", 344064, "squashfs"],
+     ["picoarch-mame2000.opk", 3657728, "squashfs"],
+     ["picoarch-mame2003_plus.opk", 8794112, "unread"],
+     ["picoarch-mednafen_ngp.opk", 208896, "squashfs"],
+     ["picoarch-mednafen_wswan.opk", 225280, "squashfs"],
+     ["picoarch-mgba.opk", 516096, "unread"],
+     ["picoarch-pcsx_rearmed.opk", 585728, "squashfs"],
+     ["picoarch-picodrive.opk", 704512, "unread"],
+     ["picoarch-pokemini.opk", 217088, "unread"],
+     ["picoarch-prboom.opk", 618496, "unread"],
+     ["picoarch-quicknes.opk", 241664, "unread"],
+     ["picoarch-scummvm.opk", 31494144, "unread"],
+     ["picoarch-smsplus-gx.opk", 184320, "unread"],
+     ["picoarch-snes9x2002.opk", 397312, "unread"],
+     ["picoarch-snes9x2005.opk", 344064, "unread"],
+     ["picoarch-snes9x2005_plus.opk", 323584, "unread"],
+     ["picoarch-snes9x2010.opk", 638976, "unread"],
+     ["picoarch-stella2014.opk", 540672, "unread"],
+     ["picoarch-tyrquake.opk", 516096, "unread"],
+     ["picoarch-vba_next.opk", 364544, "unread"]
+    ]
+   }
+  ],
+  "crawl_only": {
+   "note": "Packages seen only in the older crawl (build/crawl). Platform or role mismatch, so none is a candidate; kept so they are not researched again. tyrquake and vitaquake2 are the two inventory entries still marked unverified: the rows here are their packages (squashfs signature read, FunKey-S file names).",
+   "columns": ["name", "size", "url", "reading"],
+   "members": [
+    ["PocketSNES_gcw0.opk", 290816, "https://github.com/DrUm78/PocketSNES/releases/download/psnes_gcw0/PocketSNES_gcw0.opk", "GCW0/RG350 build, platform mismatch"],
+    ["SDLQuake2_gcw0.opk", 37076992, "https://github.com/DrUm78/SDLQuake2/releases/download/virtual_kbd/SDLQuake2_gcw0.opk", "GCW0/RG350 build, platform mismatch"],
+    ["eduke32_gcw0.opk", 7688192, "https://github.com/DrUm78/eduke32/releases/download/eduke32_gcw0/eduke32_gcw0.opk", "GCW0/RG350 build, platform mismatch"],
+    ["tyrquake_v0.62_funkey-s.opk", 372736, "https://github.com/DrUm78/tyrquake/releases/download/v0.62-funkey-s/tyrquake_v0.62_funkey-s.opk", "FunKey-S build, unlicensed, not inspected beyond signature"],
+    ["vitaquake2_v2.3_funkey-s.opk", 634880, "https://github.com/DrUm78/vitaquake2/releases/download/v2.3-funkey-s/vitaquake2_v2.3_funkey-s.opk", "FunKey-S build, unlicensed, not inspected beyond signature"],
+    ["recovery.opk", 4096, "https://github.com/Ninoh-FOX/RG350-ROGUE-CFW/releases/download/1.7.15/recovery.opk", "RG350 firmware or recovery package, never install"],
+    ["rg350-update-1.7.15-2021-08-14.opk", 87707648, "https://github.com/Ninoh-FOX/RG350-ROGUE-CFW/releases/download/1.7.15/rg350-update-1.7.15-2021-08-14.opk", "RG350 firmware or recovery package, never install"],
+    ["rg350m-update-1.7.15-2021-08-14.opk", 87707648, "https://github.com/Ninoh-FOX/RG350-ROGUE-CFW/releases/download/1.7.15/rg350m-update-1.7.15-2021-08-14.opk", "RG350 firmware or recovery package, never install"],
+    ["rg350p-update-1.7.15-2021-08-14.opk", 87707648, "https://github.com/Ninoh-FOX/RG350-ROGUE-CFW/releases/download/1.7.15/rg350p-update-1.7.15-2021-08-14.opk", "RG350 firmware or recovery package, never install"],
+    ["SimpleMenu-RFW.opk", 5185536, "https://github.com/fgl82/simplemenu/releases/download/10.3.1/SimpleMenu-RFW.opk", "RG350 firmware launcher (SimpleMenu-RFW)"],
+    ["NanoCraftDiag_funkey-s.opk", 634880, "https://github.com/DankMiimer/nanocraft/releases/download/v1.0.13/NanoCraftDiag_funkey-s.opk", "NanoCraft diagnostic helper, not an application (also in crawl-full)"]
+   ]
+  }
+ },
  "applications": [
   {
    "id": "j2mefunkeyrgnano",
