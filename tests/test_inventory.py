@@ -52,6 +52,20 @@ assert kc["status"] == "listed" and kc["license"] == "MIT" and kc["category"] ==
 assert (kc["packages"][0]["url"], kc["packages"][0]["sha256"], kc["packages"][0]["size"]) == (cat_k["url"], cat_k["sha256"], cat_k["size"]) and not kc["packages"][0]["signature"]   # copied from the catalog, no format check claimed
 ke = next(e for e in snap if e["id"] == "kishmishnano"); assert ke["approval"] == "unapproved" and ke["hardware_test"] == "none" and ke["package"]["signature"] == "" and "sha256" not in ke["package"]
 
+rb = by["rockbox"]; re_ = next(e for e in snap if e["id"] == "rockbox")
+assert rb["status"] == "unverified" and rb["category"] == "media" and rb["license"] == "unknown" and rb["version"] == "" and not rb["packages"][0]["signature"]
+assert "sha256" not in rb["packages"][0] and "size" not in rb["packages"][0] and rb["packages"][0]["member"] == "Applications/rockbox_funkey-s.opk" and rb["packages"][0]["container"] == "zip"
+assert re_["source"] == "https://gitlab.com/hairo/rockbox" and re_["package"]["url"] == "https://build.rockbox.org/data/rockbox-rgnano.zip" and re_["package"]["signature"] == "" and re_["approval"] == "unapproved"
+assert any(l["id"] == "rockbox-evidence" for l in inv["known_limits"]) and "rockbox-mt" not in by          # the fork is a different project and stays out
+
+# ---- descriptions: every browser entry has a real one, with its source recorded where it was recovered; the crawler's own limits never reach the screen ----
+import re
+assert all(a["description"] for a in browser) and not any(re.search(r"no description|not saved|wiki text|was not recorded|no description text", a["description"], re.I) for a in browser)
+g32 = [a for a in apps if any(x["url"] == "https://github.com/joyrider3774/32blit_funkey" for x in a["sources"])]
+assert len(g32) == 43 and all(a.get("description_source") and len(a["sources"]) == 2 and not a["sources"][1].get("primary", True) for a in g32)   # 32blit games: author text + the original game project
+assert sum(bool(a.get("description_source")) for a in browser) >= 71
+assert all(a["category"] == "games" for a in apps if a["id"] in ("dinothawr", "dividead", "heboris", "ncrafti", "srb2", "stk", "worshipvector"))   # wiki genre column
+
 # ---- cores, support files and system add-ons are distinguished; source-only and unverified are labeled ----
 kinds = {a["id"]: a["kind"] for a in apps}
 assert kinds["gambattesdlretrocore"] == kinds["vicesdlretrocore"] == "core" and kinds["gmenu2x"] == "system"
@@ -76,7 +90,7 @@ assert sorted(a["packages"][0]["name"] for a in b32) == sorted(m[0] for m in g) 
 assert all(a["status"] == "package-verified" and a["license"] == "unknown" and a["category"] == "games" and "sha256" not in a["packages"][0] for a in b32)
 assert all((a["packages"][0]["container_name"], a["packages"][0]["container_size"], a["packages"][0]["size"]) == (m[2], m[3], m[1]) for a in b32 for m in g if m[0] == a["packages"][0]["name"])
 assert all(a["packages"][0]["url"].endswith("/releases/download/v1.0/" + a["packages"][0]["container_name"]) and a["packages"][0]["mirrors"][0].split("/releases/")[1].startswith("latest/download/") for a in b32)
-assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 129
+assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 130
 pc = col["picoarch-cores"]
 assert len(pc["members"]) == 29 and sum(m[2] == "squashfs" for m in pc["members"]) == 11 and pc["frontend"][0] == "picoarch.opk" and len(pc["containers"]) == 2
 assert len(pe["crawl_only"]["members"]) == 11 and all(m[2].startswith("https://") for m in pe["crawl_only"]["members"])

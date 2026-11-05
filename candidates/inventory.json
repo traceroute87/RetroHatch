@@ -9,11 +9,15 @@
   },
   {
    "id": "wiki-text",
-   "note": "The wiki page text was never saved, only its links: wiki headings and descriptions are not recorded, and categories of wiki-only rows come from the file name."
+   "note": "The wiki page text was not saved by the crawlers. On 2026-11-05 one raw copy of the page was read to recover descriptions, systems and genres for the entries whose description_source says so; headings of other wiki-only rows are still not recorded and their categories come from the file name."
   },
   {
    "id": "collections",
    "note": "Only the collection members with tracked per-item evidence are itemized as applications (funkey_sdl2_games: 7). The 43 games of joyrider3774/32blit_funkey are itemized (one application each, from package_evidence). The 29 picoarch core OPKs are NOT applications: they stay grouped under picoarch (package_evidence). Still missing for the 43 games: sha256 (never hashed, needs a download), per-game licence/upstream and description, and hardware tests."
+  },
+  {
+   "id": "rockbox-evidence",
+   "note": "Rockbox (gitlab.com/hairo/rockbox, build.rockbox.org/data/rockbox-rgnano.zip, member Applications/rockbox_funkey-s.opk) comes from a maintainer report of a crawler run, not from a tracked crawl result: that run's output is not in this repository. The ZIP was reported as changed, so its contents are unverified. Keep the run output with any future import."
   },
   {
    "id": "audit-entries",
@@ -473,7 +477,8 @@
    "name": "meleelight",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "C port of meleelight, a browser remake of Super Smash Bros. Melee, for the FunKey S.",
+   "description_source": "README of github.com/chasemcdizzle/meleelight-funkey-s (first paragraph), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0.1",
    "license": "NOASSERTION",
@@ -694,11 +699,54 @@
    }
   },
   {
+   "id": "rockbox",
+   "name": "Rockbox",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Rockbox audio player firmware for the RG Nano.",
+   "description_source": "maintainer report (package rockbox-rgnano.zip) and the Rockbox RG Nano manual cited by the rockbox-mt README; no description text is recorded",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "package named rockbox-rgnano.zip containing rockbox_funkey-s.opk (maintainer-reported crawler result)",
+    "where": "report"
+   },
+   "category": "media",
+   "category_basis": "maintainer-reported: Rockbox is an audio player; no description cached",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://gitlab.com/hairo/rockbox"
+    }
+   ],
+   "packages": [
+    {
+     "name": "rockbox_funkey-s.opk",
+     "url": "https://build.rockbox.org/data/rockbox-rgnano.zip",
+     "format": "opk",
+     "signature": "",
+     "container": "zip",
+     "from": "report",
+     "container_name": "rockbox-rgnano.zip",
+     "member": "Applications/rockbox_funkey-s.opk"
+    }
+   ],
+   "notes": "Reported by the maintainer from the latest crawler run, which flagged the ZIP as CHANGED. No tracked crawl result, lead or hash exists for it, so the file was not inspected and no size, hash, version, licence or compatibility is claimed. The ZIP is rebuilt by the Rockbox build server, so any recorded hash would go stale. Not to be confused with djhardrich/rockbox-mt (a fork, source only, in the crawl results).",
+   "evidence": {
+    "report": "maintainer message 2026-11-05 (crawler run result; not in tracked files)",
+    "manual": "https://download.rockbox.org/manual/rockbox-rgnano.pdf, cited by the rockbox-mt README in build/discovery"
+   }
+  },
+  {
    "id": "3doh",
    "name": "3DOh",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "3DO emulator. Needs bios.bin.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table (system, BIOS) and the OPK .desktop Comment in discovery/opk-metadata-evidence.json (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V1",
    "license": "unknown",
@@ -860,7 +908,8 @@
    "name": "Clock App",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Sets the system time for RTC functionality.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Applications table (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -961,7 +1010,8 @@
    "name": "Dinothawr",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "Puzzle game. Needs the separate game files.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Games table (genre: Puzzle, data files link) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V2",
    "license": "unknown",
@@ -972,7 +1022,7 @@
     "where": "wiki"
    },
    "category": "games",
-   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "category_basis": "FunKey wiki games table, genre column: Puzzle",
    "sources": [
     {
      "type": "wiki",
@@ -1012,7 +1062,8 @@
    "name": "Dividead",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Visual novel game.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Games table (Divi-Dead, genre: Visual Novel) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -1022,8 +1073,8 @@
     "text": "Listed on the FunKey wiki page of third-party OPK applications",
     "where": "wiki"
    },
-   "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category": "games",
+   "category_basis": "FunKey wiki games table, genre column: Visual Novel",
    "sources": [
     {
      "type": "wiki",
@@ -1055,7 +1106,8 @@
    "name": "DOSBox Pure",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "DOS emulator.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table (system) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V1",
    "license": "unknown",
@@ -1102,7 +1154,8 @@
    "name": "EasyRPG",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "Runs games made with RPG Maker 2000 and RPG Maker 2003.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Applications table (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -1209,7 +1262,8 @@
    "name": "FinalBurn Alpha 2012",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "FinalBurn Alpha 2012 emulator for several systems.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table (system: Multiple) and the OPK .desktop Comment (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V3",
    "license": "unknown",
@@ -1266,7 +1320,8 @@
    "name": "FinalBurn Neo",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "FinalBurn Neo emulator for Libretro.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table and the OPK .desktop Comment in discovery/opk-metadata-evidence.json (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V1",
    "license": "unknown",
@@ -1378,7 +1433,8 @@
    "name": "Gambatte",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "Game Boy and Game Boy Color emulator.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table (system: GB, GBC) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V4",
    "license": "unknown",
@@ -1425,7 +1481,8 @@
    "name": "Gambatte (SDL Retro core)",
    "kind": "core",
    "status": "listed",
-   "description": "",
+   "description": "Game Boy and Game Boy Color core for the SDL Retro frontend.",
+   "description_source": "FunKey wiki list of third-party OPK applications, SDL Retro table (core: Gambatte, system: GB, GBC) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -1468,7 +1525,8 @@
    "name": "Game Music Emu",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "Music player that emulates the audio of several retro systems.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Applications table (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V2",
    "license": "unknown",
@@ -1577,7 +1635,8 @@
    "name": "GMenu2X",
    "kind": "system",
    "status": "listed",
-   "description": "",
+   "description": "GMenu2X audio fix: turns off the audio amplifier in the menu to stop a buzzing sound.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Applications table (Gmenu2x Audio Fix) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -1680,7 +1739,8 @@
    "name": "Heboris",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Puzzle game.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Games table (genre: Puzzle) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -1690,8 +1750,8 @@
     "text": "Listed on the FunKey wiki page of third-party OPK applications",
     "where": "wiki"
    },
-   "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category": "games",
+   "category_basis": "FunKey wiki games table, genre column: Puzzle",
    "sources": [
     {
      "type": "wiki",
@@ -1723,7 +1783,8 @@
    "name": "KeyKalc",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Graphing calculator program.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Applications table (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -1820,7 +1881,8 @@
    "name": "MAME 2000",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "MAME 0.37b5 emulator for several systems.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table (system: Multiple) and the OPK .desktop Comment (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V3",
    "license": "unknown",
@@ -1979,7 +2041,8 @@
    "name": "NCrafti",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Sandbox game.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Games table (Crafti, genre: Sandbox; its link is ncrafti_funkey-s.opk) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -1989,8 +2052,8 @@
     "text": "Listed on the FunKey wiki page of third-party OPK applications",
     "where": "wiki"
    },
-   "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category": "games",
+   "category_basis": "FunKey wiki games table, genre column: Sandbox",
    "sources": [
     {
      "type": "wiki",
@@ -2025,7 +2088,8 @@
    "name": "PC-FX Emu",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "PC-FX emulator. Needs pcfx.rom.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table (system, BIOS) and the OPK .desktop Comment (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -2077,7 +2141,8 @@
    "name": "PCSX ReARMed",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "PlayStation emulator. Needs the BIOS file SCPH1001.BIN.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Emulators table (system, BIOS) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V2",
    "license": "unknown",
@@ -2237,7 +2302,8 @@
    "name": "Pocket CDG",
    "kind": "app",
    "status": "package-verified",
-   "description": "",
+   "description": "Karaoke and MP3 music player. Needs a matching MP3 and CDG file for each song.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Applications table (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "V1",
    "license": "unknown",
@@ -2511,7 +2577,8 @@
    "name": "SRB2",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Platform game: Sonic Robo Blast 2.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Games table (genre: Platformer) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -2521,8 +2588,8 @@
     "text": "Listed on the FunKey wiki page of third-party OPK applications",
     "where": "wiki"
    },
-   "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category": "games",
+   "category_basis": "FunKey wiki games table, genre column: Platformer",
    "sources": [
     {
      "type": "wiki",
@@ -2554,7 +2621,8 @@
    "name": "ST",
    "kind": "app",
    "status": "package-verified",
-   "description": "ST Terminal",
+   "description": "Linux terminal program.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Applications table (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -2615,7 +2683,8 @@
    "name": "STK",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Racing game: SuperTuxKart.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Games table (Supertuxkart, genre: Racing; its link is stk_funkey-s.opk) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -2625,8 +2694,8 @@
     "text": "Listed on the FunKey wiki page of third-party OPK applications",
     "where": "wiki"
    },
-   "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category": "games",
+   "category_basis": "FunKey wiki games table, genre column: Racing",
    "sources": [
     {
      "type": "wiki",
@@ -2823,7 +2892,8 @@
    "name": "VICE (SDL Retro core)",
    "kind": "core",
    "status": "listed",
-   "description": "",
+   "description": "Commodore 64 core for the SDL Retro frontend.",
+   "description_source": "FunKey wiki list of third-party OPK applications, SDL Retro table (core: VICE, system: Commodore 64) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -2866,7 +2936,8 @@
    "name": "Worship Vector",
    "kind": "app",
    "status": "listed",
-   "description": "",
+   "description": "Tower defense game.",
+   "description_source": "FunKey wiki list of third-party OPK applications, Games table (genre: Tower Defense) (raw page fetched 2026-11-05)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -2876,8 +2947,8 @@
     "text": "Listed on the FunKey wiki page of third-party OPK applications",
     "where": "wiki"
    },
-   "category": "other",
-   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "category": "games",
+   "category_basis": "FunKey wiki games table, genre column: Tower Defense",
    "sources": [
     {
      "type": "wiki",
@@ -3822,7 +3893,8 @@
    "name": "Bibi",
    "kind": "app",
    "status": "source-only",
-   "description": "Bomberman clone readapted for the FunKey S. A 2021 release tag has no files.",
+   "description": "Bomberman clone readapted for the FunKey S.",
+   "description_source": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02); the same note says a 2021 release tag has no files",
    "topics": [],
    "version": "",
    "license": "LGPL-2.1",
@@ -3850,7 +3922,8 @@
    "name": "4 Gewinnt",
    "kind": "app",
    "status": "source-only",
-   "description": "Connect 4 game in the RGNano organisation; no description.",
+   "description": "Connect 4 game from the RGNano organisation.",
+   "description_source": "existing crawl evidence (the repository has no description)",
    "topics": [],
    "version": "",
    "license": "unknown",
@@ -4052,7 +4125,8 @@
    "name": "2048",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ArtemHarkusha, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4068,6 +4142,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ArtemHarkusha/32blit-2048",
+     "primary": false,
+     "note": "original game project (author ArtemHarkusha)"
     }
    ],
    "packages": [
@@ -4097,7 +4177,8 @@
    "name": "32blox",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ahnlak-blit32, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4113,6 +4194,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ahnlak-blit32/32blox",
+     "primary": false,
+     "note": "original game project (author ahnlak-blit32)"
     }
    ],
    "packages": [
@@ -4142,7 +4229,8 @@
    "name": "4inrow",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4158,6 +4246,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-4_in_a_row",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4187,7 +4281,8 @@
    "name": "Alienattack",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4203,6 +4298,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-AlienAttack",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4232,7 +4333,8 @@
    "name": "Amaze",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by andreban, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4248,6 +4350,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/andreban/32blit-a-maze",
+     "primary": false,
+     "note": "original game project (author andreban)"
     }
    ],
    "packages": [
@@ -4277,7 +4385,8 @@
    "name": "Armadillo",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by felipemanga, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4293,6 +4402,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/felipemanga/Armadillo32Blit",
+     "primary": false,
+     "note": "original game project (author felipemanga)"
     }
    ],
    "packages": [
@@ -4322,7 +4437,8 @@
    "name": "Asteroids",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4338,6 +4454,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Asteroids",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4367,7 +4489,8 @@
    "name": "Blit Kart",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by Daft-Freak, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4383,6 +4506,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/Daft-Freak/super-blit-kart",
+     "primary": false,
+     "note": "original game project (author Daft-Freak)"
     }
    ],
    "packages": [
@@ -4412,7 +4541,8 @@
    "name": "Blit Racers",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by shane-powell, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4428,6 +4558,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/shane-powell/blit-racers",
+     "primary": false,
+     "note": "original game project (author shane-powell)"
     }
    ],
    "packages": [
@@ -4457,7 +4593,8 @@
    "name": "Bounce",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4473,6 +4610,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Bounce",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4502,7 +4645,8 @@
    "name": "Cannonhead",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4518,6 +4662,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Cannonhead",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4547,7 +4697,8 @@
    "name": "Carsprint",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by mikerr, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4563,6 +4714,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/mikerr/32blit-games",
+     "primary": false,
+     "note": "original game project (author mikerr)"
     }
    ],
    "packages": [
@@ -4592,7 +4749,8 @@
    "name": "Castle",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4608,6 +4766,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Save-the-Castle",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4637,7 +4801,8 @@
    "name": "Dino",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4653,6 +4818,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Dino",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4682,7 +4853,8 @@
    "name": "Dodgeem",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4698,6 +4870,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Dodgeem",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4727,7 +4905,8 @@
    "name": "Dots",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by Gadgetoid, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4743,6 +4922,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/Gadgetoid/32blit-dots",
+     "primary": false,
+     "note": "original game project (author Gadgetoid)"
     }
    ],
    "packages": [
@@ -4772,7 +4957,8 @@
    "name": "Dune2",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by mikerr, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4788,6 +4974,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/mikerr/32blit-games",
+     "primary": false,
+     "note": "original game project (author mikerr)"
     }
    ],
    "packages": [
@@ -4817,7 +5009,8 @@
    "name": "Fourblock Descent",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by Daft-Freak, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4833,6 +5026,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/Daft-Freak/fourblock-descent",
+     "primary": false,
+     "note": "original game project (author Daft-Freak)"
     }
    ],
    "packages": [
@@ -4862,7 +5061,8 @@
    "name": "Geometry",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "Example game from the 32blit project, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4878,6 +5078,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/32blit/32blit-examples",
+     "primary": false,
+     "note": "original game project (author 32blit)"
     }
    ],
    "packages": [
@@ -4907,7 +5113,8 @@
    "name": "Gol",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4923,6 +5130,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-game-of-life",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4952,7 +5165,8 @@
    "name": "Harry",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -4968,6 +5182,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Pitfall-Harry",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -4997,7 +5217,8 @@
    "name": "Indy",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5013,6 +5234,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Indy500",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -5042,7 +5269,8 @@
    "name": "Invader",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5058,6 +5286,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Invader",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -5087,7 +5321,8 @@
    "name": "Jetpac",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by mikerr, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5103,6 +5338,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/mikerr/32blit-games",
+     "primary": false,
+     "note": "original game project (author mikerr)"
     }
    ],
    "packages": [
@@ -5132,7 +5373,8 @@
    "name": "Jumpy Squirrel",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ThePythonator, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5148,6 +5390,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ThePythonator/Jumpy-Squirrel",
+     "primary": false,
+     "note": "original game project (author ThePythonator)"
     }
    ],
    "packages": [
@@ -5177,7 +5425,8 @@
    "name": "Knightlore",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by mikerr, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5193,6 +5442,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/mikerr/32blit-games",
+     "primary": false,
+     "note": "original game project (author mikerr)"
     }
    ],
    "packages": [
@@ -5222,7 +5477,8 @@
    "name": "Match3",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by deckerego, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5238,6 +5494,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/deckerego/picosystem-demo",
+     "primary": false,
+     "note": "original game project (author deckerego)"
     }
    ],
    "packages": [
@@ -5267,7 +5529,8 @@
    "name": "Minesweeper",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ArtemHarkusha, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5283,6 +5546,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ArtemHarkusha/32blit-minesweeper",
+     "primary": false,
+     "note": "original game project (author ArtemHarkusha)"
     }
    ],
    "packages": [
@@ -5312,7 +5581,8 @@
    "name": "Missile",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5328,6 +5598,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-MissileCommand",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -5357,7 +5633,8 @@
    "name": "Ping",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ThePythonator, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5373,6 +5650,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ThePythonator/Ping",
+     "primary": false,
+     "note": "original game project (author ThePythonator)"
     }
    ],
    "packages": [
@@ -5402,7 +5685,8 @@
    "name": "Raycaster",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "Example game from the 32blit project, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5418,6 +5702,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/32blit/32blit-examples",
+     "primary": false,
+     "note": "original game project (author 32blit)"
     }
    ],
    "packages": [
@@ -5447,7 +5737,8 @@
    "name": "Rocks And Diamonds",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "Example game from the 32blit project, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5463,6 +5754,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/32blit/rocks-and-diamonds",
+     "primary": false,
+     "note": "original game project (author 32blit)"
     }
    ],
    "packages": [
@@ -5492,7 +5789,8 @@
    "name": "Scrolly Tile",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "Example game from the 32blit project, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5508,6 +5806,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/32blit/32blit-examples",
+     "primary": false,
+     "note": "original game project (author 32blit)"
     }
    ],
    "packages": [
@@ -5537,7 +5841,8 @@
    "name": "Simon",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5553,6 +5858,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-SimonSays",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -5582,7 +5893,8 @@
    "name": "Snake",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5598,6 +5910,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Snake",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -5627,7 +5945,8 @@
    "name": "Snake2",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5643,6 +5962,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-SnakeRace",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -5672,7 +5997,8 @@
    "name": "Sokoblit",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ahnlak-blit32, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5688,6 +6014,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ahnlak-blit32/sokoblit",
+     "primary": false,
+     "note": "original game project (author ahnlak-blit32)"
     }
    ],
    "packages": [
@@ -5717,7 +6049,8 @@
    "name": "Solitaire",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ThatOtherOtherBob, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5733,6 +6066,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ThatOtherOtherBob/Solitaire",
+     "primary": false,
+     "note": "original game project (author ThatOtherOtherBob)"
     }
    ],
    "packages": [
@@ -5762,7 +6101,8 @@
    "name": "Super Square Bros",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by ThePythonator, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5778,6 +6118,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/ThePythonator/Super-Square-Bros",
+     "primary": false,
+     "note": "original game project (author ThePythonator)"
     }
    ],
    "packages": [
@@ -5807,7 +6153,8 @@
    "name": "Tower",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by lummi01, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5823,6 +6170,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/lummi01/32Blit-Tower",
+     "primary": false,
+     "note": "original game project (author lummi01)"
     }
    ],
    "packages": [
@@ -5852,7 +6205,8 @@
    "name": "TowerDefense",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by Blackhawk-TA, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5868,6 +6222,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/Blackhawk-TA/TowerDefense",
+     "primary": false,
+     "note": "original game project (author Blackhawk-TA)"
     }
    ],
    "packages": [
@@ -5897,7 +6257,8 @@
    "name": "Wakkawakka",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by mikerr, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5913,6 +6274,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/mikerr/32blit-games",
+     "primary": false,
+     "note": "original game project (author mikerr)"
     }
    ],
    "packages": [
@@ -5942,7 +6309,8 @@
    "name": "Willy",
    "kind": "app",
    "status": "package-verified",
-   "description": "32blit game in the joyrider3774/32blit_funkey port collection (SDL2 build for Funkey-S / RG-Nano). Name taken from the OPK file name; no per-game description was recorded.",
+   "description": "32blit game by mikerr, ported for FunKey / RG Nano.",
+   "description_source": "joyrider3774/32blit_funkey README (Author and Repository fields), fetched 2026-11-05",
    "topics": [],
    "version": "v1.0",
    "license": "unknown",
@@ -5958,6 +6326,12 @@
     {
      "type": "repo",
      "url": "https://github.com/joyrider3774/32blit_funkey"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/mikerr/32blit-games",
+     "primary": false,
+     "note": "original game project (author mikerr)"
     }
    ],
    "packages": [
