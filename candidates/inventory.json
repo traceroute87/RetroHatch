@@ -1,0 +1,3860 @@
+{
+ "schema": 2,
+ "device": "rg-nano",
+ "status": "UNAPPROVED candidate inventory, read-only. Not part of the signed catalog: nothing here is approved, hardware-tested or installable.",
+ "known_limits": [
+  {
+   "id": "wiki-index-actions-run",
+   "note": "The wiki index source (discovery/sources.txt) failed in GitHub Actions run 41921300975 (https://github.com/traceroute87/RetroHatch/actions/runs/41921300975), as reported by the maintainer; the cause has not been analysed. Generic page-following stays in the crawler until the index source is proven. Wiki rows in this file come from earlier crawls and the 2026-11-04 page check, not from that run."
+  },
+  {
+   "id": "wiki-text",
+   "note": "The wiki page text was never saved, only its links: wiki headings and descriptions are not recorded, and categories of wiki-only rows come from the file name."
+  },
+  {
+   "id": "collections",
+   "note": "Only the collection members with tracked per-item evidence are itemized (funkey_sdl2_games: 7). The 43 games of joyrider3774/32blit_funkey and the 29 picoarch core launchers are known from untracked crawl results and are not listed. BEFORE IMPORT: that evidence lives only under the git-ignored build/crawl*/ directories (per-game names, ZIP members, sizes, tag URLs). Copy it into a tracked file first, or it is lost with the build directory."
+  },
+  {
+   "id": "audit-entries",
+   "note": "Entries with evidence.audit come from docs/GITHUB_COVERAGE_AUDIT.md prose: their packages were not inspected, sizes and hashes are unknown, and source-only entries have no release package."
+  },
+  {
+   "id": "system-addons",
+   "note": "System add-ons named in the audit (SimpleMenu for RG Nano, FunKey Add-on, AdvanceMAME bundle) have no tracked URL and are not listed."
+  }
+ ],
+ "applications": [
+  {
+   "id": "j2mefunkeyrgnano",
+   "name": "j2me-funkey-rgnano",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "phoneME-based J2ME runtime for FunKey S / RG Nano",
+   "topics": [],
+   "version": "1.3.0",
+   "license": "unknown",
+   "last_activity": "2026-10-24",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "phoneME-based J2ME runtime for FunKey S / RG Nano",
+    "where": "description"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/slrmoon/j2me-funkey-rgnano"
+    }
+   ],
+   "packages": [
+    {
+     "name": "pm.opk",
+     "url": "https://github.com/slrmoon/j2me-funkey-rgnano/releases/download/1.3.0/pm.opk",
+     "size": 3645440,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release",
+     "sha256": "568e6b9b665b16efcb463c1d43dfbcbaf6ea624d27ccb23231c0bb4d840aa5ca"
+    }
+   ],
+   "evidence": {
+    "metadata_id": "j2mefunkeyrgnano",
+    "metadata_review": {
+     "description": {
+      "package_comment": "Java ME runtime",
+      "kept": "existing description"
+     },
+     "name": {
+      "package_name": "J2ME",
+      "listed": "j2me-funkey-rgnano",
+      "applied": false
+     },
+     "category": {
+      "package": "emulators",
+      "row": "Engines & Tools",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "nanocraft",
+   "name": "NanoCraft",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Minecraft Pocket Edition 0.8.1 on the Anbernic RG Nano. Software-rendered, no GPU. You supply your own APK.",
+   "topics": [
+    "anbernic",
+    "arm",
+    "funkey-os",
+    "handheld",
+    "homebrew",
+    "minecraft",
+    "minecraft-pocket-edition",
+    "opk",
+    "retro-handheld",
+    "rg-nano",
+    "software-rendering"
+   ],
+   "version": "v1.0.13",
+   "license": "GPL-3.0",
+   "last_activity": "2026-09-06",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "funkey-os",
+    "where": "topics"
+   },
+   "category": "games",
+   "category_basis": "Minecraft Pocket Edition; a grass field with a tree",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DankMiimer/nanocraft"
+    }
+   ],
+   "packages": [
+    {
+     "name": "NanoCraft_funkey-s.opk",
+     "url": "https://github.com/DankMiimer/nanocraft/releases/download/v1.0.13/nanocraft-v1.0.13-rgnano.zip",
+     "size": 622592,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release"
+    }
+   ],
+   "also_in_repo": 1
+  },
+  {
+   "id": "funkoban",
+   "name": "Funkoban",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "A Sokoban Engine for funkey-s / RG-Nano",
+   "topics": [
+    "2d",
+    "2d-game",
+    "cpp",
+    "funkey-s",
+    "funkeys",
+    "remake",
+    "remake-games",
+    "retro",
+    "retrogame",
+    "rg-nano",
+    "rgnano",
+    "sdl"
+   ],
+   "version": "v1.1",
+   "license": "MIT",
+   "last_activity": "2026-03-27",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "A Sokoban Engine for funkey-s / RG-Nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "2d-game; sokoban-game; remake-games; package agrees",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/sokoban_funkey"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Funkoban.opk",
+     "url": "https://github.com/joyrider3774/sokoban_funkey/releases/download/v1.1/Funkoban.opk",
+     "size": 8531968,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release",
+     "sha256": "ef28ed1445742ee7793108d55b30dc97a480787f7c659e826be01d769d38b843"
+    },
+    {
+     "name": "Funkoban.opk",
+     "url": "https://github.com/joyrider3774/sokoban_funkey/releases/latest/download/Funkoban.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "wiki",
+     "download": "Found (squashfs seen)"
+    }
+   ],
+   "evidence": {
+    "metadata_id": "funkoban"
+   },
+   "listing": {
+    "wiki_category": "",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "cglpsdl1",
+   "name": "Cglpsdl1",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "crisp game lib portable for funkey",
+   "topics": [
+    "arcade",
+    "crisp-game-lib",
+    "funkey-s",
+    "funkeys",
+    "games",
+    "library",
+    "rg-nano",
+    "rgnano",
+    "sdl"
+   ],
+   "version": "v4.0",
+   "license": "MIT",
+   "last_activity": "2025-12-13",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "rg-nano",
+    "where": "topics"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Cglpsdl1.opk",
+     "url": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/download/v4.0/Cglpsdl1.opk",
+     "size": 303104,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release",
+     "sha256": "5b4205bf866dec116d51d6e59a9ff60bb7517fd65e271e80bbd1691041c5153f"
+    },
+    {
+     "name": "Cglpsdl1.opk",
+     "url": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/latest/download/Cglpsdl1.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "wiki",
+     "download": "Found (squashfs seen)"
+    }
+   ],
+   "evidence": {
+    "metadata_id": "cglpsdl1",
+    "metadata_review": {
+     "description": {
+      "package_comment": "Crisp Games Library Portable",
+      "kept": "existing description"
+     },
+     "category": {
+      "package": "games",
+      "row": "Other",
+      "applied": false
+     }
+    }
+   },
+   "listing": {
+    "wiki_category": "",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "picoarch",
+   "name": "picoarch",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Fork of the neonloop's picoarch. Build for FunKey-OS (I only tested with RG Nano). https://git.crowdedwood.com/picoarch/",
+   "topics": [],
+   "version": "build-231226",
+   "license": "NOASSERTION",
+   "last_activity": "2023-12-26",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "Build for FunKey-OS (I only tested with RG Nano)",
+    "where": "description"
+   },
+   "category": "emulators",
+   "category_basis": "picoarch-gambatte; picoarch-fceumm; picoarch-pcsx_rearmed",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/sdhizumi/picoarch"
+    }
+   ],
+   "packages": [
+    {
+     "name": "picoarch.opk",
+     "url": "https://github.com/sdhizumi/picoarch/releases/download/build-231226/picoarch-funkey-s.zip",
+     "size": 57540608,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release"
+    }
+   ],
+   "also_in_repo": 11
+  },
+  {
+   "id": "xash3dfs",
+   "name": "XASH3DFS",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "a port of xash 3d for the funkey s. ",
+   "topics": [],
+   "version": "xash3dfs",
+   "license": "unknown",
+   "last_activity": "2026-09-14",
+   "claim": {
+    "kind": "family",
+    "text": "a port of xash 3d for the funkey s.",
+    "where": "description"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/Sn3zee-cmds/XASH3DFS"
+    }
+   ],
+   "packages": [
+    {
+     "name": "XASH3DFS0.50.opk",
+     "url": "https://github.com/Sn3zee-cmds/XASH3DFS/releases/download/xash3dfs/XASH3DFS0.50.opk",
+     "size": 16420864,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release"
+    }
+   ]
+  },
+  {
+   "id": "meleelight",
+   "name": "meleelight",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "v1.0.1",
+   "license": "NOASSERTION",
+   "last_activity": "2026-09-02",
+   "claim": {
+    "kind": "family",
+    "text": "meleelight-funkey-s",
+    "where": "name"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/chasemcdizzle/meleelight-funkey-s"
+    }
+   ],
+   "packages": [
+    {
+     "name": "meleelight.opk",
+     "url": "https://github.com/chasemcdizzle/meleelight-funkey-s/releases/download/v1.0.1/meleelight.opk",
+     "size": 577536,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release"
+    }
+   ]
+  },
+  {
+   "id": "sudokul",
+   "name": "SuDokuL",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Multiplatform Sudoku game, made with C++/SDL2",
+   "topics": [
+    "android",
+    "cpp",
+    "funkey-s",
+    "funkeys",
+    "game",
+    "game-development",
+    "gamecube",
+    "homebrew",
+    "linux",
+    "nintendo-switch",
+    "psp",
+    "sdl"
+   ],
+   "version": "v1.5",
+   "license": "MIT",
+   "last_activity": "2026-06-05",
+   "claim": {
+    "kind": "family",
+    "text": "android cpp funkey-s funkeys game game-development gamecube homebrew linux nintendo-switch psp sdl sdl2 sudoku switch visual-studio vita wii wii-u wiiu",
+    "where": "topics"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/Mode8fx/SuDokuL"
+    }
+   ],
+   "packages": [
+    {
+     "name": "SuDokuL-v1.5-funkey.opk",
+     "url": "https://github.com/Mode8fx/SuDokuL/releases/download/v1.5/SuDokuL-v1.5-funkey.opk",
+     "size": 913408,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release",
+     "sha256": "dfd5837d4d57f067f855e21ce04974b0a1580a105241541d6f0cba1f7fa67ecd"
+    }
+   ],
+   "evidence": {
+    "metadata_id": "sudokul",
+    "metadata_review": {
+     "description": {
+      "package_comment": "Sudoku made with SDL",
+      "kept": "existing description"
+     }
+    }
+   }
+  },
+  {
+   "id": "trispace",
+   "name": "TriSpace",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "An Elite-like space game for the FunKey S.",
+   "topics": [],
+   "version": "1.1.0",
+   "license": "AGPL-3.0",
+   "last_activity": "2026-01-01",
+   "claim": {
+    "kind": "family",
+    "text": "An Elite-like space game for the FunKey S.",
+    "where": "description"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/robbi-blechdose/TriSpace"
+    }
+   ],
+   "packages": [
+    {
+     "name": "TriSpace.opk",
+     "url": "https://github.com/robbi-blechdose/TriSpace/releases/download/1.1.0/TriSpace.opk",
+     "size": 3678208,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release"
+    }
+   ]
+  },
+  {
+   "id": "keycraft",
+   "name": "KeyCraft",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "A voxel/block building game for the FunKey S.",
+   "topics": [],
+   "version": "1.2.0",
+   "license": "AGPL-3.0",
+   "last_activity": "2025-03-14",
+   "claim": {
+    "kind": "family",
+    "text": "A voxel/block building game for the FunKey S.",
+    "where": "description"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/robbi-blechdose/KeyCraft"
+    }
+   ],
+   "packages": [
+    {
+     "name": "KeyCraft.opk",
+     "url": "https://github.com/robbi-blechdose/KeyCraft/releases/download/1.2.0/KeyCraft.opk",
+     "size": 4378624,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "release"
+    }
+   ]
+  },
+  {
+   "id": "3doh",
+   "name": "3DOh",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V1",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: 3DO emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "3DOh-V1.opk",
+     "url": "https://static.miraheze.org/funkeywiki/1/1d/3DOh-V1.opk",
+     "size": 53248,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/3doh_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/3doh_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "88eeae6aa2ff785a1094ac646dccb9b55871b4e2d1a5bc832c8f74fc1b6da1fc"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-3doh"
+   }
+  },
+  {
+   "id": "blips",
+   "name": "Blips",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "A remake of the dos Bips game",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "2025-12-04",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "games",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/blips_funkey"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Blips.opk",
+     "url": "https://github.com/joyrider3774/blips_funkey/releases/download/v1.0/Blips.opk",
+     "size": 819200,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://github.com/joyrider3774/blips_funkey/releases/latest/download/Blips.opk"
+     ],
+     "from": "wiki",
+     "sha256": "4540ff6035bdb16c36ad5dbb13de0617ff5f6e8bcc41e3e12612b4d37de28628"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-blips",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "blockdude",
+   "name": "Blockdude",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "A remake of the TI-83 puzzle game",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "2025-04-05",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "games",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/blockdude_funkey"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Blockdude.opk",
+     "url": "https://github.com/joyrider3774/blockdude_funkey/releases/download/v1.0/Blockdude.opk",
+     "size": 3407872,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://github.com/joyrider3774/blockdude_funkey/releases/latest/download/Blockdude.opk"
+     ],
+     "from": "wiki",
+     "sha256": "78c8b5042d686598c0fc19f81de8051c7a1dabd1b5f9e35c28c3c535e51c2882"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-blockdude",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "clockapp",
+   "name": "Clock App",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "utilities",
+   "category_basis": "Wiki heading not cached; by file name only: clock by name",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "clock_app_funkey-s.opk",
+     "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/clock_app_funkey-s.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/clock_app_funkey-s.opk"
+     ],
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Unavailable (HTTP 403)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "commodore64",
+   "name": "Commodore 64",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Commodore 64 emulator for Libretro",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: C64 machine by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Commodore_64_funkey-s.opk",
+     "url": "https://static.miraheze.org/funkeywiki/a/ad/Commodore_64_funkey-s.opk",
+     "size": 2891776,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "94d725a76bd82944fb8b821ca9746c9cf41d5dab3fe5054c8a12d388b96ee05c"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-commodore64",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "name": {
+      "package_name": "C64",
+      "listed": "Commodore 64",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "dinothawr",
+   "name": "Dinothawr",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V2",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "games",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Dinothawr-V2.opk",
+     "url": "https://static.miraheze.org/funkeywiki/2/28/Dinothawr-V2.opk",
+     "size": 7663616,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://static.miraheze.org/funkeywiki/4/44/Dinothawr.zip"
+     ],
+     "from": "wiki",
+     "sha256": "733774b3cc8a331688fb69091c0f0f3cefa950e8ef3e2f3c739db9962e1a75b8"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download",
+     "Game files"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-dinothawr"
+   }
+  },
+  {
+   "id": "dividead",
+   "name": "Dividead",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "dividead_funkey-s.opk",
+     "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/dividead_funkey-s.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Unavailable (HTTP 403)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "dosboxpure",
+   "name": "DOSBox Pure",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V1",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: DOSBox by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "DOSBox_Pure-V1.opk",
+     "url": "https://static.miraheze.org/funkeywiki/e/ec/DOSBox_Pure-V1.opk",
+     "size": 2744320,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "fee6afa369b393fb79897209c85959f360896e0a45e85ac06dc01526eab32029"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-dosboxpure"
+   }
+  },
+  {
+   "id": "easyrpg",
+   "name": "EasyRPG",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "engines",
+   "category_basis": "Wiki heading not cached; by file name only: RPG Maker player: runtime by name; package differs",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "EasyRPG.opk",
+     "url": "https://static.miraheze.org/funkeywiki/5/5a/EasyRPG.opk",
+     "size": 21303296,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "150bb847b4d906f5dbbac9f34819b82d360cf8b332b04e0c215c0b4a452ab0a6"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-easyrpg",
+    "metadata_review": {
+     "category": {
+      "package": "games",
+      "row": "Engines & Tools",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "fake08",
+   "name": "Fake-08",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "PICO-8 Emulator (port gameblabla)",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: PICO-8 player by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Fake08.opk",
+     "url": "https://static.miraheze.org/funkeywiki/1/18/Fake08.opk",
+     "size": 233472,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/fake08_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/fake08_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "90c961f08729986faab33fbbb3aeda4ab6847e78b9371d8bd4d6de283ec5e7ed"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-fake08",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "finalburnalpha2012",
+   "name": "FinalBurn Alpha 2012",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V3",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "FinalBurnAlpha2012-V3.opk",
+     "url": "https://static.miraheze.org/funkeywiki/9/9e/FinalBurnAlpha2012-V3.opk",
+     "size": 5877760,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://static.miraheze.org/funkeywiki/c/cc/FinalBurnAlpha2012-V3.zip"
+     ],
+     "from": "wiki",
+     "sha256": "893168ea8d0230e5dfb6ebf2f96e3931b24395cd0661dd0df5c36a39b8e97322"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-finalburnalpha2012",
+    "metadata_review": {
+     "name": {
+      "package_name": "FBA 2012",
+      "listed": "FinalBurn Alpha 2012",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "finalburnneo",
+   "name": "FinalBurn Neo",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V1",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "FinalBurnNeo-V1.opk",
+     "url": "https://static.miraheze.org/funkeywiki/7/7c/FinalBurnNeo-V1.opk",
+     "size": 10264576,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://static.miraheze.org/funkeywiki/2/25/FinalBurnNeo-V1.zip"
+     ],
+     "from": "wiki",
+     "sha256": "e9c6998339f5ce2fdebd8e4087bb589aa801207961ddd3712ef90778a3f4fd6e"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-finalburnneo",
+    "metadata_review": {
+     "name": {
+      "package_name": "FB Neo",
+      "listed": "FinalBurn Neo",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "formula1",
+   "name": "Formula1",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Little fake F1 Game and Watch game",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "2025-04-05",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "games",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/formula1_funkey"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Formula1.opk",
+     "url": "https://github.com/joyrider3774/formula1_funkey/releases/download/v1.0/Formula1.opk",
+     "size": 196608,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://github.com/joyrider3774/formula1_funkey/releases/latest/download/Formula1.opk"
+     ],
+     "from": "wiki",
+     "sha256": "8baa049ff3291663ffbdbbc8458836eb312046dd206578c66ef0796f7acdb8f6"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-formula1",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "gambatte",
+   "name": "Gambatte",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V4",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Game Boy emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Gambatte-V4.opk",
+     "url": "https://static.miraheze.org/funkeywiki/9/93/Gambatte-V4.opk",
+     "size": 1843200,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "aff26988e9bd33211dbed42821cff4cfbf6ff8e8897325aed910f1e160c5d501"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-gambatte"
+   }
+  },
+  {
+   "id": "gambattesdlretrocore",
+   "name": "Gambatte (SDL Retro core)",
+   "kind": "core",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: core for SDL Retro by name",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Gambatte_(SDL_Retro_Core).zip",
+     "url": "https://static.miraheze.org/funkeywiki/6/69/Gambatte_%28SDL_Retro_Core%29.zip",
+     "size": 108972,
+     "format": "zip",
+     "signature": "",
+     "container": "zip",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "ZIP, not opened (1 entries)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   }
+  },
+  {
+   "id": "gamemusicemu",
+   "name": "Game Music Emu",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V2",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "media",
+   "category_basis": "Wiki heading not cached; by file name only: music player by name; package generic",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Game_Music_Emu-V2.opk",
+     "url": "https://static.miraheze.org/funkeywiki/4/4c/Game_Music_Emu-V2.opk",
+     "size": 1953792,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "c91168e8cee37f8fdf9cbe217f00c3cc6b73898dae1fc7e621c682af71c0c92a"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-gamemusicemu",
+    "metadata_review": {
+     "name": {
+      "package_name": "GME",
+      "listed": "Game Music Emu",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "ganbarenatuskian",
+   "name": "Ganbare Natuskian",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Puzzle/Platform game",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "games",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Ganbare-Natuskian.opk",
+     "url": "https://static.miraheze.org/funkeywiki/b/b0/Ganbare-Natuskian.opk",
+     "size": 27557888,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "085fd0ac4f8badb527901c04af91eb76ebba5ced69b120d178b09d98964c1fe4"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-ganbarenatuskian",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "name": {
+      "package_name": "Ganbare Natsuki-san",
+      "listed": "Ganbare Natuskian",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "gmenu2x",
+   "name": "GMenu2X",
+   "kind": "system",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "utilities",
+   "category_basis": "Wiki heading not cached; by file name only: menu launcher by name",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/gmenu2x"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [],
+   "listing": {
+    "wiki_category": "",
+    "download": "No file link crawled",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "gnash",
+   "name": "Gnash",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Adobe flash 8 emulator",
+   "topics": [],
+   "version": "V2",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "engines",
+   "category_basis": "Wiki heading not cached; by file name only: Flash player: runtime by name; package differs",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/gameblabla/gnash-opendingux",
+     "primary": false,
+     "note": "additional source named in docs/GITHUB_COVERAGE_AUDIT.md"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Gnash-V2.opk",
+     "url": "https://static.miraheze.org/funkeywiki/b/b1/Gnash-V2.opk",
+     "size": 8450048,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/gnash_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/gnash_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "6587d6f041beac1e90a8c307f833cf4ce7342882a1737eb2c00e50552d4b0dd8"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-gnash",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "category": {
+      "package": "emulators",
+      "row": "Engines & Tools",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "heboris",
+   "name": "Heboris",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "heboris_funkey-s.opk",
+     "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/heboris_funkey-s.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Unavailable (HTTP 403)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "keykalc",
+   "name": "KeyKalc",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "utilities",
+   "category_basis": "Wiki heading not cached; by file name only: calculator by name",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/Robbi-Blechdose/KeyKalc"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [],
+   "listing": {
+    "wiki_category": "",
+    "download": "No file link crawled",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "lameds",
+   "name": "LameDS",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "NDS emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say; package differs",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "LameDS.opk",
+     "url": "https://static.miraheze.org/funkeywiki/c/c4/LameDS.opk",
+     "size": 487424,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/lameds_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/lameds_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "2a8429fc26c9f8bc103214f1b30365dff1d0c3e0d4049f45d7547a426e868f95"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-lameds",
+    "description_source": "package .desktop Comment, edited",
+    "metadata_review": {
+     "category": {
+      "package": "emulators",
+      "row": "Other",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "mame2000",
+   "name": "MAME 2000",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V3",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: arcade emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "MAME2000-V3.opk",
+     "url": "https://static.miraheze.org/funkeywiki/d/de/MAME2000-V3.opk",
+     "size": 4677632,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://static.miraheze.org/funkeywiki/2/2e/MAME2000-V3.zip"
+     ],
+     "from": "wiki",
+     "sha256": "87c8dd4ee6daa36ababebf72dcc03402e37332c688734399aa3b1b4aba1f35ab"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-mame2000"
+   }
+  },
+  {
+   "id": "mednafennesonly",
+   "name": "Mednafen (NES only)",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Nintendo Entertainment System emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Mednafen emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Mednafen_(NES_only).opk",
+     "url": "https://static.miraheze.org/funkeywiki/4/45/Mednafen_%28NES_only%29.opk",
+     "size": 4096,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "c01566283b718b97101156754d44b73009ca84ed90132077bb0cc7f283776cd8"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-mednafennesonly",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "name": {
+      "package_name": "NES (Mednafen)",
+      "listed": "Mednafen (NES only)",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "mplayer",
+   "name": "MPlayer",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Native video player",
+   "topics": [],
+   "version": "V2",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "media",
+   "category_basis": "Wiki heading not cached; by file name only: media player by name; package generic",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/NovemberJoy/MPlayer",
+     "primary": false,
+     "note": "additional source named in docs/GITHUB_COVERAGE_AUDIT.md"
+    }
+   ],
+   "packages": [
+    {
+     "name": "MPlayer-V2.opk",
+     "url": "https://static.miraheze.org/funkeywiki/1/1d/MPlayer-V2.opk",
+     "size": 7847936,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "abe979ddc11b97ab2e9334d68545d65b17a0e35f280e8f5d5214d0ac709c8415"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-mplayer",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "ncrafti",
+   "name": "NCrafti",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "ncrafti_funkey-s.opk",
+     "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/ncrafti_funkey-s.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/ncrafti_funkey-s.opk"
+     ],
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Unavailable (HTTP 403)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "pcfxemu",
+   "name": "PC-FX Emu",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Pcfxemu_funkey-s.opk",
+     "url": "https://static.miraheze.org/funkeywiki/d/d6/Pcfxemu_funkey-s.opk",
+     "size": 552960,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/pcfxemu_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pcfxemu_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "d106ce43dca139fa2262eb4f31311a3c5956123b44a1d338e72572eb5b15abf3"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-pcfxemu"
+   }
+  },
+  {
+   "id": "pcsxrearmed",
+   "name": "PCSX ReARMed",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V2",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: PlayStation emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "PCSX_ReARMed_V2.opk",
+     "url": "https://static.miraheze.org/funkeywiki/6/65/PCSX_ReARMed_V2.opk",
+     "size": 516096,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/pcsx_rearmed_ultimate.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pcsx_rearmed_ultimate.opk"
+     ],
+     "from": "wiki",
+     "sha256": "f88c20d9ab91c9d22a17dd6d4b7a81ee82603de937be6c0071610244bb80278b"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-pcsxrearmed"
+   }
+  },
+  {
+   "id": "picodrive",
+   "name": "PicoDrive",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SMS/GG/MD/MCD/32X emulator",
+   "topics": [],
+   "version": "V3",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Mega Drive emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "PicoDrive-V3.opk",
+     "url": "https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk",
+     "size": 458752,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "996debb24bdb1def77c6f3d10e85add0dc1b032ab12a0707ea9a464be4154e0a"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-picodrive",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "piemu",
+   "name": "Piemu",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "P/EDE emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say; package differs",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Piemu_funkey-s.opk",
+     "url": "https://static.miraheze.org/funkeywiki/d/d4/Piemu_funkey-s.opk",
+     "size": 20480,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/piemu_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/piemu_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "efa73104bec90f2991c69fd7aad5783bbde6f3373ec70a36ee57be7ebe5aad03"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-piemu",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "category": {
+      "package": "emulators",
+      "row": "Other",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "pocketcdg",
+   "name": "Pocket CDG",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "",
+   "topics": [],
+   "version": "V1",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "media",
+   "category_basis": "Wiki heading not cached; by file name only: CD+G karaoke player by name; package generic",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Pocket_CDG-V1.opk",
+     "url": "https://static.miraheze.org/funkeywiki/c/c3/Pocket_CDG-V1.opk",
+     "size": 1802240,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "87f715bc667f7800ba5f391b943b80b5a52836931c51536a729e4ceaa545f6eb"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-pocketcdg"
+   }
+  },
+  {
+   "id": "pokemini",
+   "name": "PokeMini",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Pokemon Mini emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Pokemon Mini emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Pokemini_funkey.opk",
+     "url": "https://static.miraheze.org/funkeywiki/f/fd/Pokemini_funkey.opk",
+     "size": 499712,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/pokemini_funkey.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/pokemini_funkey.opk"
+     ],
+     "from": "wiki",
+     "sha256": "f0cb12b5882e57bfb8a6fb971e1023d2bb16cc6c6ccddb2234d2003df1141c64"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-pokemini",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "rubido",
+   "name": "Rubido",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "A Chinese checkers board game",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "2025-04-05",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "games",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/rubido_funkey"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Rubido.opk",
+     "url": "https://github.com/joyrider3774/rubido_funkey/releases/download/v1.0/Rubido.opk",
+     "size": 3469312,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://github.com/joyrider3774/rubido_funkey/releases/latest/download/Rubido.opk"
+     ],
+     "from": "wiki",
+     "sha256": "bbd02cca31f7842b62563a677901682a7dbaceb4b0c6cf00ba7771d971a9eef6"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   },
+   "icon_file": "icons/wiki-rubido.png",
+   "evidence": {
+    "metadata_id": "wiki-rubido",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "sdlretro",
+   "name": "SDL Retro",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Essential core pack for Libretro",
+   "topics": [],
+   "version": "V9",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: libretro frontend by name; package differs",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "SDL_Retro-V9.opk",
+     "url": "https://static.miraheze.org/funkeywiki/e/e6/SDL_Retro-V9.opk",
+     "size": 11096064,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://static.miraheze.org/funkeywiki/3/30/SDL_Retro-V9.zip"
+     ],
+     "from": "wiki",
+     "sha256": "0fc41c248edc8870d24c21c371b8aad4062d18388fd41262a60f569ea7a69bab"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-sdlretro",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "category": {
+      "package": "games",
+      "row": "Emulators",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "smsplus",
+   "name": "SMS Plus",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SMS/GG/SG emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Master System emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Smsplus_funkey-s.opk",
+     "url": "https://static.miraheze.org/funkeywiki/2/22/Smsplus_funkey-s.opk",
+     "size": 479232,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/smsplus_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/smsplus_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "6a7731f660bc24a6cffaa2d10649360c6b0c374f5744e68848c2140009af3a88"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-smsplus",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "name": {
+      "package_name": "SMS Plus GX",
+      "listed": "SMS Plus",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "srb2",
+   "name": "SRB2",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "srb2_funkey-s.opk",
+     "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/srb2_funkey-s.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Unavailable (HTTP 403)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "st",
+   "name": "ST",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "ST Terminal",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say; package generic",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/trngaje/rgnano_binary",
+     "primary": false,
+     "note": "additional source named in docs/GITHUB_COVERAGE_AUDIT.md"
+    }
+   ],
+   "packages": [
+    {
+     "name": "ST.opk",
+     "url": "https://static.miraheze.org/funkeywiki/c/cb/ST.opk",
+     "size": 81920,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "from": "wiki",
+     "sha256": "6531abb2b177c87a5f76d78aa57485434047f5ea93967f57398332103620a873"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-st",
+    "description_source": "package .desktop Comment",
+    "metadata_review": {
+     "name": {
+      "package_name": "ST-SDL",
+      "listed": "ST",
+      "applied": false
+     }
+    }
+   }
+  },
+  {
+   "id": "stk",
+   "name": "STK",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "stk_funkey-s.opk",
+     "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/stk_funkey-s.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Unavailable (HTTP 403)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "swanemu",
+   "name": "SwanEmu",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Wonderswan emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: WonderSwan emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "SwanEmu.opk",
+     "url": "https://static.miraheze.org/funkeywiki/b/bc/SwanEmu.opk",
+     "size": 466944,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/swanemu_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/swanemu_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "9e846ca94af1b78b239a180118e0478f593af35e672987abbd45d73dd78078d0"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-swanemu",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "vbanext",
+   "name": "VBA Next",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "GBA emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Game Boy Advance emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "VBA_Next.opk",
+     "url": "https://static.miraheze.org/funkeywiki/0/02/VBA_Next.opk",
+     "size": 552960,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/vbanext_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/vbanext_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "574cec796ae80a3db8b97c6836e4f083bcddc890efd9387faa695c01067a99ff"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-vbanext",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "vbemu",
+   "name": "VBEmu",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "Virtual Boy emulator",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Virtual Boy emulator by name; package agrees",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/gameblabla/vbemu",
+     "primary": false,
+     "note": "additional source named in docs/GITHUB_COVERAGE_AUDIT.md"
+    }
+   ],
+   "packages": [
+    {
+     "name": "VBEmu.opk",
+     "url": "https://static.miraheze.org/funkeywiki/2/20/VBEmu.opk",
+     "size": 434176,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/vbemu_funkey-s.opk",
+      "https://gitlab.com/gameblabla/gameblabla-releases/-/raw/master/opk/funkey/vbemu_funkey-s.opk"
+     ],
+     "from": "wiki",
+     "sha256": "9c5123bcf39126aab785a559b88524e7c08507ad5d017f741c706a350774a1ed"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "gitlab.com: HTTP 403",
+    "anchors": [
+     "Download",
+     "Link"
+    ]
+   },
+   "evidence": {
+    "metadata_id": "wiki-vbemu",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "vicesdlretrocore",
+   "name": "VICE (SDL Retro core)",
+   "kind": "core",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "emulators",
+   "category_basis": "Wiki heading not cached; by file name only: Commodore emulator core by name",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "VICE_(SDL_Retro_Core).zip",
+     "url": "https://static.miraheze.org/funkeywiki/c/c9/VICE_%28SDL_Retro_Core%29.zip",
+     "size": 1100102,
+     "format": "zip",
+     "signature": "",
+     "container": "zip",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "ZIP, not opened (1 entries)",
+    "mirror": "",
+    "anchors": [
+     "Download"
+    ]
+   }
+  },
+  {
+   "id": "worshipvector",
+   "name": "Worship Vector",
+   "kind": "app",
+   "status": "listed",
+   "description": "",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "other",
+   "category_basis": "Wiki heading not cached; by file name only: name does not say",
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "worship_vector_funkey-s.opk",
+     "url": "https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/worship_vector_funkey-s.opk",
+     "size": 0,
+     "format": "opk",
+     "signature": "",
+     "container": "",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Unavailable (HTTP 403)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   }
+  },
+  {
+   "id": "znax",
+   "name": "Znax",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "A Connect 4 Style arcade / puzzle game",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "2025-02-23",
+   "claim": {
+    "kind": "family",
+    "text": "Listed on the FunKey wiki page of third-party OPK applications",
+    "where": "wiki"
+   },
+   "category": "games",
+   "category_basis": "Wiki heading not cached; by file name only: title; package agrees",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/znax_funkey"
+    },
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Znax.opk",
+     "url": "https://github.com/joyrider3774/znax_funkey/releases/download/v1.0/Znax.opk",
+     "size": 1363968,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "",
+     "mirrors": [
+      "https://github.com/joyrider3774/znax_funkey/releases/latest/download/Znax.opk"
+     ],
+     "from": "wiki",
+     "sha256": "774c2a337e328bf816582762e282d4ad96bec001d303fe47ea6f5054f41b6705"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "download": "Found (squashfs seen)",
+    "mirror": "",
+    "anchors": [
+     "Link"
+    ]
+   },
+   "icon_file": "icons/wiki-znax.png",
+   "evidence": {
+    "metadata_id": "wiki-znax",
+    "description_source": "package .desktop Comment"
+   }
+  },
+  {
+   "id": "checkers",
+   "name": "Checkers",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "builds of my sdl2 playdate games for funkey / rg nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "repository description: sdl2 games for funkey / rg nano",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games"
+    },
+    {
+     "type": "repo",
+     "url": "https://codeberg.org/joyrider3774/funkey_sdl2_games",
+     "primary": false,
+     "note": "the author's Codeberg page links these releases"
+    }
+   ],
+   "packages": [
+    {
+     "name": "checkers.opk",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/checkers.-.Funkey-s.zip",
+     "size": 0,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "checkers.-.Funkey-s.zip"
+    }
+   ],
+   "also_in_repo": 6,
+   "evidence": {
+    "package_leads": "discovery/package-leads.json: ZIP verified, member OPK read (squashfs), last verified 2026-10-27"
+   }
+  },
+  {
+   "id": "dynamate",
+   "name": "Dynamate",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "builds of my sdl2 playdate games for funkey / rg nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "repository description: sdl2 games for funkey / rg nano",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games"
+    },
+    {
+     "type": "repo",
+     "url": "https://codeberg.org/joyrider3774/funkey_sdl2_games",
+     "primary": false,
+     "note": "the author's Codeberg page links these releases"
+    }
+   ],
+   "packages": [
+    {
+     "name": "dynamate.opk",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/dynamate.-.Funkey-s.zip",
+     "size": 0,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "dynamate.-.Funkey-s.zip"
+    }
+   ],
+   "also_in_repo": 6,
+   "evidence": {
+    "package_leads": "discovery/package-leads.json: ZIP verified, member OPK read (squashfs), last verified 2026-10-27"
+   }
+  },
+  {
+   "id": "puztrix",
+   "name": "Puztrix",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "builds of my sdl2 playdate games for funkey / rg nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "repository description: sdl2 games for funkey / rg nano",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games"
+    },
+    {
+     "type": "repo",
+     "url": "https://codeberg.org/joyrider3774/funkey_sdl2_games",
+     "primary": false,
+     "note": "the author's Codeberg page links these releases"
+    }
+   ],
+   "packages": [
+    {
+     "name": "puztrix.opk",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/puztrix.-.Funkey-s.zip",
+     "size": 0,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "puztrix.-.Funkey-s.zip"
+    }
+   ],
+   "also_in_repo": 6,
+   "evidence": {
+    "package_leads": "discovery/package-leads.json: ZIP verified, member OPK read (squashfs), last verified 2026-10-27"
+   }
+  },
+  {
+   "id": "puzzleland",
+   "name": "Puzzleland",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "builds of my sdl2 playdate games for funkey / rg nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "repository description: sdl2 games for funkey / rg nano",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games"
+    },
+    {
+     "type": "repo",
+     "url": "https://codeberg.org/joyrider3774/funkey_sdl2_games",
+     "primary": false,
+     "note": "the author's Codeberg page links these releases"
+    }
+   ],
+   "packages": [
+    {
+     "name": "puzzleland.opk",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/puzzleland.-.Funkey-s.zip",
+     "size": 0,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "puzzleland.-.Funkey-s.zip"
+    }
+   ],
+   "also_in_repo": 6,
+   "evidence": {
+    "package_leads": "discovery/package-leads.json: ZIP verified, member OPK read (squashfs), last verified 2026-10-27"
+   }
+  },
+  {
+   "id": "retrotime",
+   "name": "Retrotime",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "builds of my sdl2 playdate games for funkey / rg nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "repository description: sdl2 games for funkey / rg nano",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games"
+    },
+    {
+     "type": "repo",
+     "url": "https://codeberg.org/joyrider3774/funkey_sdl2_games",
+     "primary": false,
+     "note": "the author's Codeberg page links these releases"
+    }
+   ],
+   "packages": [
+    {
+     "name": "retrotime.opk",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/retrotime.-.Funkey-s.zip",
+     "size": 0,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "retrotime.-.Funkey-s.zip"
+    }
+   ],
+   "also_in_repo": 6,
+   "evidence": {
+    "package_leads": "discovery/package-leads.json: ZIP verified, member OPK read (squashfs), last verified 2026-10-27"
+   }
+  },
+  {
+   "id": "waternet",
+   "name": "Waternet",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "builds of my sdl2 playdate games for funkey / rg nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "repository description: sdl2 games for funkey / rg nano",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games"
+    },
+    {
+     "type": "repo",
+     "url": "https://codeberg.org/joyrider3774/funkey_sdl2_games",
+     "primary": false,
+     "note": "the author's Codeberg page links these releases"
+    }
+   ],
+   "packages": [
+    {
+     "name": "waternet.opk",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/waternet.-.Funkey-s.zip",
+     "size": 0,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "waternet.-.Funkey-s.zip"
+    }
+   ],
+   "also_in_repo": 6,
+   "evidence": {
+    "package_leads": "discovery/package-leads.json: ZIP verified, member OPK read (squashfs), last verified 2026-10-27"
+   }
+  },
+  {
+   "id": "worm",
+   "name": "Worm",
+   "kind": "app",
+   "status": "package-verified",
+   "description": "SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.",
+   "topics": [],
+   "version": "v1.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "builds of my sdl2 playdate games for funkey / rg nano",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "repository description: sdl2 games for funkey / rg nano",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games"
+    },
+    {
+     "type": "repo",
+     "url": "https://codeberg.org/joyrider3774/funkey_sdl2_games",
+     "primary": false,
+     "note": "the author's Codeberg page links these releases"
+    }
+   ],
+   "packages": [
+    {
+     "name": "worm.opk",
+     "url": "https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/worm.-.Funkey-s.zip",
+     "size": 0,
+     "format": "opk",
+     "signature": "squashfs",
+     "container": "zip",
+     "from": "release",
+     "container_name": "worm.-.Funkey-s.zip"
+    }
+   ],
+   "also_in_repo": 6,
+   "evidence": {
+    "package_leads": "discovery/package-leads.json: ZIP verified, member OPK read (squashfs), last verified 2026-10-27"
+   }
+  },
+  {
+   "id": "handheldlink",
+   "name": "Handheld Link",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Send ROMs, saves and apps between two handhelds over USB. Needs two FunKey OS handhelds, an OTG adapter and ADB mode.",
+   "topics": [],
+   "version": "v0.4.0",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "README: runs on FunKey OS, tested between an RG Nano and a GBA Mini",
+    "where": "readme"
+   },
+   "category": "utilities",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DankMiimer/handheld-usb-link"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK, about 8.5 MB; compatibility review needed (loads USB kernel modules, ships its own Python runtime)",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "temperature",
+   "name": "Temperature",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Temperature reader for an ADX sensor device, for RG Nano / FunKey.",
+   "topics": [],
+   "version": "",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "for rg nano / funkey ... from adx device",
+    "where": "description"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/joyrider3774/temperature_funkey"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK; needs an ADX sensor",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "scummvm",
+   "name": "ScummVM",
+   "kind": "app",
+   "status": "unverified",
+   "description": "ScummVM for FunKey S. Needs game data.",
+   "topics": [],
+   "version": "v2.6.1",
+   "license": "GPL-3.0",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "repo and tag say FunKey S",
+    "where": "repo"
+   },
+   "category": "engines",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/scummvm"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK, about 77 MB; RAM and speed on the Nano untested",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "eduke32",
+   "name": "eDuke32",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Duke Nukem 3D engine port for FunKey S. Needs game data.",
+   "topics": [],
+   "version": "v1.2",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "names FunKey S only",
+    "where": "release"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/StupidHoroscope/fks-eduke32"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/DynaMight1124/fks-eduke32-320",
+     "primary": false
+    }
+   ],
+   "packages": [],
+   "notes": "two builds in two repositories, direct OPKs, no licence stated; the second build's tag says 320x240 but the Nano screen is 240x240",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "halflife",
+   "name": "Half-Life",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Half-Life launcher for the Xash3D port. Needs your own game files.",
+   "topics": [],
+   "version": "",
+   "license": "GPL-3.0",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "repository name rg-nano-xash3d",
+    "where": "name"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DankMiimer/rg-nano-xash3d"
+    }
+   ],
+   "packages": [],
+   "notes": "12 KB launcher stub inside a ZIP; depends on the rest of the ZIP",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "counterstrike",
+   "name": "Counter-Strike",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Counter-Strike launcher for the Xash3D port. Needs your own game files.",
+   "topics": [],
+   "version": "",
+   "license": "GPL-3.0",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "repository name rg-nano-xash3d",
+    "where": "name"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DankMiimer/rg-nano-xash3d"
+    }
+   ],
+   "packages": [],
+   "notes": "12 KB launcher stub inside a ZIP; depends on the rest of the ZIP",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "gnuboy",
+   "name": "gnuboy",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Game Boy emulator for FunKey S.",
+   "topics": [],
+   "version": "v1.2.3",
+   "license": "GPL-2.0",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "tag says FunKey S",
+    "where": "release"
+   },
+   "category": "emulators",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/gnuboy"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK, 72 KB; small for an emulator, contents not inspected",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "dinguxmsx",
+   "name": "dingux-msx",
+   "kind": "app",
+   "status": "unverified",
+   "description": "MSX emulator build named for RG Nano. Licence unknown; likely needs BIOS and ROM files.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "file name says rgnano",
+    "where": "file name"
+   },
+   "category": "emulators",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/trngaje/rgnano_binary"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK, about 656 KB, an asset of the rgnano_binary release",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "usblink",
+   "name": "USBLink",
+   "kind": "app",
+   "status": "unverified",
+   "description": "USB link tool. Needs ADB-capable firmware.",
+   "topics": [],
+   "version": "",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "repository name rg-nano-adb-tools",
+    "where": "name"
+   },
+   "category": "utilities",
+   "category_basis": "GITHUB_COVERAGE_AUDIT: ADB tools are utilities",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DankMiimer/rg-nano-adb-tools"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK; many firmware builds do not support ADB",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "switchtoadb",
+   "name": "SwitchToADB",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Switches the handheld's USB mode to ADB. Needs ADB-capable firmware.",
+   "topics": [],
+   "version": "",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "repository name rg-nano-adb-tools",
+    "where": "name"
+   },
+   "category": "utilities",
+   "category_basis": "GITHUB_COVERAGE_AUDIT: ADB tools are utilities",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DankMiimer/rg-nano-adb-tools"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK; many firmware builds do not support ADB",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "switchtousb",
+   "name": "SwitchToUSB",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Switches the handheld's USB mode back to USB storage. Needs ADB-capable firmware.",
+   "topics": [],
+   "version": "",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "repository name rg-nano-adb-tools",
+    "where": "name"
+   },
+   "category": "utilities",
+   "category_basis": "GITHUB_COVERAGE_AUDIT: ADB tools are utilities",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DankMiimer/rg-nano-adb-tools"
+    }
+   ],
+   "packages": [],
+   "notes": "direct OPK; many firmware builds do not support ADB",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "tyrquake",
+   "name": "TyrQuake",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Quake engine port, FunKey S build.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "FunKey S build",
+    "where": "release"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/tyrquake"
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "vitaquake2",
+   "name": "VitaQuake II",
+   "kind": "app",
+   "status": "unverified",
+   "description": "Quake II port, FunKey S build.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "FunKey S build",
+    "where": "release"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/vitaquake2"
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "cannonball",
+   "name": "Cannonball",
+   "kind": "app",
+   "status": "source-only",
+   "description": "OutRun engine port, FunKey S fork.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "DrUm78 FunKey S fork",
+    "where": "repo"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/Cannonball-C"
+    }
+   ],
+   "packages": [],
+   "notes": "release assets not checked",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "vvvvvv",
+   "name": "VVVVVV",
+   "kind": "app",
+   "status": "source-only",
+   "description": "VVVVVV port, FunKey S fork.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "DrUm78 FunKey S fork",
+    "where": "repo"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/VVVVVV"
+    }
+   ],
+   "packages": [],
+   "notes": "release assets not checked",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "commander",
+   "name": "Commander",
+   "kind": "app",
+   "status": "source-only",
+   "description": "FunKey S fork.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "DrUm78 FunKey S fork",
+    "where": "repo"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/commander"
+    }
+   ],
+   "packages": [],
+   "notes": "release assets not checked",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "gmu",
+   "name": "Gmu",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Music player, FunKey S fork.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "DrUm78 FunKey S fork",
+    "where": "repo"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/gmu"
+    }
+   ],
+   "packages": [],
+   "notes": "release assets not checked",
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "sm64port",
+   "name": "Super Mario 64 port",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Super Mario 64 PC port for FunKey S. Source only; needs your own ROM.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "FunKey S port",
+    "where": "repo"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/DrUm78/sm64-port"
+    },
+    {
+     "type": "repo",
+     "url": "https://github.com/Akeruz/sm64-port-funkey-s",
+     "primary": false
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "fktd",
+   "name": "FK-TD",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Tower defense game for the FunKey S.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "for the FunKey S",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/robbi-blechdose/FK-TD"
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "bibi",
+   "name": "Bibi",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Bomberman clone readapted for the FunKey S. A 2021 release tag has no files.",
+   "topics": [],
+   "version": "",
+   "license": "LGPL-2.1",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "readapted for the FunKey S",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/FunKey-Project/Bibi"
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "4gewinnt",
+   "name": "4 Gewinnt",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Connect 4 game in the RGNano organisation; no description.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "",
+    "text": "RGNano organisation, no description",
+    "where": "owner"
+   },
+   "category": "games",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/RGNano/4gewinnt"
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "gingerginny",
+   "name": "Ginger Ginny",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Game, described as a FunKey SDL game. Source only.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "FunKey SDL Game",
+    "where": "description"
+   },
+   "category": "games",
+   "category_basis": "GITHUB_COVERAGE_AUDIT category table",
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/nckstwrt/GingerGinny"
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "choochootracker",
+   "name": "ChooChooTracker",
+   "kind": "app",
+   "status": "source-only",
+   "description": "Music tracker ported to the RG Nano / DrUm78 CFW. Source only.",
+   "topics": [],
+   "version": "",
+   "license": "MIT",
+   "last_activity": "",
+   "claim": {
+    "kind": "rg-nano",
+    "text": "ported to the RG Nano / DrUm78 CFW",
+    "where": "readme"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/jtmchorse/choochootracker-rgnano"
+    }
+   ],
+   "packages": [],
+   "evidence": {
+    "audit": "docs/GITHUB_COVERAGE_AUDIT.md (research pass 2026-11-02, unauthenticated GitHub API)"
+   }
+  },
+  {
+   "id": "databases",
+   "name": "Databases.zip",
+   "kind": "support",
+   "status": "listed",
+   "description": "Support files linked from the wiki list: data folder.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Linked from the FunKey wiki list of third-party OPK applications",
+    "where": "wiki"
+   },
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Databases.zip",
+     "url": "https://static.miraheze.org/funkeywiki/e/e6/Databases.zip",
+     "size": 0,
+     "format": "",
+     "signature": "",
+     "container": "zip",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "mirror": "",
+    "anchors": [
+     "Databases folder"
+    ]
+   }
+  },
+  {
+   "id": "machines",
+   "name": "Machines.zip",
+   "kind": "support",
+   "status": "listed",
+   "description": "Support files linked from the wiki list: data folder.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Linked from the FunKey wiki list of third-party OPK applications",
+    "where": "wiki"
+   },
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "Machines.zip",
+     "url": "https://static.miraheze.org/funkeywiki/1/1c/Machines.zip",
+     "size": 0,
+     "format": "",
+     "signature": "",
+     "container": "zip",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "mirror": "",
+    "anchors": [
+     "Machines folder"
+    ]
+   }
+  },
+  {
+   "id": "squashfs",
+   "name": "SquashFS.zip",
+   "kind": "support",
+   "status": "listed",
+   "description": "Support files linked from the wiki list: tool (mksquashfs) archive.",
+   "topics": [],
+   "version": "",
+   "license": "unknown",
+   "last_activity": "",
+   "claim": {
+    "kind": "family",
+    "text": "Linked from the FunKey wiki list of third-party OPK applications",
+    "where": "wiki"
+   },
+   "sources": [
+    {
+     "type": "wiki",
+     "url": "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications"
+    }
+   ],
+   "packages": [
+    {
+     "name": "SquashFS.zip",
+     "url": "https://static.miraheze.org/funkeywiki/7/79/SquashFS.zip",
+     "size": 0,
+     "format": "",
+     "signature": "",
+     "container": "zip",
+     "from": "wiki"
+    }
+   ],
+   "listing": {
+    "wiki_category": "",
+    "mirror": "",
+    "anchors": [
+     "here"
+    ]
+   }
+  }
+ ]
+}

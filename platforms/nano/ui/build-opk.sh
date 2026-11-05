@@ -42,9 +42,9 @@ rm -rf "$PKG"; mkdir -p "$PKG/assets" "$PKG/catalog/apps" "$PKG/catalog/devices"
 cp "$ROOT"/ui/assets/* "$PKG/assets/"
 cp "$ROOT"/catalog/apps/*.json "$PKG/catalog/apps/"          # read-only snapshot; TaraFi stays unavailable
 cp "$ROOT"/catalog/devices/*.json "$PKG/catalog/devices/"
-[ "${DEV:-0}" = 1 ] || { mkdir -p "$PKG/candidates" && cp "$ROOT/candidates/rg-nano.json" "$ROOT/candidates/wiki-listings.json" "$PKG/candidates/" && mkdir -p "$PKG/candidates/icons"; }   # UNAPPROVED discovery snapshot, read-only; never in the DEV build
+[ "${DEV:-0}" = 1 ] || { mkdir -p "$PKG/candidates" && cp "$ROOT/candidates/rg-nano.json" "$PKG/candidates/" && mkdir -p "$PKG/candidates/icons"; }   # UNAPPROVED discovery snapshot, read-only; never in the DEV build
 # icons: only the files the snapshots name (a snapshot names an icon only when its redistribution status is "redistributable"); a missing named file stops the build
-[ "${DEV:-0}" = 1 ] || for f in $(grep -ho '"icon_file": *"icons/[A-Za-z0-9._-]*\.png"' "$ROOT/candidates/rg-nano.json" "$ROOT/candidates/wiki-listings.json" | sed 's/.*"icons\//icons\//; s/"$//'); do cp "$ROOT/candidates/$f" "$PKG/candidates/$f"; done
+[ "${DEV:-0}" = 1 ] || for f in $(grep -ho '"icon_file": *"icons/[A-Za-z0-9._-]*\.png"' "$ROOT/candidates/rg-nano.json" | sed 's/.*"icons\//icons\//; s/"$//'); do cp "$ROOT/candidates/$f" "$PKG/candidates/$f"; done
 # the notices (MIT text, copyright lines) that the shipped icons require travel with them
 [ "${DEV:-0}" = 1 ] || cp "$ROOT/candidates/icons/NOTICE.md" "$PKG/candidates/icons/NOTICE.md"
 if [ "${DEV:-0}" = 1 ]; then   # DEV: signed catalog snapshot + trusted roots instead of loose JSON files

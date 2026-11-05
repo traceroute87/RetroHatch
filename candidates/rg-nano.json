@@ -1,505 +1,84 @@
-{
- "schema": 1,
- "device": "rg-nano",
- "status": "UNAPPROVED local candidates, not part of the signed catalog",
- "from": {
-  "results": "discovery-results.json",
-  "as_of": "2026-10-26"
- },
- "candidates": [
-  {
-   "id": "j2mefunkeyrgnano",
-   "name": "j2me-funkey-rgnano",
-   "description": "phoneME-based J2ME runtime for FunKey S / RG Nano",
-   "topics": [],
-   "version": "1.3.0",
-   "repo": "slrmoon/j2me-funkey-rgnano",
-   "source": "https://github.com/slrmoon/j2me-funkey-rgnano",
-   "license": "unknown",
-   "last_activity": "2026-10-24",
-   "package": {
-    "name": "pm.opk",
-    "url": "https://github.com/slrmoon/j2me-funkey-rgnano/releases/download/1.3.0/pm.opk",
-    "size": 3645440,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "rg-nano",
-    "text": "phoneME-based J2ME runtime for FunKey S / RG Nano",
-    "where": "description"
-   },
-   "hardware_test": "none",
-   "approval": "unapproved",
-   "package_metadata": {
-    "source": "package .desktop",
-    "package": {
-     "name": "pm.opk",
-     "size": 3645440,
-     "sha256": "568e6b9b665b16efcb463c1d43dfbcbaf6ea624d27ccb23231c0bb4d840aa5ca",
-     "identity": "high: SHA-256 on record"
-    },
-    "name": "J2ME",
-    "comment": "Java ME runtime",
-    "comment_class": "description",
-    "categories": "emulators",
-    "category_evidence": {
-     "maps_to": "Emulators",
-     "row_category": "Engines & Tools",
-     "row_category_reviewed": false,
-     "verdict": "differs"
-    },
-    "icon": {
-     "file": "pm.png",
-     "bytes": 610,
-     "format": "PNG",
-     "width": 32,
-     "height": 32,
-     "available": true,
-     "sha256": "ab3aa1bf9baa75101b488f1f754a2cd117bbb43ecdfdf9062046152e49457d75",
-     "redistribution": {
-      "status": "unclear",
-      "evidence": "Repository declares no licence. The package's only notice (NOTICE-JavaMobileAudio.txt, GPLv2) covers a Java audio library, not this icon.",
-      "source_license": "unknown",
-      "package_files_inspected": true
-     }
-    }
-   },
-   "metadata_review": {
-    "description": {
-     "package_comment": "Java ME runtime",
-     "kept": "existing description"
-    },
-    "name": {
-     "package_name": "J2ME",
-     "listed": "j2me-funkey-rgnano",
-     "applied": false
-    },
-    "category": {
-     "package": "emulators",
-     "row": "Engines & Tools",
-     "applied": false
-    }
-   }
-  },
-  {
-   "id": "nanocraft",
-   "name": "NanoCraft",
-   "description": "Minecraft Pocket Edition 0.8.1 on the Anbernic RG Nano. Software-rendered, no GPU. You supply your own APK.",
-   "topics": [
-    "anbernic",
-    "arm",
-    "funkey-os",
-    "handheld",
-    "homebrew",
-    "minecraft",
-    "minecraft-pocket-edition",
-    "opk",
-    "retro-handheld",
-    "rg-nano",
-    "software-rendering"
-   ],
-   "version": "v1.0.13",
-   "repo": "DankMiimer/nanocraft",
-   "source": "https://github.com/DankMiimer/nanocraft",
-   "license": "GPL-3.0",
-   "last_activity": "2026-09-06",
-   "package": {
-    "name": "NanoCraft_funkey-s.opk",
-    "url": "https://github.com/DankMiimer/nanocraft/releases/download/v1.0.13/nanocraft-v1.0.13-rgnano.zip",
-    "size": 622592,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "zip",
-    "more_packages": 1
-   },
-   "claim": {
-    "kind": "rg-nano",
-    "text": "funkey-os",
-    "where": "topics"
-   },
-   "category": "games",
-   "category_basis": "Minecraft Pocket Edition; a grass field with a tree",
-   "hardware_test": "none",
-   "approval": "unapproved"
-  },
-  {
-   "id": "funkoban",
-   "name": "Funkoban",
-   "description": "A Sokoban Engine for funkey-s / RG-Nano",
-   "topics": [
-    "2d",
-    "2d-game",
-    "cpp",
-    "funkey-s",
-    "funkeys",
-    "remake",
-    "remake-games",
-    "retro",
-    "retrogame",
-    "rg-nano",
-    "rgnano",
-    "sdl"
-   ],
-   "version": "v1.1",
-   "repo": "joyrider3774/sokoban_funkey",
-   "source": "https://github.com/joyrider3774/sokoban_funkey",
-   "license": "MIT",
-   "last_activity": "2026-03-27",
-   "package": {
-    "name": "Funkoban.opk",
-    "url": "https://github.com/joyrider3774/sokoban_funkey/releases/download/v1.1/Funkoban.opk",
-    "size": 8531968,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "rg-nano",
-    "text": "A Sokoban Engine for funkey-s / RG-Nano",
-    "where": "description"
-   },
-   "category": "games",
-   "category_basis": "2d-game; sokoban-game; remake-games; package agrees",
-   "hardware_test": "none",
-   "approval": "unapproved",
-   "package_metadata": {
-    "source": "package .desktop",
-    "package": {
-     "name": "Funkoban.opk",
-     "size": 8531968,
-     "sha256": "ef28ed1445742ee7793108d55b30dc97a480787f7c659e826be01d769d38b843",
-     "identity": "high: SHA-256 on record"
-    },
-    "name": "Funkoban",
-    "comment": "A Sokoban Engine",
-    "comment_class": "description",
-    "categories": "games",
-    "category_evidence": {
-     "maps_to": "Games",
-     "row_category": "Games",
-     "row_category_reviewed": true,
-     "verdict": "agrees"
-    },
-    "icon": {
-     "file": "graphics/sokoban.png",
-     "bytes": 9679,
-     "format": "PNG",
-     "width": 32,
-     "height": 32,
-     "available": true,
-     "sha256": "6e6c3bcdfbc68022fd9b2c961a46019a842d8da65d18c2eba0bc794a410cb3ed",
-     "redistribution": {
-      "status": "unclear",
-      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork. The package ships licence notices for its fonts (Roboto, Space Mono) only, none for graphics.",
-      "source_license": "MIT",
-      "package_files_inspected": true
-     }
-    }
-   }
-  },
-  {
-   "id": "cglpsdl1",
-   "name": "Cglpsdl1",
-   "description": "crisp game lib portable for funkey",
-   "topics": [
-    "arcade",
-    "crisp-game-lib",
-    "funkey-s",
-    "funkeys",
-    "games",
-    "library",
-    "rg-nano",
-    "rgnano",
-    "sdl"
-   ],
-   "version": "v4.0",
-   "repo": "joyrider3774/crisp-game-lib-portable-funkey",
-   "source": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey",
-   "license": "MIT",
-   "last_activity": "2025-12-13",
-   "package": {
-    "name": "Cglpsdl1.opk",
-    "url": "https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/download/v4.0/Cglpsdl1.opk",
-    "size": 303104,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "rg-nano",
-    "text": "rg-nano",
-    "where": "topics"
-   },
-   "hardware_test": "none",
-   "approval": "unapproved",
-   "package_metadata": {
-    "source": "package .desktop",
-    "package": {
-     "name": "Cglpsdl1.opk",
-     "size": 303104,
-     "sha256": "5b4205bf866dec116d51d6e59a9ff60bb7517fd65e271e80bbd1691041c5153f",
-     "identity": "medium: squashfs signature + recorded size"
-    },
-    "name": "cglpsdl1",
-    "comment": "Crisp Games Library Portable",
-    "comment_class": "description",
-    "categories": "games",
-    "category_evidence": {
-     "maps_to": "Games",
-     "row_category": "Other",
-     "row_category_reviewed": false,
-     "verdict": "differs"
-    },
-    "icon": {
-     "file": "cglpsdl1.png",
-     "bytes": 2826,
-     "format": "PNG",
-     "width": 32,
-     "height": 32,
-     "available": true,
-     "sha256": "6cecff5750e1c0053c49c1362fd7ab46c7b8779e8660bee698dc5047083ed123",
-     "redistribution": {
-      "status": "unclear",
-      "evidence": "Repository is MIT (GitHub licence field). No notice names the icon's author or source, so the MIT grant is not assumed to cover this artwork.",
-      "source_license": "MIT",
-      "package_files_inspected": false
-     }
-    },
-    "multiple_desktop_files": true
-   },
-   "metadata_review": {
-    "description": {
-     "package_comment": "Crisp Games Library Portable",
-     "kept": "existing description"
-    },
-    "category": {
-     "package": "games",
-     "row": "Other",
-     "applied": false
-    }
-   }
-  },
-  {
-   "id": "picoarch",
-   "name": "picoarch",
-   "description": "Fork of the neonloop's picoarch. Build for FunKey-OS (I only tested with RG Nano). https://git.crowdedwood.com/picoarch/",
-   "topics": [],
-   "version": "build-231226",
-   "repo": "sdhizumi/picoarch",
-   "source": "https://github.com/sdhizumi/picoarch",
-   "license": "NOASSERTION",
-   "last_activity": "2023-12-26",
-   "package": {
-    "name": "picoarch.opk",
-    "url": "https://github.com/sdhizumi/picoarch/releases/download/build-231226/picoarch-funkey-s.zip",
-    "size": 57540608,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "zip",
-    "more_packages": 11
-   },
-   "claim": {
-    "kind": "rg-nano",
-    "text": "Build for FunKey-OS (I only tested with RG Nano)",
-    "where": "description"
-   },
-   "category": "emulators",
-   "category_basis": "picoarch-gambatte; picoarch-fceumm; picoarch-pcsx_rearmed",
-   "hardware_test": "none",
-   "approval": "unapproved"
-  },
-  {
-   "id": "xash3dfs",
-   "name": "XASH3DFS",
-   "description": "a port of xash 3d for the funkey s. ",
-   "topics": [],
-   "version": "xash3dfs",
-   "repo": "Sn3zee-cmds/XASH3DFS",
-   "source": "https://github.com/Sn3zee-cmds/XASH3DFS",
-   "license": "unknown",
-   "last_activity": "2026-09-14",
-   "package": {
-    "name": "XASH3DFS0.50.opk",
-    "url": "https://github.com/Sn3zee-cmds/XASH3DFS/releases/download/xash3dfs/XASH3DFS0.50.opk",
-    "size": 16420864,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "family",
-    "text": "a port of xash 3d for the funkey s.",
-    "where": "description"
-   },
-   "hardware_test": "none",
-   "approval": "unapproved"
-  },
-  {
-   "id": "meleelight",
-   "name": "meleelight",
-   "description": "",
-   "topics": [],
-   "version": "v1.0.1",
-   "repo": "chasemcdizzle/meleelight-funkey-s",
-   "source": "https://github.com/chasemcdizzle/meleelight-funkey-s",
-   "license": "NOASSERTION",
-   "last_activity": "2026-09-02",
-   "package": {
-    "name": "meleelight.opk",
-    "url": "https://github.com/chasemcdizzle/meleelight-funkey-s/releases/download/v1.0.1/meleelight.opk",
-    "size": 577536,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "family",
-    "text": "meleelight-funkey-s",
-    "where": "name"
-   },
-   "hardware_test": "none",
-   "approval": "unapproved"
-  },
-  {
-   "id": "sudokul",
-   "name": "SuDokuL",
-   "description": "Multiplatform Sudoku game, made with C++/SDL2",
-   "topics": [
-    "android",
-    "cpp",
-    "funkey-s",
-    "funkeys",
-    "game",
-    "game-development",
-    "gamecube",
-    "homebrew",
-    "linux",
-    "nintendo-switch",
-    "psp",
-    "sdl"
-   ],
-   "version": "v1.5",
-   "repo": "Mode8fx/SuDokuL",
-   "source": "https://github.com/Mode8fx/SuDokuL",
-   "license": "MIT",
-   "last_activity": "2026-06-05",
-   "package": {
-    "name": "SuDokuL-v1.5-funkey.opk",
-    "url": "https://github.com/Mode8fx/SuDokuL/releases/download/v1.5/SuDokuL-v1.5-funkey.opk",
-    "size": 913408,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "family",
-    "text": "android cpp funkey-s funkeys game game-development gamecube homebrew linux nintendo-switch psp sdl sdl2 sudoku switch visual-studio vita wii wii-u wiiu",
-    "where": "topics"
-   },
-   "hardware_test": "none",
-   "approval": "unapproved",
-   "package_metadata": {
-    "source": "package .desktop",
-    "package": {
-     "name": "SuDokuL-v1.5-funkey.opk",
-     "size": 913408,
-     "sha256": "dfd5837d4d57f067f855e21ce04974b0a1580a105241541d6f0cba1f7fa67ecd",
-     "identity": "high: SHA-256 on record"
-    },
-    "name": "SuDokuL",
-    "comment": "Sudoku made with SDL",
-    "comment_class": "description",
-    "categories": "games",
-    "category_evidence": {
-     "maps_to": "Games",
-     "row_category": "Games",
-     "row_category_reviewed": false,
-     "verdict": "agrees"
-    },
-    "icon": {
-     "file": "sudokul-image.png",
-     "bytes": 1869,
-     "format": "PNG",
-     "width": 32,
-     "height": 32,
-     "available": true,
-     "sha256": "c4a1101747f32164c694c0a732706251f5212319b47d6a5690dd5d460341cea8",
-     "redistribution": {
-      "status": "unclear",
-      "evidence": "Repository is MIT (GitHub licence field). The package's strings point to opengameart.org for art and sound; the licence of this picture was not identified.",
-      "source_license": "MIT",
-      "package_files_inspected": true
-     }
-    }
-   },
-   "metadata_review": {
-    "description": {
-     "package_comment": "Sudoku made with SDL",
-     "kept": "existing description"
-    }
-   }
-  },
-  {
-   "id": "trispace",
-   "name": "TriSpace",
-   "description": "An Elite-like space game for the FunKey S.",
-   "topics": [],
-   "version": "1.1.0",
-   "repo": "robbi-blechdose/TriSpace",
-   "source": "https://github.com/robbi-blechdose/TriSpace",
-   "license": "AGPL-3.0",
-   "last_activity": "2026-01-01",
-   "package": {
-    "name": "TriSpace.opk",
-    "url": "https://github.com/robbi-blechdose/TriSpace/releases/download/1.1.0/TriSpace.opk",
-    "size": 3678208,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "family",
-    "text": "An Elite-like space game for the FunKey S.",
-    "where": "description"
-   },
-   "hardware_test": "none",
-   "approval": "unapproved"
-  },
-  {
-   "id": "keycraft",
-   "name": "KeyCraft",
-   "description": "A voxel/block building game for the FunKey S.",
-   "topics": [],
-   "version": "1.2.0",
-   "repo": "robbi-blechdose/KeyCraft",
-   "source": "https://github.com/robbi-blechdose/KeyCraft",
-   "license": "AGPL-3.0",
-   "last_activity": "2025-03-14",
-   "package": {
-    "name": "KeyCraft.opk",
-    "url": "https://github.com/robbi-blechdose/KeyCraft/releases/download/1.2.0/KeyCraft.opk",
-    "size": 4378624,
-    "format": "opk",
-    "signature": "squashfs",
-    "container": "",
-    "more_packages": 0
-   },
-   "claim": {
-    "kind": "family",
-    "text": "A voxel/block building game for the FunKey S.",
-    "where": "description"
-   },
-   "hardware_test": "none",
-   "approval": "unapproved"
-  }
- ]
-}
+{"schema":1,"device":"rg-nano","status":"UNAPPROVED candidates, read-only; not part of the signed catalog. Generated from candidates/inventory.json by tools/make_inventory.py: edit that file.","candidates":[{"id":"j2mefunkeyrgnano","name":"j2me-funkey-rgnano","description":"phoneME-based J2ME runtime for FunKey S / RG Nano","topics":[],"version":"1.3.0","repo":"slrmoon/j2me-funkey-rgnano","source":"https://github.com/slrmoon/j2me-funkey-rgnano","license":"unknown","last_activity":"2026-10-24","package":{"name":"pm.opk","url":"https://github.com/slrmoon/j2me-funkey-rgnano/releases/download/1.3.0/pm.opk","size":3645440,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"phoneME-based J2ME runtime for FunKey S / RG Nano","where":"description"},"hardware_test":"none","approval":"unapproved"},
+{"id":"nanocraft","name":"NanoCraft","description":"Minecraft Pocket Edition 0.8.1 on the Anbernic RG Nano. Software-rendered, no GPU. You supply your own APK.","topics":["anbernic","arm","funkey-os","handheld","homebrew","minecraft","minecraft-pocket-edition","opk","retro-handheld","rg-nano","software-rendering"],"version":"v1.0.13","repo":"DankMiimer/nanocraft","source":"https://github.com/DankMiimer/nanocraft","license":"GPL-3.0","last_activity":"2026-09-06","package":{"name":"NanoCraft_funkey-s.opk","url":"https://github.com/DankMiimer/nanocraft/releases/download/v1.0.13/nanocraft-v1.0.13-rgnano.zip","size":622592,"format":"opk","signature":"squashfs","container":"zip","more_packages":1},"claim":{"kind":"rg-nano","text":"funkey-os","where":"topics"},"category":"games","category_basis":"Minecraft Pocket Edition; a grass field with a tree","hardware_test":"none","approval":"unapproved"},
+{"id":"funkoban","name":"Funkoban","description":"A Sokoban Engine for funkey-s / RG-Nano","topics":["2d","2d-game","cpp","funkey-s","funkeys","remake","remake-games","retro","retrogame","rg-nano","rgnano","sdl"],"version":"v1.1","repo":"joyrider3774/sokoban_funkey","source":"https://github.com/joyrider3774/sokoban_funkey","license":"MIT","last_activity":"2026-03-27","package":{"name":"Funkoban.opk","url":"https://github.com/joyrider3774/sokoban_funkey/releases/download/v1.1/Funkoban.opk","size":8531968,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"A Sokoban Engine for funkey-s / RG-Nano","where":"description"},"category":"games","category_basis":"2d-game; sokoban-game; remake-games; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"","mirror":""}},
+{"id":"cglpsdl1","name":"Cglpsdl1","description":"crisp game lib portable for funkey","topics":["arcade","crisp-game-lib","funkey-s","funkeys","games","library","rg-nano","rgnano","sdl"],"version":"v4.0","repo":"joyrider3774/crisp-game-lib-portable-funkey","source":"https://github.com/joyrider3774/crisp-game-lib-portable-funkey","license":"MIT","last_activity":"2025-12-13","package":{"name":"Cglpsdl1.opk","url":"https://github.com/joyrider3774/crisp-game-lib-portable-funkey/releases/download/v4.0/Cglpsdl1.opk","size":303104,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"rg-nano","where":"topics"},"hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"","mirror":""}},
+{"id":"picoarch","name":"picoarch","description":"Fork of the neonloop's picoarch. Build for FunKey-OS (I only tested with RG Nano). https://git.crowdedwood.com/picoarch/","topics":[],"version":"build-231226","repo":"sdhizumi/picoarch","source":"https://github.com/sdhizumi/picoarch","license":"NOASSERTION","last_activity":"2023-12-26","package":{"name":"picoarch.opk","url":"https://github.com/sdhizumi/picoarch/releases/download/build-231226/picoarch-funkey-s.zip","size":57540608,"format":"opk","signature":"squashfs","container":"zip","more_packages":11},"claim":{"kind":"rg-nano","text":"Build for FunKey-OS (I only tested with RG Nano)","where":"description"},"category":"emulators","category_basis":"picoarch-gambatte; picoarch-fceumm; picoarch-pcsx_rearmed","hardware_test":"none","approval":"unapproved"},
+{"id":"xash3dfs","name":"XASH3DFS","description":"a port of xash 3d for the funkey s. ","topics":[],"version":"xash3dfs","repo":"Sn3zee-cmds/XASH3DFS","source":"https://github.com/Sn3zee-cmds/XASH3DFS","license":"unknown","last_activity":"2026-09-14","package":{"name":"XASH3DFS0.50.opk","url":"https://github.com/Sn3zee-cmds/XASH3DFS/releases/download/xash3dfs/XASH3DFS0.50.opk","size":16420864,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"a port of xash 3d for the funkey s.","where":"description"},"hardware_test":"none","approval":"unapproved"},
+{"id":"meleelight","name":"meleelight","description":"","topics":[],"version":"v1.0.1","repo":"chasemcdizzle/meleelight-funkey-s","source":"https://github.com/chasemcdizzle/meleelight-funkey-s","license":"NOASSERTION","last_activity":"2026-09-02","package":{"name":"meleelight.opk","url":"https://github.com/chasemcdizzle/meleelight-funkey-s/releases/download/v1.0.1/meleelight.opk","size":577536,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"meleelight-funkey-s","where":"name"},"hardware_test":"none","approval":"unapproved"},
+{"id":"sudokul","name":"SuDokuL","description":"Multiplatform Sudoku game, made with C++/SDL2","topics":["android","cpp","funkey-s","funkeys","game","game-development","gamecube","homebrew","linux","nintendo-switch","psp","sdl"],"version":"v1.5","repo":"Mode8fx/SuDokuL","source":"https://github.com/Mode8fx/SuDokuL","license":"MIT","last_activity":"2026-06-05","package":{"name":"SuDokuL-v1.5-funkey.opk","url":"https://github.com/Mode8fx/SuDokuL/releases/download/v1.5/SuDokuL-v1.5-funkey.opk","size":913408,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"android cpp funkey-s funkeys game game-development gamecube homebrew linux nintendo-switch psp sdl sdl2 sudoku switch visual-studio vita wii wii-u wiiu","where":"topics"},"hardware_test":"none","approval":"unapproved"},
+{"id":"trispace","name":"TriSpace","description":"An Elite-like space game for the FunKey S.","topics":[],"version":"1.1.0","repo":"robbi-blechdose/TriSpace","source":"https://github.com/robbi-blechdose/TriSpace","license":"AGPL-3.0","last_activity":"2026-01-01","package":{"name":"TriSpace.opk","url":"https://github.com/robbi-blechdose/TriSpace/releases/download/1.1.0/TriSpace.opk","size":3678208,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"An Elite-like space game for the FunKey S.","where":"description"},"hardware_test":"none","approval":"unapproved"},
+{"id":"keycraft","name":"KeyCraft","description":"A voxel/block building game for the FunKey S.","topics":[],"version":"1.2.0","repo":"robbi-blechdose/KeyCraft","source":"https://github.com/robbi-blechdose/KeyCraft","license":"AGPL-3.0","last_activity":"2025-03-14","package":{"name":"KeyCraft.opk","url":"https://github.com/robbi-blechdose/KeyCraft/releases/download/1.2.0/KeyCraft.opk","size":4378624,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"A voxel/block building game for the FunKey S.","where":"description"},"hardware_test":"none","approval":"unapproved"},
+{"id":"3doh","name":"3DOh","description":"","topics":[],"version":"V1","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"3DOh-V1.opk","url":"https://static.miraheze.org/funkeywiki/1/1d/3DOh-V1.opk","size":53248,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: 3DO emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"blips","name":"Blips","description":"A remake of the dos Bips game","topics":[],"version":"v1.0","repo":"joyrider3774/blips_funkey","source":"https://github.com/joyrider3774/blips_funkey","license":"MIT","last_activity":"2025-12-04","package":{"name":"Blips.opk","url":"https://github.com/joyrider3774/blips_funkey/releases/download/v1.0/Blips.opk","size":819200,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"games","category_basis":"Wiki heading not cached; by file name only: title; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"blockdude","name":"Blockdude","description":"A remake of the TI-83 puzzle game","topics":[],"version":"v1.0","repo":"joyrider3774/blockdude_funkey","source":"https://github.com/joyrider3774/blockdude_funkey","license":"MIT","last_activity":"2025-04-05","package":{"name":"Blockdude.opk","url":"https://github.com/joyrider3774/blockdude_funkey/releases/download/v1.0/Blockdude.opk","size":3407872,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"games","category_basis":"Wiki heading not cached; by file name only: title; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"clockapp","name":"Clock App","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"clock_app_funkey-s.opk","url":"https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/clock_app_funkey-s.opk","size":0,"format":"opk","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"utilities","category_basis":"Wiki heading not cached; by file name only: clock by name","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Unavailable (HTTP 403)","mirror":""}},
+{"id":"commodore64","name":"Commodore 64","description":"Commodore 64 emulator for Libretro","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Commodore_64_funkey-s.opk","url":"https://static.miraheze.org/funkeywiki/a/ad/Commodore_64_funkey-s.opk","size":2891776,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: C64 machine by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"dinothawr","name":"Dinothawr","description":"","topics":[],"version":"V2","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Dinothawr-V2.opk","url":"https://static.miraheze.org/funkeywiki/2/28/Dinothawr-V2.opk","size":7663616,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"games","category_basis":"Wiki heading not cached; by file name only: title; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"dividead","name":"Dividead","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"dividead_funkey-s.opk","url":"https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/dividead_funkey-s.opk","size":0,"format":"opk","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Unavailable (HTTP 403)","mirror":""}},
+{"id":"dosboxpure","name":"DOSBox Pure","description":"","topics":[],"version":"V1","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"DOSBox_Pure-V1.opk","url":"https://static.miraheze.org/funkeywiki/e/ec/DOSBox_Pure-V1.opk","size":2744320,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: DOSBox by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"easyrpg","name":"EasyRPG","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"EasyRPG.opk","url":"https://static.miraheze.org/funkeywiki/5/5a/EasyRPG.opk","size":21303296,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"engines","category_basis":"Wiki heading not cached; by file name only: RPG Maker player: runtime by name; package differs","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"fake08","name":"Fake-08","description":"PICO-8 Emulator (port gameblabla)","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Fake08.opk","url":"https://static.miraheze.org/funkeywiki/1/18/Fake08.opk","size":233472,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: PICO-8 player by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"finalburnalpha2012","name":"FinalBurn Alpha 2012","description":"","topics":[],"version":"V3","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"FinalBurnAlpha2012-V3.opk","url":"https://static.miraheze.org/funkeywiki/9/9e/FinalBurnAlpha2012-V3.opk","size":5877760,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: arcade emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"finalburnneo","name":"FinalBurn Neo","description":"","topics":[],"version":"V1","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"FinalBurnNeo-V1.opk","url":"https://static.miraheze.org/funkeywiki/7/7c/FinalBurnNeo-V1.opk","size":10264576,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: arcade emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"formula1","name":"Formula1","description":"Little fake F1 Game and Watch game","topics":[],"version":"v1.0","repo":"joyrider3774/formula1_funkey","source":"https://github.com/joyrider3774/formula1_funkey","license":"MIT","last_activity":"2025-04-05","package":{"name":"Formula1.opk","url":"https://github.com/joyrider3774/formula1_funkey/releases/download/v1.0/Formula1.opk","size":196608,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"games","category_basis":"Wiki heading not cached; by file name only: title; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"gambatte","name":"Gambatte","description":"","topics":[],"version":"V4","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Gambatte-V4.opk","url":"https://static.miraheze.org/funkeywiki/9/93/Gambatte-V4.opk","size":1843200,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Game Boy emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"gambattesdlretrocore","name":"Gambatte (SDL Retro core)","description":"Emulator core, not a stand-alone app. ","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Gambatte_(SDL_Retro_Core).zip","url":"https://static.miraheze.org/funkeywiki/6/69/Gambatte_%28SDL_Retro_Core%29.zip","size":108972,"format":"zip","signature":"","container":"zip","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: core for SDL Retro by name","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"ZIP, not opened (1 entries)","mirror":""}},
+{"id":"gamemusicemu","name":"Game Music Emu","description":"","topics":[],"version":"V2","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Game_Music_Emu-V2.opk","url":"https://static.miraheze.org/funkeywiki/4/4c/Game_Music_Emu-V2.opk","size":1953792,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"media","category_basis":"Wiki heading not cached; by file name only: music player by name; package generic","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"ganbarenatuskian","name":"Ganbare Natuskian","description":"Puzzle/Platform game","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Ganbare-Natuskian.opk","url":"https://static.miraheze.org/funkeywiki/b/b0/Ganbare-Natuskian.opk","size":27557888,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"games","category_basis":"Wiki heading not cached; by file name only: title; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"gmenu2x","name":"GMenu2X","description":"System add-on, changes the menu or firmware. ","topics":[],"version":"","repo":"DrUm78/gmenu2x","source":"https://github.com/DrUm78/gmenu2x","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"utilities","category_basis":"Wiki heading not cached; by file name only: menu launcher by name","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"No file link crawled","mirror":""}},
+{"id":"gnash","name":"Gnash","description":"Adobe flash 8 emulator","topics":[],"version":"V2","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Gnash-V2.opk","url":"https://static.miraheze.org/funkeywiki/b/b1/Gnash-V2.opk","size":8450048,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"engines","category_basis":"Wiki heading not cached; by file name only: Flash player: runtime by name; package differs","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"heboris","name":"Heboris","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"heboris_funkey-s.opk","url":"https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/heboris_funkey-s.opk","size":0,"format":"opk","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Unavailable (HTTP 403)","mirror":""}},
+{"id":"keykalc","name":"KeyKalc","description":"","topics":[],"version":"","repo":"Robbi-Blechdose/KeyKalc","source":"https://github.com/Robbi-Blechdose/KeyKalc","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"utilities","category_basis":"Wiki heading not cached; by file name only: calculator by name","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"No file link crawled","mirror":""}},
+{"id":"lameds","name":"LameDS","description":"NDS emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"LameDS.opk","url":"https://static.miraheze.org/funkeywiki/c/c4/LameDS.opk","size":487424,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say; package differs","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"mame2000","name":"MAME 2000","description":"","topics":[],"version":"V3","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"MAME2000-V3.opk","url":"https://static.miraheze.org/funkeywiki/d/de/MAME2000-V3.opk","size":4677632,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: arcade emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"mednafennesonly","name":"Mednafen (NES only)","description":"Nintendo Entertainment System emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Mednafen_(NES_only).opk","url":"https://static.miraheze.org/funkeywiki/4/45/Mednafen_%28NES_only%29.opk","size":4096,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Mednafen emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"mplayer","name":"MPlayer","description":"Native video player","topics":[],"version":"V2","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"MPlayer-V2.opk","url":"https://static.miraheze.org/funkeywiki/1/1d/MPlayer-V2.opk","size":7847936,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"media","category_basis":"Wiki heading not cached; by file name only: media player by name; package generic","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"ncrafti","name":"NCrafti","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"ncrafti_funkey-s.opk","url":"https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/ncrafti_funkey-s.opk","size":0,"format":"opk","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Unavailable (HTTP 403)","mirror":""}},
+{"id":"pcfxemu","name":"PC-FX Emu","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Pcfxemu_funkey-s.opk","url":"https://static.miraheze.org/funkeywiki/d/d6/Pcfxemu_funkey-s.opk","size":552960,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"pcsxrearmed","name":"PCSX ReARMed","description":"","topics":[],"version":"V2","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"PCSX_ReARMed_V2.opk","url":"https://static.miraheze.org/funkeywiki/6/65/PCSX_ReARMed_V2.opk","size":516096,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: PlayStation emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"picodrive","name":"PicoDrive","description":"SMS/GG/MD/MCD/32X emulator","topics":[],"version":"V3","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"PicoDrive-V3.opk","url":"https://static.miraheze.org/funkeywiki/1/14/PicoDrive-V3.opk","size":458752,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Mega Drive emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"piemu","name":"Piemu","description":"P/EDE emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Piemu_funkey-s.opk","url":"https://static.miraheze.org/funkeywiki/d/d4/Piemu_funkey-s.opk","size":20480,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say; package differs","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"pocketcdg","name":"Pocket CDG","description":"","topics":[],"version":"V1","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Pocket_CDG-V1.opk","url":"https://static.miraheze.org/funkeywiki/c/c3/Pocket_CDG-V1.opk","size":1802240,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"media","category_basis":"Wiki heading not cached; by file name only: CD+G karaoke player by name; package generic","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"pokemini","name":"PokeMini","description":"Pokemon Mini emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Pokemini_funkey.opk","url":"https://static.miraheze.org/funkeywiki/f/fd/Pokemini_funkey.opk","size":499712,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Pokemon Mini emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"rubido","name":"Rubido","description":"A Chinese checkers board game","topics":[],"version":"v1.0","repo":"joyrider3774/rubido_funkey","source":"https://github.com/joyrider3774/rubido_funkey","license":"MIT","last_activity":"2025-04-05","package":{"name":"Rubido.opk","url":"https://github.com/joyrider3774/rubido_funkey/releases/download/v1.0/Rubido.opk","size":3469312,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"games","category_basis":"Wiki heading not cached; by file name only: title; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""},"icon_file":"icons/wiki-rubido.png"},
+{"id":"sdlretro","name":"SDL Retro","description":"Essential core pack for Libretro","topics":[],"version":"V9","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"SDL_Retro-V9.opk","url":"https://static.miraheze.org/funkeywiki/e/e6/SDL_Retro-V9.opk","size":11096064,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: libretro frontend by name; package differs","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"smsplus","name":"SMS Plus","description":"SMS/GG/SG emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"Smsplus_funkey-s.opk","url":"https://static.miraheze.org/funkeywiki/2/22/Smsplus_funkey-s.opk","size":479232,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Master System emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"srb2","name":"SRB2","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"srb2_funkey-s.opk","url":"https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/srb2_funkey-s.opk","size":0,"format":"opk","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Unavailable (HTTP 403)","mirror":""}},
+{"id":"st","name":"ST","description":"ST Terminal","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"ST.opk","url":"https://static.miraheze.org/funkeywiki/c/cb/ST.opk","size":81920,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say; package generic","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""}},
+{"id":"stk","name":"STK","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"stk_funkey-s.opk","url":"https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/stk_funkey-s.opk","size":0,"format":"opk","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Unavailable (HTTP 403)","mirror":""}},
+{"id":"swanemu","name":"SwanEmu","description":"Wonderswan emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"SwanEmu.opk","url":"https://static.miraheze.org/funkeywiki/b/bc/SwanEmu.opk","size":466944,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: WonderSwan emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"vbanext","name":"VBA Next","description":"GBA emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"VBA_Next.opk","url":"https://static.miraheze.org/funkeywiki/0/02/VBA_Next.opk","size":552960,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Game Boy Advance emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"vbemu","name":"VBEmu","description":"Virtual Boy emulator","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"VBEmu.opk","url":"https://static.miraheze.org/funkeywiki/2/20/VBEmu.opk","size":434176,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Virtual Boy emulator by name; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":"gitlab.com: HTTP 403"}},
+{"id":"vicesdlretrocore","name":"VICE (SDL Retro core)","description":"Emulator core, not a stand-alone app. ","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"VICE_(SDL_Retro_Core).zip","url":"https://static.miraheze.org/funkeywiki/c/c9/VICE_%28SDL_Retro_Core%29.zip","size":1100102,"format":"zip","signature":"","container":"zip","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"emulators","category_basis":"Wiki heading not cached; by file name only: Commodore emulator core by name","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"ZIP, not opened (1 entries)","mirror":""}},
+{"id":"worshipvector","name":"Worship Vector","description":"","topics":[],"version":"","repo":"","source":"https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications","license":"unknown","last_activity":"","package":{"name":"worship_vector_funkey-s.opk","url":"https://gitlab.com/gameblabla/gameblabla-releases/-/blob/master/opk/funkey/worship_vector_funkey-s.opk","size":0,"format":"opk","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"other","category_basis":"Wiki heading not cached; by file name only: name does not say","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Unavailable (HTTP 403)","mirror":""}},
+{"id":"znax","name":"Znax","description":"A Connect 4 Style arcade / puzzle game","topics":[],"version":"v1.0","repo":"joyrider3774/znax_funkey","source":"https://github.com/joyrider3774/znax_funkey","license":"MIT","last_activity":"2025-02-23","package":{"name":"Znax.opk","url":"https://github.com/joyrider3774/znax_funkey/releases/download/v1.0/Znax.opk","size":1363968,"format":"opk","signature":"squashfs","container":"","more_packages":0},"claim":{"kind":"family","text":"Listed on the FunKey wiki page of third-party OPK applications","where":"wiki"},"category":"games","category_basis":"Wiki heading not cached; by file name only: title; package agrees","hardware_test":"none","approval":"unapproved","listing":{"source":"wiki","wiki_category":"","download":"Found (squashfs seen)","mirror":""},"icon_file":"icons/wiki-znax.png"},
+{"id":"checkers","name":"Checkers","description":"SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.","topics":[],"version":"v1.0","repo":"joyrider3774/funkey_sdl2_games","source":"https://github.com/joyrider3774/funkey_sdl2_games","license":"MIT","last_activity":"","package":{"name":"checkers.opk","url":"https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/checkers.-.Funkey-s.zip","size":0,"format":"opk","signature":"squashfs","container":"zip","more_packages":6},"claim":{"kind":"rg-nano","text":"builds of my sdl2 playdate games for funkey / rg nano","where":"description"},"category":"games","category_basis":"repository description: sdl2 games for funkey / rg nano","hardware_test":"none","approval":"unapproved"},
+{"id":"dynamate","name":"Dynamate","description":"SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.","topics":[],"version":"v1.0","repo":"joyrider3774/funkey_sdl2_games","source":"https://github.com/joyrider3774/funkey_sdl2_games","license":"MIT","last_activity":"","package":{"name":"dynamate.opk","url":"https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/dynamate.-.Funkey-s.zip","size":0,"format":"opk","signature":"squashfs","container":"zip","more_packages":6},"claim":{"kind":"rg-nano","text":"builds of my sdl2 playdate games for funkey / rg nano","where":"description"},"category":"games","category_basis":"repository description: sdl2 games for funkey / rg nano","hardware_test":"none","approval":"unapproved"},
+{"id":"puztrix","name":"Puztrix","description":"SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.","topics":[],"version":"v1.0","repo":"joyrider3774/funkey_sdl2_games","source":"https://github.com/joyrider3774/funkey_sdl2_games","license":"MIT","last_activity":"","package":{"name":"puztrix.opk","url":"https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/puztrix.-.Funkey-s.zip","size":0,"format":"opk","signature":"squashfs","container":"zip","more_packages":6},"claim":{"kind":"rg-nano","text":"builds of my sdl2 playdate games for funkey / rg nano","where":"description"},"category":"games","category_basis":"repository description: sdl2 games for funkey / rg nano","hardware_test":"none","approval":"unapproved"},
+{"id":"puzzleland","name":"Puzzleland","description":"SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.","topics":[],"version":"v1.0","repo":"joyrider3774/funkey_sdl2_games","source":"https://github.com/joyrider3774/funkey_sdl2_games","license":"MIT","last_activity":"","package":{"name":"puzzleland.opk","url":"https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/puzzleland.-.Funkey-s.zip","size":0,"format":"opk","signature":"squashfs","container":"zip","more_packages":6},"claim":{"kind":"rg-nano","text":"builds of my sdl2 playdate games for funkey / rg nano","where":"description"},"category":"games","category_basis":"repository description: sdl2 games for funkey / rg nano","hardware_test":"none","approval":"unapproved"},
+{"id":"retrotime","name":"Retrotime","description":"SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.","topics":[],"version":"v1.0","repo":"joyrider3774/funkey_sdl2_games","source":"https://github.com/joyrider3774/funkey_sdl2_games","license":"MIT","last_activity":"","package":{"name":"retrotime.opk","url":"https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/retrotime.-.Funkey-s.zip","size":0,"format":"opk","signature":"squashfs","container":"zip","more_packages":6},"claim":{"kind":"rg-nano","text":"builds of my sdl2 playdate games for funkey / rg nano","where":"description"},"category":"games","category_basis":"repository description: sdl2 games for funkey / rg nano","hardware_test":"none","approval":"unapproved"},
+{"id":"waternet","name":"Waternet","description":"SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.","topics":[],"version":"v1.0","repo":"joyrider3774/funkey_sdl2_games","source":"https://github.com/joyrider3774/funkey_sdl2_games","license":"MIT","last_activity":"","package":{"name":"waternet.opk","url":"https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/waternet.-.Funkey-s.zip","size":0,"format":"opk","signature":"squashfs","container":"zip","more_packages":6},"claim":{"kind":"rg-nano","text":"builds of my sdl2 playdate games for funkey / rg nano","where":"description"},"category":"games","category_basis":"repository description: sdl2 games for funkey / rg nano","hardware_test":"none","approval":"unapproved"},
+{"id":"worm","name":"Worm","description":"SDL2 game build for FunKey / RG Nano, one of seven in the funkey_sdl2_games collection.","topics":[],"version":"v1.0","repo":"joyrider3774/funkey_sdl2_games","source":"https://github.com/joyrider3774/funkey_sdl2_games","license":"MIT","last_activity":"","package":{"name":"worm.opk","url":"https://github.com/joyrider3774/funkey_sdl2_games/releases/latest/download/worm.-.Funkey-s.zip","size":0,"format":"opk","signature":"squashfs","container":"zip","more_packages":6},"claim":{"kind":"rg-nano","text":"builds of my sdl2 playdate games for funkey / rg nano","where":"description"},"category":"games","category_basis":"repository description: sdl2 games for funkey / rg nano","hardware_test":"none","approval":"unapproved"},
+{"id":"handheldlink","name":"Handheld Link","description":"Package not inspected (audit note). Send ROMs, saves and apps between two handhelds over USB. Needs two FunKey OS handhelds, an OTG adapter and ADB mode.","topics":[],"version":"v0.4.0","repo":"DankMiimer/handheld-usb-link","source":"https://github.com/DankMiimer/handheld-usb-link","license":"MIT","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"README: runs on FunKey OS, tested between an RG Nano and a GBA Mini","where":"readme"},"category":"utilities","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"temperature","name":"Temperature","description":"Package not inspected (audit note). Temperature reader for an ADX sensor device, for RG Nano / FunKey.","topics":[],"version":"","repo":"joyrider3774/temperature_funkey","source":"https://github.com/joyrider3774/temperature_funkey","license":"MIT","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"for rg nano / funkey ... from adx device","where":"description"},"hardware_test":"none","approval":"unapproved"},
+{"id":"scummvm","name":"ScummVM","description":"Package not inspected (audit note). ScummVM for FunKey S. Needs game data.","topics":[],"version":"v2.6.1","repo":"DrUm78/scummvm","source":"https://github.com/DrUm78/scummvm","license":"GPL-3.0","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"repo and tag say FunKey S","where":"repo"},"category":"engines","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"eduke32","name":"eDuke32","description":"Package not inspected (audit note). Duke Nukem 3D engine port for FunKey S. Needs game data.","topics":[],"version":"v1.2","repo":"StupidHoroscope/fks-eduke32","source":"https://github.com/StupidHoroscope/fks-eduke32","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"names FunKey S only","where":"release"},"hardware_test":"none","approval":"unapproved"},
+{"id":"halflife","name":"Half-Life","description":"Package not inspected (audit note). Half-Life launcher for the Xash3D port. Needs your own game files.","topics":[],"version":"","repo":"DankMiimer/rg-nano-xash3d","source":"https://github.com/DankMiimer/rg-nano-xash3d","license":"GPL-3.0","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"repository name rg-nano-xash3d","where":"name"},"hardware_test":"none","approval":"unapproved"},
+{"id":"counterstrike","name":"Counter-Strike","description":"Package not inspected (audit note). Counter-Strike launcher for the Xash3D port. Needs your own game files.","topics":[],"version":"","repo":"DankMiimer/rg-nano-xash3d","source":"https://github.com/DankMiimer/rg-nano-xash3d","license":"GPL-3.0","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"repository name rg-nano-xash3d","where":"name"},"hardware_test":"none","approval":"unapproved"},
+{"id":"gnuboy","name":"gnuboy","description":"Package not inspected (audit note). Game Boy emulator for FunKey S.","topics":[],"version":"v1.2.3","repo":"DrUm78/gnuboy","source":"https://github.com/DrUm78/gnuboy","license":"GPL-2.0","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"tag says FunKey S","where":"release"},"category":"emulators","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"dinguxmsx","name":"dingux-msx","description":"Package not inspected (audit note). MSX emulator build named for RG Nano. Licence unknown; likely needs BIOS and ROM files.","topics":[],"version":"","repo":"trngaje/rgnano_binary","source":"https://github.com/trngaje/rgnano_binary","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"file name says rgnano","where":"file name"},"category":"emulators","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"usblink","name":"USBLink","description":"Package not inspected (audit note). USB link tool. Needs ADB-capable firmware.","topics":[],"version":"","repo":"DankMiimer/rg-nano-adb-tools","source":"https://github.com/DankMiimer/rg-nano-adb-tools","license":"MIT","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"repository name rg-nano-adb-tools","where":"name"},"category":"utilities","category_basis":"GITHUB_COVERAGE_AUDIT: ADB tools are utilities","hardware_test":"none","approval":"unapproved"},
+{"id":"switchtoadb","name":"SwitchToADB","description":"Package not inspected (audit note). Switches the handheld's USB mode to ADB. Needs ADB-capable firmware.","topics":[],"version":"","repo":"DankMiimer/rg-nano-adb-tools","source":"https://github.com/DankMiimer/rg-nano-adb-tools","license":"MIT","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"repository name rg-nano-adb-tools","where":"name"},"category":"utilities","category_basis":"GITHUB_COVERAGE_AUDIT: ADB tools are utilities","hardware_test":"none","approval":"unapproved"},
+{"id":"switchtousb","name":"SwitchToUSB","description":"Package not inspected (audit note). Switches the handheld's USB mode back to USB storage. Needs ADB-capable firmware.","topics":[],"version":"","repo":"DankMiimer/rg-nano-adb-tools","source":"https://github.com/DankMiimer/rg-nano-adb-tools","license":"MIT","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"repository name rg-nano-adb-tools","where":"name"},"category":"utilities","category_basis":"GITHUB_COVERAGE_AUDIT: ADB tools are utilities","hardware_test":"none","approval":"unapproved"},
+{"id":"tyrquake","name":"TyrQuake","description":"Package not inspected (audit note). Quake engine port, FunKey S build.","topics":[],"version":"","repo":"DrUm78/tyrquake","source":"https://github.com/DrUm78/tyrquake","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"FunKey S build","where":"release"},"hardware_test":"none","approval":"unapproved"},
+{"id":"vitaquake2","name":"VitaQuake II","description":"Package not inspected (audit note). Quake II port, FunKey S build.","topics":[],"version":"","repo":"DrUm78/vitaquake2","source":"https://github.com/DrUm78/vitaquake2","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"FunKey S build","where":"release"},"hardware_test":"none","approval":"unapproved"},
+{"id":"cannonball","name":"Cannonball","description":"Source only, no release package. OutRun engine port, FunKey S fork.","topics":[],"version":"","repo":"DrUm78/Cannonball-C","source":"https://github.com/DrUm78/Cannonball-C","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"DrUm78 FunKey S fork","where":"repo"},"hardware_test":"none","approval":"unapproved"},
+{"id":"vvvvvv","name":"VVVVVV","description":"Source only, no release package. VVVVVV port, FunKey S fork.","topics":[],"version":"","repo":"DrUm78/VVVVVV","source":"https://github.com/DrUm78/VVVVVV","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"DrUm78 FunKey S fork","where":"repo"},"hardware_test":"none","approval":"unapproved"},
+{"id":"commander","name":"Commander","description":"Source only, no release package. FunKey S fork.","topics":[],"version":"","repo":"DrUm78/commander","source":"https://github.com/DrUm78/commander","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"DrUm78 FunKey S fork","where":"repo"},"hardware_test":"none","approval":"unapproved"},
+{"id":"gmu","name":"Gmu","description":"Source only, no release package. Music player, FunKey S fork.","topics":[],"version":"","repo":"DrUm78/gmu","source":"https://github.com/DrUm78/gmu","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"DrUm78 FunKey S fork","where":"repo"},"hardware_test":"none","approval":"unapproved"},
+{"id":"sm64port","name":"Super Mario 64 port","description":"Source only, no release package. Super Mario 64 PC port for FunKey S. Source only; needs your own ROM.","topics":[],"version":"","repo":"DrUm78/sm64-port","source":"https://github.com/DrUm78/sm64-port","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"FunKey S port","where":"repo"},"hardware_test":"none","approval":"unapproved"},
+{"id":"fktd","name":"FK-TD","description":"Source only, no release package. Tower defense game for the FunKey S.","topics":[],"version":"","repo":"robbi-blechdose/FK-TD","source":"https://github.com/robbi-blechdose/FK-TD","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"for the FunKey S","where":"description"},"category":"games","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"bibi","name":"Bibi","description":"Source only, no release package. Bomberman clone readapted for the FunKey S. A 2021 release tag has no files.","topics":[],"version":"","repo":"FunKey-Project/Bibi","source":"https://github.com/FunKey-Project/Bibi","license":"LGPL-2.1","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"readapted for the FunKey S","where":"description"},"category":"games","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"4gewinnt","name":"4 Gewinnt","description":"Source only, no release package. Connect 4 game in the RGNano organisation; no description.","topics":[],"version":"","repo":"RGNano/4gewinnt","source":"https://github.com/RGNano/4gewinnt","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"","text":"RGNano organisation, no description","where":"owner"},"category":"games","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"gingerginny","name":"Ginger Ginny","description":"Source only, no release package. Game, described as a FunKey SDL game. Source only.","topics":[],"version":"","repo":"nckstwrt/GingerGinny","source":"https://github.com/nckstwrt/GingerGinny","license":"unknown","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"family","text":"FunKey SDL Game","where":"description"},"category":"games","category_basis":"GITHUB_COVERAGE_AUDIT category table","hardware_test":"none","approval":"unapproved"},
+{"id":"choochootracker","name":"ChooChooTracker","description":"Source only, no release package. Music tracker ported to the RG Nano / DrUm78 CFW. Source only.","topics":[],"version":"","repo":"jtmchorse/choochootracker-rgnano","source":"https://github.com/jtmchorse/choochootracker-rgnano","license":"MIT","last_activity":"","package":{"name":"","url":"","size":0,"format":"","signature":"","container":"","more_packages":0},"claim":{"kind":"rg-nano","text":"ported to the RG Nano / DrUm78 CFW","where":"readme"},"hardware_test":"none","approval":"unapproved"}]}

@@ -152,16 +152,15 @@ int main(int argc, char **argv)
 		sc.keys = zero; sc.nkeys = 0; memset(&si, 0, sizeof si); CHECK(rh_src_load(&sc, &idx, &len, &si) != 0 && !idx);   /* no usable key: nothing can verify */
 		rh_model_load_none(&model, si.why, pstate);
 		snprintf(f, sizeof f, "%s/candidates/rg-nano.json", argv[1]); rh_model_load_candidates(&model, f);
-		snprintf(f, sizeof f, "%s/candidates/wiki-listings.json", argv[1]); rh_model_add_candidates(&model, f);
-		CHECK(model.n_apps == 0 && model.n_cands == 54 && !model.cat.ok && model.cat.status[0]);   /* only read-only candidate rows */
+		CHECK(model.n_apps == 0 && model.n_cands >= 84 && !model.cat.ok && model.cat.status[0]);   /* only read-only candidate rows */
 		c = with_net(cfg(1, pstate, pcache), key, ca, "https://catalog.invalid/"); o = rh_ops_init(&c); CHECK(o != NULL);
 		setenv("SDL_VIDEODRIVER", "dummy", 0);
 		CHECK(!SDL_Init(SDL_INIT_VIDEO) && SDL_SetVideoMode(240, 240, 32, SDL_SWSURFACE) != NULL);
 		snprintf(assets_dir, sizeof assets_dir, "%s/ui/assets", argv[1]);
 		CHECK(rh_ui_init(assets_dir, &model) == 0);
 		rh_ui_set_ops(o);                                                                       /* production ops ARE enabled: candidates still cannot use them */
-		keys_("a"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.count == 54);
-		for (n = 0; n < 54; n++) {
+		keys_("a"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.count == model.n_cands);   /* every candidate row, whatever their number */
+		for (n = 0; n < model.n_cands; n++) {
 			keys_("a"); v = V(); CHECK(v.screen == RH_S_CAND && v.action == RH_ACT_NONE);
 			keys_("aaaaa"); v = V(); CHECK(v.screen == RH_S_CAND && v.depth == 2 && !rh_ui_busy() && rh_ui_run_pending() == 0);   /* A does nothing: no install, download or preview */
 			keys_("b"); CHECK(V().screen == RH_S_DISCOVER); keys_("d");

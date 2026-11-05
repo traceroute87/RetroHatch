@@ -282,9 +282,10 @@ static void candidates(const char *root, const char *assets)
 	/* the real snapshot beside the real (approved) catalog */
 	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root);
 	rh_model_load(&m, cat, st); n_apps = m.n_apps; rh_model_load_candidates(&m, f);
-	CHECK(m.n_cands >= 1 && m.n_cands <= 10 && m.n_apps == n_apps);   /* approved apps untouched */
-	for (i = 0; i < m.n_cands; i++) CHECK(m.cands[i].name[0] && m.cands[i].repo[0] && m.cands[i].sig_ok && m.cands[i].size > 0 && m.cands[i].claim[0]);
-	for (i = 0; i < m.n_cands; i++) { int j; for (j = i + 1; j < m.n_cands; j++) CHECK(strcmp(m.cands[i].repo, m.cands[j].repo) != 0); }   /* one entry per project */
+	CHECK(m.n_cands > 12 && m.n_apps == n_apps);   /* the one inventory snapshot has no fixed limit; approved apps untouched */
+	for (i = 0; i < m.n_cands; i++) CHECK(m.cands[i].name[0] && m.cands[i].id[0]);
+	for (i = 0; i < 10; i++) CHECK(m.cands[i].repo[0] && m.cands[i].sig_ok && m.cands[i].size > 0 && m.cands[i].claim[0]);   /* the first ten are the original verified repository entries */
+	for (i = 0; i < m.n_cands; i++) { int j; for (j = i + 1; j < m.n_cands; j++) CHECK(strcmp(m.cands[i].id, m.cands[j].id) != 0); }   /* one entry per application, not per repository */
 	CHECK(rh_ui_init(assets, &m) == 0);
 	rh_ui_set_planner(rh_plan_target);                      /* even with the preview planner, a candidate has no install path */
 	keys("a"); v = V(); CHECK(v.screen == RH_S_DISCOVER && v.count == n_apps + m.n_cands); shot("cand_1_discover");
@@ -380,6 +381,7 @@ static void categories(const char *root, const char *assets)
 	CHECK(m.cands[find_cand(&m, "NanoCraft")].cat == RH_CAT_GAMES && m.cands[find_cand(&m, "NanoCraft")].cat_basis[0]);          /* reviewed, evidence kept */
 	CHECK(m.cands[find_cand(&m, "Funkoban")].cat == RH_CAT_GAMES && m.cands[find_cand(&m, "picoarch")].cat == RH_CAT_EMU && m.cands[find_cand(&m, "picoarch")].cat_basis[0]);
 	CHECK(!m.cands[find_cand(&m, "KeyCraft")].cat_basis[0]);                           /* derived from its own words: no review entry */
+	{ int k = 0; for (i = 0; i < m.n_cands; i++) if (m.cands[i].cat != RH_CAT_UTIL) m.cands[k++] = m.cands[i]; m.n_cands = k; }   /* the inventory has Utilities now: drop them so the empty-filter case stays covered */
 	CHECK(n_cat(&m, RH_CAT_UTIL) == 0);                                                /* an empty category exists */
 	games = n_cat(&m, RH_CAT_GAMES); sudo = find_cand(&m, "SuDokuL");
 	CHECK(games >= 2 && sudo >= 0 && m.cands[sudo].cat == RH_CAT_GAMES);
@@ -419,10 +421,7 @@ static void wiki_listings(const char *root, const char *assets)
 	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root);
 	snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root);
 	rh_model_load(&m, cat, st); n_apps = m.n_apps; rh_model_load_candidates(&m, f);
-	CHECK(m.n_cands == 10);
-	snprintf(f, sizeof f, "%s/candidates/wiki-listings.json", root);
-	rh_model_add_candidates(&m, f);
-	CHECK(m.n_cands > 12 && m.n_apps == n_apps);                                        /* past the old 12-row limit; approved apps untouched */
+	CHECK(m.n_cands > 12 && m.n_apps == n_apps);                                        /* one file, past the old 12-row limit; approved apps untouched */
 	for (i = 0; i < 10; i++) CHECK(find_cand(&m, OLD[i]) >= 0);                         /* nothing unique to the existing source was dropped */
 	CHECK(m.cands[find_cand(&m, "Funkoban")].wiki && m.cands[find_cand(&m, "Cglpsdl1")].wiki);   /* matched, not duplicated */
 	for (i = 0, j = 0; i < m.n_cands; i++) j += !strcmp(m.cands[i].name, "Funkoban") || !strcmp(m.cands[i].name, "Cglpsdl1");
@@ -468,6 +467,22 @@ static void wiki_listings(const char *root, const char *assets)
 			rh_ui_free();
 		}
 		CHECK(!m.cands[find_cand(&m, "Clock App")].sig_ok && m.cands[find_cand(&m, "Gambatte")].sig_ok);
+	}
+	{   /* inventory entries that are not wiki listings: a ZIP collection member, an uninspected package, a source-only entry, a core, a system add-on */
+		const char *pick[] = {"Checkers", "Handheld Link", "FK-TD", "Gambatte (SDL Retro core)", "GMenu2X"}, *tag[] = {"zip_member", "unverified", "source_only", "core", "system"}, *lead[] = {"", "Package not inspected", "Source only", "Emulator core", "System add-on"};
+		for (j = 0; j < 5; j++) {
+			int idx = find_cand(&m, pick[j]), k; char nm[64];
+			CHECK(idx >= 0 && !strncmp(m.cands[idx].desc, lead[j], strlen(lead[j])));        /* the label is the first thing the description says */
+			CHECK(rh_ui_init(assets, &m) == 0);
+			keys("a"); for (k = 0; k < n_apps + idx; k++) keys("d");
+			keys("a"); v = V(); CHECK(v.screen == RH_S_CAND && v.app == idx && v.action == RH_ACT_NONE);
+			snprintf(nm, sizeof nm, "inv_%d_%s_details", j + 1, tag[j]); shot(nm);
+			for (k = 0; k < 40; k++) keys("d");
+			snprintf(nm, sizeof nm, "inv_%d_%s_bottom", j + 1, tag[j]); shot(nm);
+			rh_ui_free();
+		}
+		CHECK(m.cands[find_cand(&m, "Checkers")].sig_ok && m.cands[find_cand(&m, "Checkers")].zipped && !m.cands[find_cand(&m, "Checkers")].wiki);
+		CHECK(!m.cands[find_cand(&m, "FK-TD")].sig_ok && !m.cands[find_cand(&m, "FK-TD")].pkg_name[0] && !m.cands[find_cand(&m, "Handheld Link")].sig_ok);
 	}
 	{   /* every candidate page opens, scrolls to its end and comes back under the sanitizers: row buffers and text wrapping stay in bounds */
 		int idx, k;
@@ -528,8 +543,7 @@ static void icons(const char *root, const char *assets)
 	/* the shipped snapshots: an icon is named only when its file is there (icons ship only with a recorded right to redistribute them) */
 	rh_model_load(&m, cat, st);
 	snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root); rh_model_load_candidates(&m, f);
-	snprintf(f, sizeof f, "%s/candidates/wiki-listings.json", root); rh_model_add_candidates(&m, f);
-	CHECK(m.n_cands == 54);
+	CHECK(m.n_cands >= 84);   /* every inventory entry that is a browser entry */
 	for (i = 0; i < m.n_cands; i++) if (m.cands[i].icon[0]) {
 		n_icon++; fp = fopen(m.cands[i].icon, "rb"); CHECK(fp != NULL); if (fp) fclose(fp);
 	}

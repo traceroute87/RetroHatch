@@ -1,5 +1,5 @@
 /* RetroHatch UI program (host and RG Nano).
- *   retrohatch [--assets dir] [--candidates file] [--wiki file] [--shot out.bmp]      production: signed catalog, install enabled
+ *   retrohatch [--assets dir] [--candidates file] [--shot out.bmp]                      production: signed catalog, install enabled
  *   retrohatch --catalog dir --state dir ...                                           preview/test data: unsigned, READ-ONLY, no install
  * Defaults are relative to the cwd: opkrun chdir()s into the mounted OPK.
  * --shot renders the Home screen once and exits (path/asset check); it never creates state or enables installing.
@@ -7,7 +7,7 @@
  * Production (this file without RH_DEV): the catalog shown is the newest signed one that verified against the compiled-in
  * production key (trusted_keys_prod.h): bundled in the OPK or downloaded earlier, refreshed over HTTPS. Install, update and
  * uninstall go through rh_ops.c (production rules) and the same engine as DEV. Missing or invalid key, no catalog, or an
- * unusable state directory = nothing installable: the UI stays a read-only browser. The 54 UNAPPROVED candidates are
+ * unusable state directory = nothing installable: the UI stays a read-only browser. The UNAPPROVED candidates are
  * rh_cand rows: the UI has no install path for them in any build.
  *
  * Keys: fkgpiod on FunKey OS delivers the buttons as the letters u d l r a b x y m n s q
@@ -55,7 +55,7 @@ static int net_poll(uint64_t done, uint64_t total)
 #define PROD_CACHE_DIR RH_NANO_STATE_DIR "/cache"
 static rh_model m;
 static SDL_Surface *g_scr;
-static const char *cands_path = "candidates/rg-nano.json", *wiki_path = "candidates/wiki-listings.json";
+static const char *cands_path = "candidates/rg-nano.json";
 /* nkeys is set at start: 0 when the compiled-in key is missing (placeholder) or invalid (all zero), so nothing can verify */
 static rh_src_cfg src = {RH_NANO_STATE_DIR, RH_NANO_STATE_DIR "/catalog.pkg", "catalog/catalog.pkg", RH_TRUSTED_KEYS, 0};
 static size_t usable_keys(void)
@@ -76,8 +76,7 @@ static void refresh(void)
 		rh_model_load_signed(&m, idx, len, si.source, si.serial, si.expires, RH_DEVICE_ID, RH_NANO_STATE_DIR);
 		free(idx);
 	} else rh_model_load_none(&m, si.why, RH_NANO_STATE_DIR);
-	rh_model_load_candidates(&m, cands_path);   /* UNAPPROVED discovery results: read-only, never installable */
-	rh_model_add_candidates(&m, wiki_path);     /* UNAPPROVED FunKey wiki listings, same rules; a missing file adds nothing */
+	rh_model_load_candidates(&m, cands_path);   /* UNAPPROVED candidate inventory snapshot: read-only, never installable */
 }
 /* called by the downloader every ~100 ms: show progress, let B cancel */
 static int net_poll(uint64_t done, uint64_t total)
@@ -120,7 +119,6 @@ int main(int argc, char **argv)
 		else if (!strcmp(argv[i], "--shot")) shot = argv[i + 1];
 #ifndef RH_DEV
 		else if (!strcmp(argv[i], "--candidates")) cands_path = argv[i + 1];
-		else if (!strcmp(argv[i], "--wiki")) wiki_path = argv[i + 1];
 #endif
 		else { fprintf(stderr, "retrohatch: unknown option %s\n", argv[i]); return 2; }
 	}
@@ -131,7 +129,6 @@ int main(int argc, char **argv)
 	if (preview) {   /* local unsigned catalog files: shown, never installable (no ops are set below) */
 		rh_model_load(&m, catalog, state);
 		rh_model_load_candidates(&m, cands_path);
-		rh_model_add_candidates(&m, wiki_path);
 	} else {
 		src.nkeys = usable_keys();
 		if (!src.nkeys) fprintf(stderr, "retrohatch: no usable production catalog key: nothing can be verified or installed\n");

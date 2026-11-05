@@ -20,4 +20,6 @@
 
 # FunKey wiki, "List of third-party OPK applications": 64 package links (OPK and ZIP, hosted on the wiki CDN, GitLab and GitHub) and 19
 # repository roots. Reached with HTTP 200 on 2026-11-04. Packages it lists count as community-source finds, not autonomous ones.
+# Known limitation: this index source FAILED in GitHub Actions run 41921300975 (reported by the maintainer; cause not analysed). Generic page-following
+# stays in the crawler until the index is proven; candidates/inventory.json records the same limit.
 index  https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications  rg-nano
