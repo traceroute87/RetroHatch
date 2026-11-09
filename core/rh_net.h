@@ -1,4 +1,4 @@
-/* HTTPS file download (Phase 7). mbedTLS 2.16 client, certificate AND hostname verification always on (VERIFY_REQUIRED,
+/* HTTPS file download (Phase 7). OpenSSL client (the firmware's 1.1.1: TLS 1.2 and 1.3), certificate AND hostname verification always on (SSL_VERIFY_PEER,
  * TLS 1.2+, no insecure mode, no http:// URLs, no https->http redirects). Blocking; bounded by per-read and total
  * deadlines. Writes <dest>.part and renames it to <dest> only after the size and SHA-256 you asked for matched.
  * Knows nothing about catalogs or installs. */

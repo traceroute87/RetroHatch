@@ -426,10 +426,10 @@ static void paging(const char *root, const char *assets)
 	static rh_model m; char cat[512], st[512], f[512]; rh_ui_view v; int i, n, sc, max, last = 0, steps = 0; unsigned h0;
 	snprintf(cat, sizeof cat, "%s/catalog", root); snprintf(st, sizeof st, "%s/tests/ui_fixture/nostate", root); snprintf(f, sizeof f, "%s/candidates/rg-nano.json", root);
 	rh_model_load(&m, cat, st); rh_model_load_candidates(&m, f); n = m.n_apps + m.n_cands;
-	CHECK(find_cand(&m, "TaraFi") < 0 && find_cand(&m, "Kishmish Nano") < 0 && find_cand(&m, "Rockbox") >= 0 && n == 130);   /* with the catalog loaded, its TaraFi and Kishmish rows replace the candidates (same source URL) */
+	CHECK(find_cand(&m, "TaraFi") < 0 && find_cand(&m, "Kishmish Nano") < 0 && find_cand(&m, "Rockbox") >= 0 && n == 123);   /* with the catalog loaded, its TaraFi and Kishmish rows replace the candidates (same source URL) */
 	{ int a, k = 0; for (a = 0; a < m.n_apps; a++) k += !strcmp(m.apps[a].name, "TaraFi") || !strcmp(m.apps[a].name, "Kishmish Nano"); CHECK(k == 2); }
 	{ static rh_model b; snprintf(cat, sizeof cat, "%s/tests/ui_fixture/no-such-catalog", root); rh_model_load(&b, cat, st); rh_model_load_candidates(&b, f);   /* the Nano today: no signed catalog */
-	  CHECK(b.n_apps == 0 && b.n_cands == 130 && find_cand(&b, "Rockbox") >= 0 && b.cands[find_cand(&b, "Rockbox")].cat == RH_CAT_MEDIA && !b.cands[find_cand(&b, "Rockbox")].sig_ok && find_cand(&b, "TaraFi") >= 0 && b.cands[find_cand(&b, "TaraFi")].cat == RH_CAT_MEDIA
+	  CHECK(b.n_apps == 0 && b.n_cands == 123 && find_cand(&b, "Rockbox") >= 0 && b.cands[find_cand(&b, "Rockbox")].cat == RH_CAT_MEDIA && !b.cands[find_cand(&b, "Rockbox")].sig_ok && find_cand(&b, "TaraFi") >= 0 && b.cands[find_cand(&b, "TaraFi")].cat == RH_CAT_MEDIA
 	        && find_cand(&b, "Kishmish Nano") >= 0 && b.cands[find_cand(&b, "Kishmish Nano")].cat == RH_CAT_GAMES && !b.cands[find_cand(&b, "Kishmish Nano")].sig_ok); }
 	snprintf(cat, sizeof cat, "%s/catalog", root);
 	CHECK(n > 100 && rh_ui_init(assets, &m) == 0);
@@ -487,7 +487,7 @@ static void wiki_listings(const char *root, const char *assets)
 		if (c->sig_ok) n_ver++;
 		else { n_unver++; CHECK(c->dl[0]); }                                             /* an unverified listing says why */
 	}
-	CHECK(n_wiki >= 46 && n_ver > 0 && n_unver > 0 && n_wiki == n_ver + n_unver);
+	CHECK(n_wiki >= 39 && n_ver > 0 && n_unver > 0 && n_wiki == n_ver + n_unver);
 	for (i = 0, j = 0; i < RH_CAT_N; i++) j += n_cat(&m, i) * (i != RH_CAT_ALL);
 	CHECK(j == n_apps + m.n_cands);                                                      /* one category each */
 
@@ -505,7 +505,7 @@ static void wiki_listings(const char *root, const char *assets)
 	rh_ui_free();
 
 	{   /* a verified listing, an unverified one, a long name: details pages */
-		const char *pick[][2] = {{"Gambatte", "wiki_3_details_verified"}, {"Clock App", "wiki_4_details_unverified"}, {"FinalBurn Alpha 2012", "wiki_5_details_long_name"}, {"KeyKalc", "wiki_6_details_no_file"}};
+		const char *pick[][2] = {{"Gambatte", "wiki_3_details_verified"}, {"VICE (SDL Retro core)", "wiki_4_details_unverified"}, {"FinalBurn Alpha 2012", "wiki_5_details_long_name"}, {"KeyKalc", "wiki_6_details_no_file"}};
 		for (j = 0; j < 4; j++) {
 			int idx = find_cand(&m, pick[j][0]), k;
 			CHECK(idx >= 0 && m.cands[idx].wiki);
@@ -517,7 +517,7 @@ static void wiki_listings(const char *root, const char *assets)
 			CHECK(V().scroll > 0); if (j == 1) shot("wiki_4b_details_unverified_bottom");
 			rh_ui_free();
 		}
-		CHECK(!m.cands[find_cand(&m, "Clock App")].sig_ok && m.cands[find_cand(&m, "Gambatte")].sig_ok);
+		CHECK(!m.cands[find_cand(&m, "VICE (SDL Retro core)")].sig_ok && m.cands[find_cand(&m, "Gambatte")].sig_ok);
 	}
 	{   /* inventory entries that are not wiki listings: a ZIP collection member, an uninspected package, a source-only entry, a core, a system add-on */
 		const char *pick[] = {"Checkers", "Handheld Link", "FK-TD", "Gambatte (SDL Retro core)", "GMenu2X", "Match3", "Super Square Bros", "2048"}, *tag[] = {"zip_member", "unverified", "source_only", "core", "system", "blit_match3", "blit_longname", "blit_2048"}, *lead[] = {"", "Package not inspected", "Source only", "Emulator core", "System add-on", "32blit game", "32blit game", "32blit game"};

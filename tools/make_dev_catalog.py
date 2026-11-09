@@ -51,6 +51,17 @@ def other_doc():
     return d
 
 
+def kishmish_doc():
+    """Real app, real GitHub URL, DEV-signed fixture ONLY (hardware test in progress). The evidence note says so; production catalog/apps is untouched."""
+    d = json.load(open(ROOT / "catalog" / "apps" / "kishmish-nano.json"))
+    a = d["artifacts"][0]
+    a.pop("unavailable_reason", None)
+    a.update(status="available", compatibility={"level": "verified", "evidence": [{
+        "sha256": a["sha256"], "date": "2026-11-06", "tester": "dev-fixture",
+        "note": "DEV FIXTURE for the hardware test in progress. NOT production evidence."}]})
+    return d
+
+
 def catalog(td, apps, serial, date="2026-10-26"):
     c = Path(td) / f"c{serial}{len(apps)}{date}"
     (c / "apps").mkdir(parents=True); (c / "devices").mkdir()
@@ -89,10 +100,12 @@ def main():
         i1 = catalog(td, [d1], 1)
         i2 = catalog(td, [d2, other_doc()], 2)
         i2b = catalog(td, [d2], 2, "2026-11-01")
+        i3 = catalog(td, [d2, kishmish_doc()], 3, "2026-11-06")   # serial 3: adds the real Kishmish entry (DEV hardware test)
         (out / "bundled.pkg").write_bytes(sign(i1, key) + b"\n" + i1)
-        for name, idx in (("index-1", i1), ("index-2", i2), ("index-2b", i2b)):
+        for name, idx in (("index-1", i1), ("index-2", i2), ("index-2b", i2b), ("index-3", i3)):
             (out / f"{name}.json").write_bytes(idx)
             (out / f"{name}.json.sig").write_bytes(sign(idx, key))
+        (out / "catalog-3.pkg").write_bytes(sign(i3, key) + b"\n" + i3)   # drop into <state dir>/catalog.pkg (the downloaded-copy format)
         t = bytearray(i2); t[t.index(b"RH Probe")] ^= 0x20
         (out / "index-2.tampered.json").write_bytes(bytes(t))
     for v, b in pk.items():

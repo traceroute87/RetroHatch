@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #define RH_MAX_APPS 32
+#define RH_MAX_INST 160   /* installed.tsv rows shown: catalog apps plus experimental test installs */
 
 /* Software category. Derived from the name, description and topics the entry already carries, never stored in the trusted catalog. */
 typedef enum { RH_CAT_ALL, RH_CAT_GAMES, RH_CAT_EMU, RH_CAT_MEDIA, RH_CAT_UTIL, RH_CAT_ENGINE, RH_CAT_OTHER, RH_CAT_N } rh_cat;   /* ALL is only a filter value */
@@ -45,6 +46,11 @@ typedef struct {
 	char icon[192];       /* PNG next to the candidate file (candidates/icons/<id>.png): "icon_file" of the entry, or "" when it has none or names an unsafe path */
 	char dl[48];          /* wiki listings: what the file link gave when it was crawled ("Found...", "Unavailable (HTTP 403)", ...); "" = n/a */
 	char mirror[64];      /* wiki listings: result of the page's other link(s) to the same application, "" = none */
+	/* experimental test install (DEV builds only; production never reads these): where the package is, what the snapshot says it is */
+	char url[256];        /* package.url as published upstream; "" = none, or longer than the field (url_long) */
+	char fmt[8];          /* package.format: "opk" | "zip" | "" */
+	char sha256[65];      /* package.sha256 when the snapshot has a valid one (hash of the downloaded file); "" = none: authenticity unverified */
+	int url_long;
 } rh_cand;
 
 typedef struct {
@@ -55,7 +61,7 @@ typedef struct {
 	rh_app apps[RH_MAX_APPS]; int n_apps;
 	rh_dev devs[8];           int n_devs;
 	/* installed record rows; app = index into apps or -1 when not in the catalog */
-	struct { char id[40], version[24]; int app; } inst[RH_MAX_APPS]; int n_inst;
+	struct { char id[40], version[24]; int app; } inst[RH_MAX_INST]; int n_inst;
 	int upd[RH_MAX_APPS];     int n_upd;   /* indexes into inst[]: catalog has a different available version */
 	rh_devinfo di;
 	rh_cand *cands; int n_cands, cap_cands;   /* rh_model_load_candidates(); grown as needed, no fixed limit; shown after the approved apps, always labeled UNAPPROVED */

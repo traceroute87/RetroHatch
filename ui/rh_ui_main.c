@@ -18,7 +18,7 @@
 #include <SDL/SDL.h>
 #include "rh_ui.h"
 #include "../platforms/nano/rh_install.h"
-#ifdef RH_DEV                       /* RetroHatchDev.opk only: install flow for RH Probe, DEV state dir only */
+#ifdef RH_DEV                       /* RetroHatchDev.opk only: install flow for the DEV allowlist and experimental test installs, DEV state dir only */
 #include <stdlib.h>
 #include "rh_ops.h"
 #include "rh_source.h"
@@ -35,6 +35,7 @@ static void refresh(void)
 		rh_model_load_signed(&m, idx, len, si.source, si.serial, si.expires, RH_DEVICE_ID, RH_DEV_STATE_DIR);
 		free(idx);
 	} else rh_model_load_none(&m, si.why, RH_DEV_STATE_DIR);
+	rh_model_load_candidates(&m, "candidates/rg-nano.json");   /* all UNAPPROVED candidates; installable ones offer an EXPERIMENTAL, UNVERIFIED test install (DEV build only) */
 }
 /* called by the downloader every ~100 ms: show progress, let B cancel */
 static int net_poll(uint64_t done, uint64_t total)

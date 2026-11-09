@@ -9,10 +9,15 @@
 #include "../core/rh_net.h"
 #include "rh_ops.h"
 #include "rh_source.h"
+#ifdef RH_EXPERIMENTAL
+#include "../core/rh_zip.h"
+#include "../core/sha256.h"
+#endif
 
 /* The only things DEV may install. Exact id + exact file name. Production has no list: the signed catalog is the gate. */
 static const struct { const char *id, *dest; } ALLOWED[] = {
 	{"rhprobe", "rhprobe_funkey-s.opk"},
+	{"kishmish-nano", "kishmish-nano_funkey-s.opk"},   /* first real app: DEV hardware test only; production uses the signed catalog */
 };
 
 static rh_cfg eng;
@@ -154,8 +159,12 @@ static const char *net_status(void) { return last_net; }
 static int install(const rh_app *a, char *msg, size_t n) { return run(a, 0, msg, n); }
 static int update(const rh_app *a, char *msg, size_t n) { return run(a, 1, msg, n); }
 
+#ifdef RH_EXPERIMENTAL
+#include "rh_ops_exp.inc"
+#endif
+
 static rh_ui_ops ops = {can_install, can_update, update, can_uninstall, uninstall, install, NULL, "DEV (install/update/uninstall)",
-	NULL, NULL, NULL, NULL, 0};
+	NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL};
 
 static void read_mirror(const char *path)
 {
@@ -201,6 +210,10 @@ const rh_ui_ops *rh_ops_init(const rh_ops_cfg *c)
 		for (k = 0; net_on && k < c->nkeys; k++) { for (b = 0; b < 32 && !c->keys[k][b]; b++) {} if (b == 32) net_on = 0; }
 	}
 	ops.can_download = NULL; ops.download = NULL; ops.refresh_catalog = NULL; ops.net_status = NULL;   /* a second init never inherits the first one's network */
+	ops.cand_state = NULL; ops.cand_do = NULL; ops.cand_facts = NULL;   /* candidates stay read-only unless this DEV build enables the experiment */
+#ifdef RH_EXPERIMENTAL
+	if (!prod) { ops.cand_state = x_state; ops.cand_do = x_do; ops.cand_facts = x_facts; }
+#endif
 	if (net_on) {
 		FILE *f; size_t k;
 		memset(&net, 0, sizeof net);

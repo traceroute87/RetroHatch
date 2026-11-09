@@ -1,4 +1,4 @@
-"""Run: python tests/test_signed_flow.py    (needs WSL Ubuntu with gcc, SDL host libs, mbedTLS in ~/mbedtls_native, openssl)
+"""Run: python tests/test_signed_flow.py    (needs WSL Ubuntu with gcc, SDL host libs, OpenSSL headers in ~/ossl_native/root (see tests/Makefile), openssl)
 
 DEV UI + ops + signed catalog + HTTPS downloads against a local TLS server (throwaway CA, throwaway signing key)."""
 import subprocess, sys

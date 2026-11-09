@@ -49,4 +49,13 @@ assert "-DRH_DEV" not in prodsec and "rh_ops.c" in prodsec and "rh_source.c" in 
 assert "-DRH_DEV" in b.split("elif", 1)[1].split("else NAME=RetroHatch", 1)[0]                     # DEV recipe keeps its own define
 assert "PRODCAT" in b and "catalog.pkg" in b and "ca-bundle.crt" in b
 assert "DEVCAT" in b and b.count("catalog.pkg") >= 2 and "PRODCAT:-" in b                           # a bundled production catalog only when one is supplied; the DEV one is a separate variable
+# experimental test installs (unapproved candidates): compiled only into the DEV OPK, never the production one, and never near signing/approval
+assert "RH_EXPERIMENTAL" in b.split("elif", 1)[1].split("else NAME=RetroHatch", 1)[0] and "rh_zip.c" in b.split("elif", 1)[1].split("else NAME=RetroHatch", 1)[0]
+assert "RH_EXPERIMENTAL" not in prodsec and "rh_zip" not in prodsec and "-lz" not in prodsec          # the production recipe has neither the define, the ZIP code nor zlib
+assert "RH_EXPERIMENTAL" not in main and "rh_ops_exp" not in main                                       # the program source never names it: only the DEV recipe can turn it on
+assert ops.count("RH_EXPERIMENTAL") == 3 and 'include "rh_ops_exp.inc"' in ops and "if (!prod) { ops.cand_state" in ops   # the only hooks; production never sets them
+for f in ("trust.py", "validate.py", "artifact_verify.py", "make_pkg.py", "make_dev_catalog.py"):
+    t = (ROOT / "tools" / f).read_text(encoding="utf-8")
+    assert "candidates" not in t, f                                                                     # no signing / approval tool reads the candidate snapshot
+assert "x-" not in (ROOT / "catalog" / "approvals.json").read_text(encoding="utf-8")                  # no experimental id was ever approved
 print("test_prod_wiring: ok")

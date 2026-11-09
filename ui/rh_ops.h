@@ -8,6 +8,8 @@
  *              An app is eligible only when it came from a verified signed index (rh_app.signed_catalog) and that index
  *              already enforced approval, licence, availability and hardware verification. Entries from loose local files
  *              (rh_model_load) are never eligible.
+ * DEV only, and only when built with -DRH_EXPERIMENTAL (the DEV OPK, never the production one): an EXPERIMENTAL, UNVERIFIED test install of
+ *  UNAPPROVED candidates (rh_ops_exp.inc: cand_state / cand_do / cand_facts). Production ops leave those three NULL.
  * Both modes (all fail closed):
  *  - the local cache lives inside the state dir;
  *  - catalog entry must be verified, with a sha256, a size and a destination;

@@ -28,6 +28,7 @@ static const rh_model *M;
 static const rh_ui_ops *OPS;
 static rh_plan_fn PLAN;
 static int preview;   /* the open RH_S_CONFIRM screen is a read-only Install/Update Preview */
+static int cmode;     /* the CONFIRM/WORKING/RESULT screens belong to an EXPERIMENTAL test install of the candidate CUR.app (cur_op 5 download, 6 install, 7 uninstall) */
 static char blocked_why[40], res_msg[96];
 static int filt;                                                   /* Discover category filter: an rh_cat, RH_CAT_ALL = no filter */
 static struct { int cand, idx; } *vis;   /* Discover rows under the filter: approved app or candidate, index into the model; sized to the model, no fixed limit */
@@ -101,6 +102,30 @@ void rh_ui_free(void)
 	if (f_title != f_body) gfx_font_free(f_title);
 	gfx_font_free(f_body); f_body = f_title = NULL;
 }
+
+/* ---- experimental test install (DEV builds): helpers. Everything is -1 / 0 when the ops provider has no cand_state (production) ---- */
+static int cand_inst(const rh_cand *c)   /* 1 = RetroHatch's own record holds this candidate as a test install (app id "x-<id>") */
+{
+	int i;
+	for (i = 0; i < M->n_inst; i++) if (!strncmp(M->inst[i].id, "x-", 2) && !strcmp(M->inst[i].id + 2, c->id)) return 1;
+	return 0;
+}
+static int cand_by_inst(int i)   /* candidate index for installed row i, or -1 */
+{
+	int k;
+	if (i < 0 || i >= M->n_inst || M->inst[i].app >= 0 || strncmp(M->inst[i].id, "x-", 2)) return -1;
+	for (k = 0; k < M->n_cands; k++) if (!strcmp(M->cands[k].id, M->inst[i].id + 2)) return k;
+	return -1;
+}
+static int cand_x(int idx, char *why, size_t n)   /* RH_X_*, or -1 when this build has no experiment */
+{
+	char tmp[60];
+	if (!why) { why = tmp; n = sizeof tmp; }
+	why[0] = 0;
+	if (!OPS || !OPS->cand_state || idx < 0 || idx >= M->n_cands) return -1;
+	return OPS->cand_state(&M->cands[idx], cand_inst(&M->cands[idx]), why, n);
+}
+static int eop(void) { return cur_op == 5 ? 3 : cur_op == 6 ? 0 : cur_op == 7 ? 2 : cur_op; }   /* experimental ops wear the normal download/install/uninstall labels */
 
 /* ---- small helpers ---- */
 static void icon(SDL_Surface *d, int id, int cx, int cy, rh_rgb c)   /* centred */
@@ -262,7 +287,7 @@ static int cand_details(SDL_Surface *d, int y0, const rh_cand *c)
 	if (d && cand_icon((int)(c - M->cands))) gfx_img(d, cand_icon((int)(c - M->cands)), 12, y + 4);   /* 32x32 picture inside the 40x40 card */
 	else icon(d, IC_PACKAGE, 28, y + 20, C_GREEN);
 	gfx_text(d, f_title, gfx_ellipsize(f_title, c->name, 170, b, sizeof b), 56, y + 2, C_TXT);
-	gfx_text(d, f_title, "UNAPPROVED", 56, y + 22, C_ERR);
+	gfx_text(d, f_title, cand_inst(c) ? "UNVERIFIED INSTALL" : "UNAPPROVED", 56, y + 22, C_ERR);
 	y += 48;
 	{   /* at most 3 lines up here so the essentials stay on the first screen; a longer description continues in full below the facts */
 		const char *dsc = c->desc[0] ? c->desc : c->wiki ? "No description: the wiki text was not saved." : "No description. Unknown.", *s_[12]; int ln[12], k, lines = gfx_wrap(f_body, dsc, 220, s_, ln, 12);
@@ -284,7 +309,7 @@ static int cand_details(SDL_Surface *d, int y0, const rh_cand *c)
 	CROW(r, n, "Claim", "%s", !strcmp(c->claim, "rg-nano") ? "RG Nano" : !strcmp(c->claim, "family") ? "FunKey only" : "Unknown");
 	CROW(r, n, "Hardware", "Not tested");
 	y += kv_card(d, y, r, n, C_TXT) + 6;
-	paragraph(d, 10, &y, 220, "Read-only: RetroHatch cannot install or download this.", C_TXT2, 0);
+	paragraph(d, 10, &y, 220, OPS && OPS->cand_state ? "Experimental: test install only. Not approved, not tested, authenticity unverified." : "Read-only: RetroHatch cannot install or download this.", C_TXT2, 0);
 	y += 4;
 	if (c->wiki) CROW(t, nt, "Wiki category", "%s", c->wiki_cat[0] ? c->wiki_cat : "Not recorded");
 	if (!c->claim_text[0] || !strcmp(c->claim_text, "Unknown")) snprintf(ev, sizeof ev, "Unknown");
@@ -414,9 +439,44 @@ static void draw_preview(SDL_Surface *d)
 	kv_card(d, 74, r, 3, C_TXT);
 }
 
+/* EXPERIMENTAL test install screens (DEV builds). Always says UNVERIFIED; the download screen is the explicit confirmation the user must give
+ * before a package without a trusted hash is fetched, and installing is a separate second confirmation. */
+static void draw_cand_confirm(SDL_Surface *d)
+{
+	const rh_cand *c = &M->cands[CUR.app];
+	kv r[3]; char b[96], file[80] = "", hash[48] = "", hb[64], sz[24]; int y0 = CONT_B - 47;
+	gfx_text_c(d, f_title, gfx_ellipsize(f_title, c->name, 210, b, sizeof b), 120, 37, C_TXT);
+	if (OPS && OPS->cand_facts) OPS->cand_facts(c, cur_op == 5 ? RH_X_DOWNLOAD : RH_X_INSTALL, file, sizeof file, hash, sizeof hash);
+	fmt_size(sz, sizeof sz, c->size);
+	if (cur_op == 7) {
+		gfx_text_c(d, f_body, "Removes this test app", 120, 55, C_ERR);
+		snprintf(r[0].l, sizeof r[0].l, "File"); snprintf(r[0].v, sizeof r[0].v, "%s", file);
+		gfx_text_c(d, f_body, "Saves and settings are kept", 120, 74 + kv_card(d, 74, r, 1, C_TXT) + 8, C_TXT2);
+		button(d, y0, CUR.sel == 0, "Cancel");
+		button(d, y0 + 25, CUR.sel == 1, "Uninstall");
+		return;
+	}
+	gfx_text_c(d, f_body, cur_op == 5 ? "UNVERIFIED. Not approved." : "UNVERIFIED test install", 120, 55, C_ERR);
+	if (cur_op == 5) {
+		snprintf(r[0].l, sizeof r[0].l, "From"); snprintf(r[0].v, sizeof r[0].v, "%s", host_of(c->url, hb, sizeof hb));
+		snprintf(r[1].l, sizeof r[1].l, "Size"); snprintf(r[1].v, sizeof r[1].v, "%s", sz);
+		snprintf(r[2].l, sizeof r[2].l, "Hash"); snprintf(r[2].v, sizeof r[2].v, "%s", hash);
+		gfx_text_c(d, f_body, c->sha256[0] ? "Hash is checked after download" : "Publisher not verified", 120, 74 + kv_card(d, 74, r, 3, C_TXT) + 3, C_ERR);
+		button(d, y0, CUR.sel == 0, "Cancel");
+		button(d, y0 + 25, CUR.sel == 1, c->sha256[0] ? "Download" : "Download anyway");
+		return;
+	}
+	snprintf(r[0].l, sizeof r[0].l, "File"); snprintf(r[0].v, sizeof r[0].v, "%s", file);
+	snprintf(r[1].l, sizeof r[1].l, "SHA-256"); snprintf(r[1].v, sizeof r[1].v, "%s", hash);
+	kv_card(d, 74, r, 2, C_TXT);
+	button(d, y0, CUR.sel == 0, "Cancel");
+	button(d, y0 + 25, CUR.sel == 1, "Install");
+}
+
 static void draw_confirm(SDL_Surface *d)
 {
 	if (preview) { draw_preview(d); return; }
+	if (cmode) { draw_cand_confirm(d); return; }
 	const rh_app *a = &M->apps[CUR.app];
 	kv r[3]; char b[96]; int y0 = CONT_B - 47;
 	gfx_text_c(d, f_title, gfx_ellipsize(f_title, a->name, 210, b, sizeof b), 120, 37, C_TXT);
@@ -456,6 +516,17 @@ static void draw_result(SDL_Surface *d)
 {
 	const rh_app *a = &M->apps[CUR.app < M->n_apps ? CUR.app : 0];
 	char b[200];
+	if (cmode && CUR.app < M->n_cands) {                  /* experimental test install */
+		const char *nm = M->cands[CUR.app].name;
+		if (res_rc == 0) {
+			snprintf(b, sizeof b, cur_op == 5 ? "%s is downloaded, not installed. UNVERIFIED." : cur_op == 6 ? "%s is installed as an UNVERIFIED test. Open the Apps drawer." : "%s was removed. Saves and settings are kept.", nm);
+			empty_state_c(d, IC_CHECK_L, C_GREEN, cur_op == 5 ? "Downloaded" : cur_op == 6 ? "Installed" : "Uninstalled", b);
+		} else {
+			snprintf(b, sizeof b, "%s. %s", res_msg, res_rc == 2 ? "Restart RetroHatch to recover." : cur_op == 7 ? "The app was kept." : "Nothing was kept.");
+			empty_state_c(d, IC_ALERT_L, C_ERR, cur_op == 5 ? "Download failed" : cur_op == 6 ? "Install failed" : "Uninstall failed", b);
+		}
+		return;
+	}
 	if (cur_op == 4) {                                    /* catalog refresh: msg says what happened */
 		snprintf(b, sizeof b, "%s", res_msg);
 		if (res_rc == 0) empty_state_c(d, IC_CHECK_L, C_GREEN, "Catalog", b);
@@ -491,7 +562,7 @@ static int list_n(void)
 static int row_p(void) { return CUR.s == RH_S_SETTINGS ? SET_P : LIST_P; }
 static int row_h(void) { return CUR.s == RH_S_SETTINGS ? SET_RH : LIST_RH; }
 static int is_list(void) { return CUR.s == RH_S_DISCOVER || CUR.s == RH_S_INSTALLED || CUR.s == RH_S_UPDATES || CUR.s == RH_S_SETTINGS; }
-static int has_cta(void) { return CUR.s == RH_S_DETAILS; }   /* every details page carries the action bar */
+static int has_cta(void) { return CUR.s == RH_S_DETAILS || (CUR.s == RH_S_CAND && OPS && OPS->cand_state); }   /* every details page carries the action bar; a candidate page only where the experiment is on */
 
 static rh_action app_action(int ai)
 {
@@ -513,6 +584,23 @@ static rh_action app_action(int ai)
 	return RH_ACT_BLOCKED;
 }
 
+/* candidate action bar (experimental test install). Not installable: a plain card with the reason. */
+static void draw_cand_action(SDL_Surface *d, int idx)
+{
+	char why[60]; int x = cand_x(idx, why, sizeof why), cy = CONT_B - CTA_H, ty = cy + (CTA_H - gfx_font_h(f_title)) / 2, k = x - 1; char b[80];
+	if (x > RH_X_NO) {
+		static const char *L[3] = {"Test Install", "Install (UNVERIFIED)", "Uninstall test app"};
+		gfx_rfill(d, 8, cy, 224, CTA_H, 4, C_ACC);
+		icon(d, x == RH_X_UNINSTALL ? IC_TRASH : IC_DOWNLOAD, 26, cy + CTA_H / 2, C_ONACC);
+		gfx_text(d, f_title, L[k], 44, ty, C_ONACC);
+		icon(d, IC_CHEV, 218, cy + CTA_H / 2, C_ONACC);
+		return;
+	}
+	gfx_rbox(d, 8, cy, 224, CTA_H, 4, C_LINE, C_CARD);
+	icon(d, IC_LOCK, 26, cy + CTA_H / 2, C_DIS);
+	gfx_text(d, f_body, gfx_ellipsize(f_body, why[0] ? why : "Not installable", 176, b, sizeof b), 44, cy + (CTA_H - 16) / 2, C_TXT2);
+}
+
 void rh_ui_set_ops(const rh_ui_ops *ops) { OPS = ops; }
 void rh_ui_set_planner(rh_plan_fn plan) { PLAN = plan; }
 static int act_preview(rh_action a) { return PLAN && (a == RH_ACT_INSTALL_SOON || a == RH_ACT_UPDATE); }   /* production bars that open the preview */
@@ -530,7 +618,8 @@ int rh_ui_run_pending(void)
 	prog_done = prog_total = 0;
 	if (!OPS) res_rc = 1;
 	else if (cur_op == 4) res_rc = OPS->refresh_catalog ? OPS->refresh_catalog(res_msg, sizeof res_msg) : 1;
-	else if (cur_op == 3) res_rc = OPS->download ? OPS->download(&M->apps[CUR.app], res_msg, sizeof res_msg) : 1;
+	else if (cmode) res_rc = OPS->cand_do && CUR.app < M->n_cands ? OPS->cand_do(&M->cands[CUR.app], cur_op == 5 ? RH_X_DOWNLOAD : cur_op == 6 ? RH_X_INSTALL : RH_X_UNINSTALL, res_msg, sizeof res_msg) : 1;
+		else if (cur_op == 3) res_rc = OPS->download ? OPS->download(&M->apps[CUR.app], res_msg, sizeof res_msg) : 1;
 	else res_rc = (cur_op == 2 ? OPS->uninstall : cur_op ? OPS->update : OPS->install)(&M->apps[CUR.app], res_msg, sizeof res_msg);
 	if (OPS && OPS->refresh) { OPS->refresh(); vis_build(); }   /* the model was reloaded: row indices changed */
 	CUR.s = RH_S_RESULT;
@@ -629,17 +718,22 @@ void rh_ui_key(rh_key k)
 	case RH_S_HOME: go((rh_screen[]){RH_S_DISCOVER, RH_S_INSTALLED, RH_S_UPDATES, RH_S_SETTINGS}[CUR.sel], 0, 0); break;
 	case RH_S_SETTINGS: go(RH_S_INFO, (rh_info)CUR.sel, 0); break;
 	case RH_S_INFO:
-		if (CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) { cur_op = 4; go(RH_S_WORKING, 0, 0); pending = 1; }
+		if (CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) { cmode = 0; cur_op = 4; go(RH_S_WORKING, 0, 0); pending = 1; }
 		break;
 	case RH_S_DISCOVER: case RH_S_INSTALLED: case RH_S_UPDATES:
 		if (n && row_app(CUR.sel) >= 0) go(RH_S_DETAILS, 0, row_app(CUR.sel));
 		else if (CUR.s == RH_S_DISCOVER && n && vis[CUR.sel].cand) go(RH_S_CAND, 0, vis[CUR.sel].idx);
+			else if (CUR.s == RH_S_INSTALLED && n && cand_by_inst(CUR.sel) >= 0) go(RH_S_CAND, 0, cand_by_inst(CUR.sel));   /* an experimental test install: its candidate page */
+		break;
+	case RH_S_CAND:
+		{ int x = cand_x(CUR.app, NULL, 0);
+		  if (x > RH_X_NO) { cmode = 1; preview = 0; cur_op = x == RH_X_DOWNLOAD ? 5 : x == RH_X_INSTALL ? 6 : 7; go(RH_S_CONFIRM, 0, CUR.app); } }
 		break;
 	case RH_S_DETAILS:
 		{ rh_action act = app_action(CUR.app);
-		  if (act_preview(act)) { preview = 1; cur_op = act == RH_ACT_UPDATE; go(RH_S_CONFIRM, 0, CUR.app); break; }
-		  preview = 0;
-		  if (act == RH_ACT_INSTALL || act == RH_ACT_UPDATE_NOW || act == RH_ACT_UNINSTALL || act == RH_ACT_DOWNLOAD) {
+		  if (act_preview(act)) { preview = 1; cmode = 0; cur_op = act == RH_ACT_UPDATE; go(RH_S_CONFIRM, 0, CUR.app); break; }
+		  preview = 0; cmode = 0;
+			  if (act == RH_ACT_INSTALL || act == RH_ACT_UPDATE_NOW || act == RH_ACT_UNINSTALL || act == RH_ACT_DOWNLOAD) {
 			cur_op = act == RH_ACT_DOWNLOAD ? 3 : act == RH_ACT_UNINSTALL ? 2 : act == RH_ACT_UPDATE_NOW; go(RH_S_CONFIRM, 0, CUR.app); } }   /* every other bar is inert */
 		break;
 	default: break;
@@ -672,8 +766,8 @@ static const char *screen_title(void)
 	case RH_S_SETTINGS: return "Settings";
 	case RH_S_INFO: return INFO_TITLE[CUR.info];
 	case RH_S_CONFIRM: if (preview) return cur_op ? "Update Preview" : "Install Preview";   /* fall through */
-	case RH_S_RESULT: return cur_op == 4 ? "Catalog" : cur_op == 3 ? "Download" : cur_op == 2 ? "Uninstall" : cur_op ? "Update" : "Install";
-	case RH_S_WORKING: return cur_op == 4 ? "Refreshing" : cur_op == 3 ? "Downloading" : cur_op == 2 ? "Removing" : cur_op ? "Updating" : "Installing";
+	case RH_S_RESULT: return eop() == 4 ? "Catalog" : eop() == 3 ? "Download" : eop() == 2 ? "Uninstall" : eop() ? "Update" : "Install";
+	case RH_S_WORKING: return eop() == 4 ? "Refreshing" : eop() == 3 ? "Downloading" : eop() == 2 ? "Removing" : eop() ? "Updating" : "Installing";
 	default: return "";
 	}
 }
@@ -766,7 +860,11 @@ static void draw_content(SDL_Surface *d)
 			char sub[48]; int a = M->inst[i].app;
 			snprintf(sub, sizeof sub, "Version %s", M->inst[i].version);
 			y = CONT_Y + i * LIST_P - CUR.scroll;
-			if (y + LIST_RH > CONT_Y && y < CONT_B) list_row(d, y, i == CUR.sel, a >= 0 ? M->apps[a].name : M->inst[i].id, sub);
+			if (y + LIST_RH > CONT_Y && y < CONT_B) {
+				int ci = cand_by_inst(i);
+				if (ci >= 0) list_row_tag(d, y, i == CUR.sel, M->cands[ci].name, "UNVERIFIED", M->inst[i].version, cand_icon(ci));   /* an experimental test install */
+				else list_row(d, y, i == CUR.sel, a >= 0 ? M->apps[a].name : M->inst[i].id, sub);
+			}
 		}
 		if (!M->n_inst) empty_state_mark(d, "No installed applications", "You haven't installed any applications with RetroHatch yet.");
 		break;
@@ -791,12 +889,12 @@ static void draw_content(SDL_Surface *d)
 	case RH_S_INFO: info_page(d, CONT_Y - CUR.scroll, CUR.info); break;
 	case RH_S_CONFIRM: draw_confirm(d); break;
 	case RH_S_WORKING:
-		if (cur_op == 3 || cur_op == 4) {
+		if (eop() == 3 || eop() == 4) {
 			char pb[80];
-			if (cur_op == 3 && prog_total) snprintf(pb, sizeof pb, "%u%% of %.1f KB. B cancels.", (unsigned)(prog_done * 100 / prog_total), prog_total / 1024.0);
-			else snprintf(pb, sizeof pb, "%s", cur_op == 3 ? "Connecting... B cancels." : "Connecting...");
-			empty_state(d, IC_REFRESH_L, cur_op == 3 ? "Downloading..." : "Refreshing...", pb);
-		} else empty_state(d, IC_REFRESH_L, cur_op == 2 ? "Removing..." : cur_op ? "Updating..." : "Installing...", "Please wait. Do not power off.");
+			if (eop() == 3 && prog_total) snprintf(pb, sizeof pb, "%u%% of %.1f KB. B cancels.", (unsigned)(prog_done * 100 / prog_total), prog_total / 1024.0);
+			else snprintf(pb, sizeof pb, "%s", eop() == 3 ? "Connecting... B cancels." : "Connecting...");
+			empty_state(d, IC_REFRESH_L, eop() == 3 ? "Downloading..." : "Refreshing...", pb);
+		} else empty_state(d, IC_REFRESH_L, eop() == 2 ? "Removing..." : eop() ? "Updating..." : "Installing...", "Please wait. Do not power off.");
 		break;
 	case RH_S_RESULT: draw_result(d); break;
 	default: break;
@@ -815,7 +913,7 @@ void rh_ui_draw(SDL_Surface *scr)
 		SDL_SetClipRect(scr, &clip);
 		draw_content(scr);
 		SDL_SetClipRect(scr, &all);
-		if (has_cta()) draw_action(scr, app_action(CUR.app));
+		if (has_cta()) { if (CUR.s == RH_S_CAND) draw_cand_action(scr, CUR.app); else draw_action(scr, app_action(CUR.app)); }
 		if (CUR.s == RH_S_DISCOVER && M->n_apps + M->n_cands) draw_filter(scr);
 		gfx_img(scr, img_header, 0, 0);
 		gfx_fill(scr, 0, HDR_H, W, 1, C_LINE);
@@ -825,7 +923,7 @@ void rh_ui_draw(SDL_Surface *scr)
 			gfx_text_c(scr, f_title, t, W / 2, (HDR_H - gfx_font_h(f_title)) / 2, C_TXT);
 		}
 	}
-	a_ok = CUR.s == RH_S_HOME || CUR.s == RH_S_CONFIRM || CUR.s == RH_S_RESULT || (CUR.s == RH_S_DETAILS && act_focus(app_action(CUR.app))) || (CUR.s == RH_S_INFO && CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) || (is_list() && list_n() && (CUR.s == RH_S_SETTINGS || row_app(CUR.sel) >= 0 || CUR.s == RH_S_DISCOVER));
+	a_ok = CUR.s == RH_S_HOME || CUR.s == RH_S_CONFIRM || CUR.s == RH_S_RESULT || (CUR.s == RH_S_DETAILS && act_focus(app_action(CUR.app))) || (CUR.s == RH_S_CAND && cand_x(CUR.app, NULL, 0) > RH_X_NO) || (CUR.s == RH_S_INFO && CUR.info == RH_I_CATALOG && OPS && OPS->refresh_catalog && M->cat.status[0]) || (is_list() && list_n() && (CUR.s == RH_S_SETTINGS || row_app(CUR.sel) >= 0 || CUR.s == RH_S_DISCOVER || (CUR.s == RH_S_INSTALLED && cand_by_inst(CUR.sel) >= 0)));
 	gfx_fill(scr, 8, HINT_Y - 2, 224, 1, C_LINE);
 	hint(scr, 22, "A", a_ok ? C_GREEN : C_DIS, "Select", a_ok ? C_TXT : C_DIS);
 	hint(scr, 178, "B", depth && CUR.s != RH_S_WORKING ? C_ACC : C_DIS, "Back", depth && CUR.s != RH_S_WORKING ? C_TXT : C_DIS);

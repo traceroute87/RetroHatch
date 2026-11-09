@@ -1,6 +1,6 @@
 # RG Nano beta: what remains (everything else is built and tested)
 
-Already done and hardware-tested in DEV: signed catalog + rollback state, verified HTTPS downloads (mbedTLS, real certificate checks), cache install/update/uninstall through the engine, offline use, tamper/hash/untrusted-TLS rejection.
+Already done and hardware-tested in DEV: signed catalog + rollback state, verified HTTPS downloads (mbedTLS until 2026-11-09, now the firmware OpenSSL 1.1.1i for TLS 1.3; real certificate checks; see docs/NANO_V1_RELEASE.md blocker 6), cache install/update/uninstall through the engine, offline use, tamper/hash/untrusted-TLS rejection.
 
 ## From you (nothing else blocks the beta)
 1. Create the GitHub repo `traceroute87/RetroHatch`, push this project, enable Pages (Source = GitHub Actions): `docs/PUBLISHING.md`. (Different name? tell me, one constant changes.)

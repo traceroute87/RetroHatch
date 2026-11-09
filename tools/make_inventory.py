@@ -13,6 +13,8 @@ Every entry is UNAPPROVED and untested; `status` says how far the package was lo
   unverified        an audit note says a release package exists; it was not inspected
   source-only       no release package
 Detailed evidence (opk metadata ids, reviews, audit references) stays in the inventory; the snapshot carries only what the browser shows.
+An entry with a non-empty `hidden` (the reason, with the date) stays here in full but is left out of the snapshot, so the browser never offers it:
+used for an app whose only published download is known not to work. Remove the field when a working link exists.
 """
 import argparse, json, re, sys
 from pathlib import Path
@@ -45,6 +47,7 @@ def problems(inv):
             if "sha256" in p and not re.fullmatch(r"[0-9a-f]{64}", p["sha256"]): errs.append(f"{w}: bad sha256")
         seen_sig = any(p.get("signature") == "squashfs" for p in a.get("packages", []))
         if (a.get("status") == "package-verified") != seen_sig: errs.append(f"{w}: status package-verified needs (and only needs) a squashfs-verified package")
+        if "hidden" in a and not (isinstance(a["hidden"], str) and a["hidden"].strip()): errs.append(f"{w}: hidden needs a reason")
         if a.get("status") == "source-only" and a.get("packages"): errs.append(f"{w}: source-only entries have no package")
         if a.get("icon_file") and not (OUT.parent / a["icon_file"]).is_file(): errs.append(f"{w}: icon file {a['icon_file']} is missing")
         for bad in ("approval", "hardware_test"):
@@ -75,9 +78,13 @@ def entry(a):
     return e
 
 
+def shown(a):   # in the browser snapshot?
+    return KINDS[a["kind"]] is not None and not a.get("hidden")
+
+
 def snapshot(inv):
     return {"schema": 1, "device": inv["device"], "status": "UNAPPROVED candidates, read-only; not part of the signed catalog. Generated from candidates/inventory.json by tools/make_inventory.py: edit that file.",
-            "candidates": [entry(a) for a in inv["applications"] if KINDS[a["kind"]] is not None]}
+            "candidates": [entry(a) for a in inv["applications"] if shown(a)]}
 
 
 def main():
@@ -91,7 +98,7 @@ def main():
     for e in errs: print("inventory:", e, file=sys.stderr)
     if errs: sys.exit(1)
     if not a.check: OUT.write_text(text, encoding="utf-8")
-    print(f"{len(inv['applications'])} inventory entries -> {sum(KINDS[x['kind']] is not None for x in inv['applications'])} browser entries" + (" (checked)" if a.check else f", {len(text)} bytes written"))
+    print(f"{len(inv['applications'])} inventory entries -> {sum(shown(x) for x in inv['applications'])} browser entries ({sum(bool(x.get('hidden')) for x in inv['applications'])} hidden)" + (" (checked)" if a.check else f", {len(text)} bytes written"))
 
 
 if __name__ == "__main__":

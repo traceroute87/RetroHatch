@@ -14,12 +14,13 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/entropy.h>
-#include <mbedtls/error.h>
-#include <mbedtls/net_sockets.h>
-#include <mbedtls/ssl.h>
-#include <mbedtls/x509_crt.h>
+#include <arpa/inet.h>
+#include <sys/time.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
+#include <openssl/x509_vfy.h>
+#include <openssl/x509v3.h>
 
 #define MAX_REDIRECTS 5
 #define MAX_HDR_LINE 4096
@@ -31,12 +32,8 @@ typedef struct {
 } url_t;
 
 typedef struct {
-	mbedtls_net_context net;
-	mbedtls_ssl_context ssl;
-	mbedtls_ssl_config conf;
-	mbedtls_ctr_drbg_context drbg;
-	mbedtls_entropy_context ent;
-	int up;                   /* TLS structures initialised */
+	int fd;                   /* blocking socket with send/receive timeouts; -1 = none */
+	SSL *ssl;                 /* NULL = no TLS session */
 	unsigned char buf[4096];  /* read-ahead */
 	size_t pos, len;
 	long long deadline;       /* CLOCK_MONOTONIC ms */
@@ -64,34 +61,43 @@ static int fail(char *msg, size_t n, int code, const char *why)
 	return code;
 }
 
-/* ---- CA store: parsed once per process ---- */
-static mbedtls_x509_crt g_ca;
-static int g_ca_ok;
+/* ---- TLS context + CA store: built once per process ----
+ * OpenSSL (the firmware's own libssl/libcrypto 1.1.1) instead of mbedTLS 2.16, which has no TLS 1.3: static.miraheze.org (the FunKey wiki's file host) answers
+ * a TLS 1.2 hello with "protocol_version" alert. TLS 1.2 stays the floor; 1.3 is negotiated when the server offers it. Verification is mandatory. */
+static SSL_CTX *g_ctx;
 static char g_ca_key[600];
 
 static int load_ca(const rh_net_cfg *c)
 {
 	char key[600];
 	struct stat st;
-	int r;
+	SSL_CTX *x;
 
 	snprintf(key, sizeof key, "%s|%s", c->ca_bundle, c->extra_ca ? c->extra_ca : "");
-	if (g_ca_ok && !strcmp(key, g_ca_key))
+	if (g_ctx && !strcmp(key, g_ca_key))
 		return 0;
-	if (g_ca_ok)
-		mbedtls_x509_crt_free(&g_ca);
-	g_ca_ok = 0;
-	mbedtls_x509_crt_init(&g_ca);
-	r = mbedtls_x509_crt_parse_file(&g_ca, c->ca_bundle); /* >0 = some entries unparsable, still usable */
-	if (r < 0 || !g_ca.version)
-		return -1;
-	if (c->extra_ca && !stat(c->extra_ca, &st) && S_ISREG(st.st_mode)) {
-		r = mbedtls_x509_crt_parse_file(&g_ca, c->extra_ca);
-		if (r < 0)
-			return -1;
+	if (g_ctx) {
+		SSL_CTX_free(g_ctx);
+		g_ctx = NULL;
 	}
+	ERR_clear_error();
+	x = SSL_CTX_new(TLS_client_method());
+	if (!x)
+		return -1;
+	SSL_CTX_set_min_proto_version(x, TLS1_2_VERSION);
+	SSL_CTX_set_options(x, SSL_OP_NO_COMPRESSION | SSL_OP_NO_RENEGOTIATION);
+#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
+	SSL_CTX_set_options(x, SSL_OP_IGNORE_UNEXPECTED_EOF);   /* OpenSSL 3: a close without close_notify is an EOF (length checks catch truncation), as with 1.1.1 */
+#endif
+	SSL_CTX_set_verify(x, SSL_VERIFY_PEER, NULL);          /* never relaxed: an untrusted or mismatched certificate fails the handshake */
+	if (SSL_CTX_load_verify_locations(x, c->ca_bundle, NULL) != 1 ||
+	    sk_X509_OBJECT_num(X509_STORE_get0_objects(SSL_CTX_get_cert_store(x))) <= 0 ||
+	    (c->extra_ca && !stat(c->extra_ca, &st) && S_ISREG(st.st_mode) && SSL_CTX_load_verify_locations(x, c->extra_ca, NULL) != 1)) {
+		SSL_CTX_free(x);
+		return -1;
+	}
+	g_ctx = x;
 	snprintf(g_ca_key, sizeof g_ca_key, "%s", key);
-	g_ca_ok = 1;
 	return 0;
 }
 
@@ -183,17 +189,14 @@ static int tcp_connect(const url_t *u, long long deadline, unsigned connect_ms, 
 
 static void conn_close(conn *c)
 {
-	if (c->up) {
-		mbedtls_ssl_close_notify(&c->ssl);
-		mbedtls_ssl_free(&c->ssl);
-		mbedtls_ssl_config_free(&c->conf);
-		mbedtls_ctr_drbg_free(&c->drbg);
-		mbedtls_entropy_free(&c->ent);
-		c->up = 0;
+	if (c->ssl) {
+		SSL_shutdown(c->ssl);   /* one call: sends close_notify, does not wait for the peer */
+		SSL_free(c->ssl);
+		c->ssl = NULL;
 	}
-	if (c->net.fd >= 0) {
-		mbedtls_net_free(&c->net);
-		c->net.fd = -1;
+	if (c->fd >= 0) {
+		close(c->fd);
+		c->fd = -1;
 	}
 }
 
@@ -201,55 +204,55 @@ static int conn_open(conn *c, const rh_net_cfg *cfg, const url_t *u)
 {
 	int fd, r;
 	unsigned rd = cfg->read_ms ? cfg->read_ms : 15000;
-	uint32_t vf;
+	struct timeval tv;
+	unsigned char ip[16];
+	long vf;
 
 	memset(c->why, 0, sizeof c->why);
 	c->pos = c->len = 0;
-	mbedtls_net_init(&c->net);
-	c->net.fd = -1;
+	c->fd = -1;
 	fd = tcp_connect(u, c->deadline, cfg->connect_ms ? cfg->connect_ms : 10000, c->why, sizeof c->why);
 	if (fd < 0)
 		return RH_NET_E_OFFLINE;
-	c->net.fd = fd;
-	mbedtls_ssl_init(&c->ssl);
-	mbedtls_ssl_config_init(&c->conf);
-	mbedtls_ctr_drbg_init(&c->drbg);
-	mbedtls_entropy_init(&c->ent);
-	c->up = 1;
-	if (mbedtls_ctr_drbg_seed(&c->drbg, mbedtls_entropy_func, &c->ent, (const unsigned char *)"retrohatch", 10) ||
-	    mbedtls_ssl_config_defaults(&c->conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT)) {
+	c->fd = fd;
+	tv.tv_sec = (time_t)(rd / 1000);
+	tv.tv_usec = (suseconds_t)(rd % 1000) * 1000;
+	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
+	setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof tv);
+	ERR_clear_error();
+	c->ssl = SSL_new(g_ctx);
+	if (!c->ssl || !SSL_set_fd(c->ssl, fd)) {
 		snprintf(c->why, sizeof c->why, "TLS setup failed");
 		return RH_NET_E_TLS;
 	}
-	mbedtls_ssl_conf_authmode(&c->conf, MBEDTLS_SSL_VERIFY_REQUIRED);   /* never relaxed */
-	mbedtls_ssl_conf_min_version(&c->conf, MBEDTLS_SSL_MAJOR_VERSION_3, MBEDTLS_SSL_MINOR_VERSION_3);
-	mbedtls_ssl_conf_ca_chain(&c->conf, &g_ca, NULL);
-	mbedtls_ssl_conf_rng(&c->conf, mbedtls_ctr_drbg_random, &c->drbg);
-	mbedtls_ssl_conf_read_timeout(&c->conf, rd);
-	if (mbedtls_ssl_setup(&c->ssl, &c->conf) || mbedtls_ssl_set_hostname(&c->ssl, u->host)) {
-		snprintf(c->why, sizeof c->why, "TLS setup failed");
-		return RH_NET_E_TLS;
-	}
-	mbedtls_ssl_set_bio(&c->ssl, &c->net, mbedtls_net_send, NULL, mbedtls_net_recv_timeout);
-	while ((r = mbedtls_ssl_handshake(&c->ssl)) != 0) {
-		if (r == MBEDTLS_ERR_SSL_WANT_READ || r == MBEDTLS_ERR_SSL_WANT_WRITE) {
-			if (now_ms() > c->deadline) { snprintf(c->why, sizeof c->why, "Timed out"); return RH_NET_E_TIMEOUT; }
-			continue;
+	if (inet_pton(AF_INET, u->host, ip) == 1 || inet_pton(AF_INET6, u->host, ip) == 1) {
+		if (!X509_VERIFY_PARAM_set1_ip_asc(SSL_get0_param(c->ssl), u->host)) {
+			snprintf(c->why, sizeof c->why, "TLS setup failed");
+			return RH_NET_E_TLS;
 		}
-		if (r == MBEDTLS_ERR_SSL_TIMEOUT) { snprintf(c->why, sizeof c->why, "TLS handshake timed out"); return RH_NET_E_TIMEOUT; }
-		vf = mbedtls_ssl_get_verify_result(&c->ssl);
-		if (vf & (MBEDTLS_X509_BADCERT_EXPIRED | MBEDTLS_X509_BADCERT_FUTURE)) {
+	} else if (!SSL_set_tlsext_host_name(c->ssl, u->host) || !SSL_set1_host(c->ssl, u->host)) {   /* SNI + hostname check */
+		snprintf(c->why, sizeof c->why, "TLS setup failed");
+		return RH_NET_E_TLS;
+	}
+	errno = 0;
+	r = SSL_connect(c->ssl);
+	if (r != 1) {
+		int e = SSL_get_error(c->ssl, r);
+		vf = SSL_get_verify_result(c->ssl);
+		if ((e == SSL_ERROR_SYSCALL || e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE) && (errno == EAGAIN || errno == EWOULDBLOCK)) { snprintf(c->why, sizeof c->why, "TLS handshake timed out"); return RH_NET_E_TIMEOUT; }
+		if (vf == X509_V_ERR_CERT_HAS_EXPIRED || vf == X509_V_ERR_CERT_NOT_YET_VALID) {
 			snprintf(c->why, sizeof c->why, "Certificate date invalid: check the device date and time");
 			return RH_NET_E_CERT_TIME;
 		}
-		if (vf & MBEDTLS_X509_BADCERT_CN_MISMATCH) snprintf(c->why, sizeof c->why, "Certificate is for a different host");
-		else if (vf & MBEDTLS_X509_BADCERT_NOT_TRUSTED) snprintf(c->why, sizeof c->why, "Certificate not trusted");
-		else if (vf) snprintf(c->why, sizeof c->why, "Certificate rejected");
+		if (vf == X509_V_ERR_HOSTNAME_MISMATCH || vf == X509_V_ERR_IP_ADDRESS_MISMATCH) snprintf(c->why, sizeof c->why, "Certificate is for a different host");
+		else if (vf == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY || vf == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT || vf == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT ||
+			 vf == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN || vf == X509_V_ERR_CERT_UNTRUSTED) snprintf(c->why, sizeof c->why, "Certificate not trusted");
+		else if (vf != X509_V_OK) snprintf(c->why, sizeof c->why, "Certificate rejected");
 		else snprintf(c->why, sizeof c->why, "TLS handshake failed");
 		return RH_NET_E_TLS;
 	}
-	vf = mbedtls_ssl_get_verify_result(&c->ssl);
-	if (vf) {                                           /* belt and braces: VERIFY_REQUIRED already fails the handshake */
+	if (now_ms() > c->deadline) { snprintf(c->why, sizeof c->why, "Timed out"); return RH_NET_E_TIMEOUT; }
+	if (SSL_get_verify_result(c->ssl) != X509_V_OK) {   /* belt and braces: SSL_VERIFY_PEER already fails the handshake */
 		snprintf(c->why, sizeof c->why, "Certificate rejected");
 		return RH_NET_E_TLS;
 	}
@@ -259,9 +262,7 @@ static int conn_open(conn *c, const rh_net_cfg *cfg, const url_t *u)
 static int conn_write_all(conn *c, const char *s, size_t n)
 {
 	while (n) {
-		int r = mbedtls_ssl_write(&c->ssl, (const unsigned char *)s, n);
-		if (r == MBEDTLS_ERR_SSL_WANT_READ || r == MBEDTLS_ERR_SSL_WANT_WRITE)
-			continue;
+		int r = SSL_write(c->ssl, s, n > 16384 ? 16384 : (int)n);
 		if (r <= 0)
 			return -1;
 		s += r;
@@ -274,17 +275,24 @@ static int conn_write_all(conn *c, const char *s, size_t n)
 static int conn_read(conn *c, unsigned char *b, size_t n)
 {
 	for (;;) {
-		int r;
+		int r, e;
 		if (now_ms() > c->deadline) { c->err = RH_NET_E_TIMEOUT; snprintf(c->why, sizeof c->why, "Download took too long"); return -1; }
-		r = mbedtls_ssl_read(&c->ssl, b, n);
+		ERR_clear_error();
+		errno = 0;
+		r = SSL_read(c->ssl, b, n > 16384 ? 16384 : (int)n);
 		if (r > 0)
 			return r;
-		if (r == 0 || r == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY || r == MBEDTLS_ERR_NET_CONN_RESET || r == MBEDTLS_ERR_SSL_CONN_EOF)
+		e = SSL_get_error(c->ssl, r);
+		if (e == SSL_ERROR_ZERO_RETURN)
 			return 0;
-		if (r == MBEDTLS_ERR_SSL_WANT_READ || r == MBEDTLS_ERR_SSL_WANT_WRITE)
-			continue;
-		c->err = r == MBEDTLS_ERR_SSL_TIMEOUT ? RH_NET_E_TIMEOUT : RH_NET_E_IO;
-		snprintf(c->why, sizeof c->why, r == MBEDTLS_ERR_SSL_TIMEOUT ? "Connection stalled" : "Connection error");
+		if ((e == SSL_ERROR_SYSCALL || e == SSL_ERROR_WANT_READ || e == SSL_ERROR_WANT_WRITE) && (errno == EAGAIN || errno == EWOULDBLOCK)) {   /* SO_RCVTIMEO expired (the BIO reports it as "retry") */
+			c->err = RH_NET_E_TIMEOUT; snprintf(c->why, sizeof c->why, "Connection stalled");
+			return -1;
+		}
+		if (e == SSL_ERROR_SYSCALL && (r == 0 || errno == ECONNRESET))   /* end without close_notify: same as before, the size checks catch truncation */
+			return 0;
+		c->err = RH_NET_E_IO;
+		snprintf(c->why, sizeof c->why, "Connection error");
 		return -1;
 	}
 }
@@ -488,7 +496,7 @@ int rh_net_get_file(const rh_net_cfg *cfg, const char *url, const char *dest, ui
 		return fail(msg, msglen, RH_NET_E_TLS, "No trusted certificates on this device");
 	snprintf(part, sizeof part, "%s.part", dest);
 	memset(&c, 0, sizeof c);
-	c.net.fd = -1;
+	c.fd = -1;
 	total_ms = cfg->total_ms ? cfg->total_ms : 180000;
 	c.deadline = now_ms() + total_ms;
 	memset(&s, 0, sizeof s);

@@ -55,7 +55,13 @@ typedef struct {
 	int (*refresh_catalog)(char *msg, size_t n);                 /* blocking; fetches and verifies a newer signed catalog */
 	const char *(*net_status)(void);                             /* last network result for Settings > Network Status */
 	int production;               /* 1 = production rules (any approved, signed, hardware-verified catalog entry); 0 = DEV (allowlist) */
+	/* EXPERIMENTAL test install of an UNAPPROVED candidate (DEV builds only; all three NULL in production = candidates stay read-only).
+	 * Nothing here approves anything: the result is always labelled UNVERIFIED. */
+	int (*cand_state)(const rh_cand *c, int installed, char *why, size_t n);       /* RH_X_*; RH_X_NO: why[] = short reason */
+	int (*cand_do)(const rh_cand *c, int op, char *msg, size_t n);                 /* op RH_X_DOWNLOAD / RH_X_INSTALL / RH_X_UNINSTALL; blocking; 0 ok, 1 failed, 2 restart to recover */
+	void (*cand_facts)(const rh_cand *c, int op, char *file, size_t fn, char *hash, size_t hn);   /* confirm screen: install file name, hash status */
 } rh_ui_ops;
+enum { RH_X_NO, RH_X_DOWNLOAD, RH_X_INSTALL, RH_X_UNINSTALL };
 void rh_ui_set_ops(const rh_ui_ops *ops);
 /* Optional install PLANNER (read-only). Given the catalog names it returns the file an install would write, or why it would be
  * refused: 1 = target filled, 0 = refused, why = short reason (see rh_plan_target in rh_install.c). With a planner set and no ops,

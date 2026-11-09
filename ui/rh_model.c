@@ -136,7 +136,7 @@ static void load_installed(rh_model *m, const char *state_dir)
 	char path[512], line[512]; FILE *f; int i;
 	snprintf(path, sizeof path, "%s/installed.tsv", state_dir);
 	if (!(f = fopen(path, "r"))) return;
-	while (m->n_inst < RH_MAX_APPS && fgets(line, sizeof line, f)) {
+	while (m->n_inst < RH_MAX_INST && fgets(line, sizeof line, f)) {
 		char *id = strtok(line, "\t\r\n"), *ver = strtok(NULL, "\t\r\n");
 		if (!id || !ver) continue;
 		CP(m->inst[m->n_inst].id, id); CP(m->inst[m->n_inst].version, ver);
@@ -147,7 +147,7 @@ static void load_installed(rh_model *m, const char *state_dir)
 	fclose(f);
 	for (i = 0; i < m->n_inst; i++) {
 		int a = m->inst[i].app;
-		if (a >= 0 && m->apps[a].verified && rh_ver_cmp(m->inst[i].version, m->apps[a].version) < 0)
+		if (a >= 0 && m->n_upd < RH_MAX_APPS && m->apps[a].verified && rh_ver_cmp(m->inst[i].version, m->apps[a].version) < 0)
 			m->upd[m->n_upd++] = i;
 	}
 }
@@ -271,6 +271,13 @@ void rh_model_add_candidates(rh_model *m, const char *path)
 			if (dup) continue;
 			if (p) {
 				CP(x->pkg_name, rj_str(p, "name", "")); x->zipped = !strcmp(rj_str(p, "container", ""), "zip");
+				CP(x->fmt, rj_str(p, "format", ""));
+				if (strlen(rj_str(p, "url", "")) >= sizeof x->url) x->url_long = 1; else CP(x->url, rj_str(p, "url", ""));
+				{   /* an optional hash of the downloaded file; anything but 64 lowercase hex is ignored */
+					const char *h = rj_str(p, "sha256", ""); size_t q;
+					for (q = 0; h[q] && ((h[q] >= '0' && h[q] <= '9') || (h[q] >= 'a' && h[q] <= 'f')); q++) {}
+					if (q == 64 && !h[q]) CP(x->sha256, h);
+				}
 				x->sig_ok = !strcmp(rj_str(p, "format", ""), "opk") && !strcmp(rj_str(p, "signature", ""), "squashfs");
 				if ((n = rj_get(p, "size")) && n->t == '#' && n->num > 0) x->size = (uint64_t)n->num;
 				if ((n = rj_get(p, "more_packages")) && n->t == '#' && n->num > 0) x->more = (int)n->num;

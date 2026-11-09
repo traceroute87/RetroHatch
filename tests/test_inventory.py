@@ -19,7 +19,8 @@ assert regen == snap_text, "candidates/rg-nano.json is out of date: run python t
 # ---- one application, one entry; ids stable and URL/version independent; no cap ----
 ids = [a["id"] for a in apps]
 assert len(ids) == len(set(ids)) and all(M.ID.fullmatch(i) for i in ids)
-browser = [a for a in apps if a["kind"] != "support"]
+browser = [a for a in apps if a["kind"] != "support" and not a.get("hidden")]
+hidden = [a for a in apps if a.get("hidden")]
 assert len(snap) == len(browser) >= 84 and [e["id"] for e in snap] == [a["id"] for a in browser]
 assert [e["name"] for e in snap[:10]] == ["j2me-funkey-rgnano", "NanoCraft", "Funkoban", "Cglpsdl1", "picoarch", "XASH3DFS", "meleelight", "SuDokuL", "TriSpace", "KeyCraft"]
 assert "wiki-znax" not in ids and "znax" in ids            # the old wiki-/repo-derived ids are gone
@@ -40,7 +41,7 @@ assert sum(e["repo"] == "joyrider3774/funkey_sdl2_games" for e in snap) == 7
 assert len(by["funkoban"]["packages"]) >= 2 and sum(s["type"] == "wiki" for s in by["funkoban"]["sources"]) == 1   # one application, release + wiki links
 assert len([s for s in by["eduke32"]["sources"] if s["type"] == "repo"]) == 2                                      # one application, two builds in two repositories
 assert sum(e["name"] in ("Funkoban", "Cglpsdl1") for e in snap) == 2                                              # the wiki's listing of them merged, not duplicated
-assert sum("listing" in e for e in snap) == 46                                                                    # every FunKey wiki listing kept (44 own rows + 2 merged)
+assert sum("listing" in e for e in snap) + sum("listing" in a for a in hidden) == 46                           # every FunKey wiki listing kept (44 own rows + 2 merged); 7 of them are hidden, see the end
 
 # ---- TaraFi: a catalog app (invisible on the device until a signed catalog exists) is also a candidate, deduplicated by source URL, never approved ----
 tf = by["tarafi"]; cat_tf = json.loads((ROOT / "catalog" / "apps" / "tarafi.json").read_text(encoding="utf-8"))
@@ -63,7 +64,7 @@ import re
 assert all(a["description"] for a in browser) and not any(re.search(r"no description|not saved|wiki text|was not recorded|no description text", a["description"], re.I) for a in browser)
 g32 = [a for a in apps if any(x["url"] == "https://github.com/joyrider3774/32blit_funkey" for x in a["sources"])]
 assert len(g32) == 43 and all(a.get("description_source") and len(a["sources"]) == 2 and not a["sources"][1].get("primary", True) for a in g32)   # 32blit games: author text + the original game project
-assert sum(bool(a.get("description_source")) for a in browser) >= 71
+assert sum(bool(a.get("description_source")) for a in browser + hidden) >= 71     # recovered once; 7 of them belong to the hidden entries
 assert all(a["category"] == "games" for a in apps if a["id"] in ("dinothawr", "dividead", "heboris", "ncrafti", "srb2", "stk", "worshipvector"))   # wiki genre column
 
 # ---- cores, support files and system add-ons are distinguished; source-only and unverified are labeled ----
@@ -90,7 +91,7 @@ assert sorted(a["packages"][0]["name"] for a in b32) == sorted(m[0] for m in g) 
 assert all(a["status"] == "package-verified" and a["license"] == "unknown" and a["category"] == "games" and "sha256" not in a["packages"][0] for a in b32)
 assert all((a["packages"][0]["container_name"], a["packages"][0]["container_size"], a["packages"][0]["size"]) == (m[2], m[3], m[1]) for a in b32 for m in g if m[0] == a["packages"][0]["name"])
 assert all(a["packages"][0]["url"].endswith("/releases/download/v1.0/" + a["packages"][0]["container_name"]) and a["packages"][0]["mirrors"][0].split("/releases/")[1].startswith("latest/download/") for a in b32)
-assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 130
+assert sum(e["repo"] == "joyrider3774/32blit_funkey" for e in snap) == 43 and len(snap) == 123
 pc = col["picoarch-cores"]
 assert len(pc["members"]) == 29 and sum(m[2] == "squashfs" for m in pc["members"]) == 11 and pc["frontend"][0] == "picoarch.opk" and len(pc["containers"]) == 2
 assert len(pe["crawl_only"]["members"]) == 11 and all(m[2].startswith("https://") for m in pe["crawl_only"]["members"])
@@ -122,3 +123,11 @@ assert any("UNAPPROVED" in e for e in bad(lambda a: a[0].update(approval="approv
 assert any("source-only entries have no package" in e for e in bad(lambda a: by_id(a, "fktd").update(packages=[{"name": "x.opk", "url": "https://x.example/x.opk"}])))
 assert any("icon file" in e for e in bad(lambda a: a[0].update(icon_file="icons/missing.png")))
 print("inventory tests OK")
+
+# ---- hidden entries: kept in full in the inventory (source, package, link), never in the browser snapshot ----
+HID = {"clockapp", "dividead", "heboris", "ncrafti", "srb2", "stk", "worshipvector"}
+assert {a["id"] for a in hidden} == HID and not (HID & {e["id"] for e in snap})
+assert all(a["packages"] and a["packages"][0]["url"].startswith("https://gitlab.com/gameblabla/") and a["sources"] and a["listing"]["download"] == "Unavailable (HTTP 403)" and "403" in a["hidden"] for a in hidden)
+bad = copy.deepcopy(inv); bad["applications"][0]["hidden"] = " "
+assert any("hidden needs a reason" in e for e in M.problems(bad))                                    # a hidden entry must say why
+assert len(snap) + len(hidden) + sum(a["kind"] == "support" for a in apps) == len(apps) == 133        # nothing disappeared: shown + hidden + support
