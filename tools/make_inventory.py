@@ -40,6 +40,8 @@ def problems(inv):
         if not a.get("name"): errs.append(f"{w}: no name")
         if a.get("claim", {}).get("kind", "") not in ("rg-nano", "family", "android", ""): errs.append(f"{w}: claim kind")
         if "category" in a and (a["category"] not in CATS or not a.get("category_basis")): errs.append(f"{w}: category needs a known id and its basis")
+        if "group" in a and a["group"] not in ("games", "emulators", "ports", "utilities", "media", "themes-launchers"): errs.append(f"{w}: group must be one of discovery/categories.py GROUPS")
+        if "tags" in a and not (isinstance(a["tags"], list) and all(isinstance(t, str) and re.fullmatch(r"[a-z0-9][a-z0-9+-]{1,23}", t) for t in a["tags"])): errs.append(f"{w}: tags must be short lower-case words")
         for s in a.get("sources", []):
             if s.get("type") not in ("repo", "wiki") or not HTTPS.fullmatch(s.get("url", "")): errs.append(f"{w}: bad source {s}")
         for p in a.get("packages", []):

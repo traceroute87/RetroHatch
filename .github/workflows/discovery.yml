@@ -52,6 +52,34 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: crawl-discovery, path: out-crawl, if-no-files-found: ignore}
+      # RG Rotate and multi-device search (discovery/search.py, same profiles.json): repository search, latest release, real-file check (4-byte range read),
+      # README evidence. discovery/review.py turns it into the grouped maintainer report; first/last-seen state lives in the same cache as the package leads.
+      # Bounded, read-only, nothing is approved or published. It edits ONE issue, and only when the set of new/updated candidates changed.
+      - name: Candidate search and review report
+        if: always()
+        continue-on-error: true
+        timeout-minutes: 14
+        run: |
+          python3 tests/test_search.py
+          python3 -I discovery/search.py --device all --max-req 700 --out out-search
+          python3 -I discovery/review.py --in out-search --out out-search --state .cache/leads/review-state.json --update-state
+          cat out-search/review.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: candidate-review, path: out-search, if-no-files-found: ignore}
+      - name: Create or update the single candidate-review issue
+        if: always()
+        continue-on-error: true
+        run: |
+          [ -s out-search/review.md ] || { echo "no review report"; exit 0; }
+          grep -q '"errors": \[\]' out-search/candidates-rg-rotate.json || echo "::warning::search reported errors (rate limit?); report still lists what was found"
+          MARK="rh-review:$(cat out-search/review.digest)"
+          if gh issue list --label review --state all --limit 30 --json body --jq '.[].body' | grep -qF "$MARK"; then echo "unchanged"; exit 0; fi
+          { head -c 60000 out-search/review.md; printf '\n<!-- %s -->\n' "$MARK"; } > out-search/review-issue.md
+          gh label create review --color 1d76db --description "Candidate review report" 2>/dev/null || true
+          N=$(gh issue list --label review --state open --json number --jq '.[0].number // empty')
+          if [ -n "$N" ]; then gh issue edit "$N" --body-file out-search/review-issue.md   # edit, not comment: no notification spam
+          else gh issue create --label review --title "Candidate review: new and updated leads" --body-file out-search/review-issue.md; fi
       - name: Save package lead cache
         if: always() && hashFiles('.cache/leads/*.json') != ''
         uses: actions/cache/save@v4

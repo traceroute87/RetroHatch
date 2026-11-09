@@ -57,7 +57,8 @@ def inspect(path):
     tgt = re.search(r"targetSdkVersion:'(\d+)'", out)
     abis = re.findall(r"native-code: ([^\n]*)", out)
     abis = sorted(set(re.findall(r"'([^']+)'", abis[0]))) if abis else []
-    rc, so, se = run(tool("apksigner"), "verify", "--verbose", "--print-certs", str(path))
+    # verify AS RG ROTATE SEES IT (API 31): an APK with a rotated signing key (v3.1) shows another certificate to API 33+ than to Android 12, and the catalog must name the one Android 12 checks
+    rc, so, se = run(tool("apksigner"), "verify", "--verbose", "--print-certs", "--min-sdk-version", str(API_LEVEL), "--max-sdk-version", str(API_LEVEL), str(path))
     schemes = [k for k in ("v1", "v2", "v3", "v3.1", "v4") if re.search(rf"Verified using {re.escape(k)} scheme.*: true", so)]
     # ONLY "Signer #N" lines: apksigner also prints a "Source Stamp Signer" (Play's stamp key, shared by unrelated apps), which is not the app's signing identity
     signers = sorted(set(re.findall(r"^Signer #\d+ certificate SHA-256 digest: ([0-9a-f]{64})", so, re.M)))
@@ -155,6 +156,10 @@ def entry(i, tested=None):
                          "release": {"tag": i["tag"], "published": i["published"], "page": i["release_url"], "github_digest_matches": i["github_digest_matches"]},
                          "fits_from_metadata": i["fits"],
                          "tested": {"emulator_x86_64_api31": t or "not tested", "rg_rotate_hardware": "not tested"}, "notes": notes}}
+    sys.path.insert(0, str(ROOT / "discovery")); import categories as CAT
+    e["group"], conf = CAT.classify(e["name"], e["description"], e["topics"])
+    if conf == "low": e["group_confidence"] = "low"
+    e["tags"] = CAT.make_tags(e["topics"])
     if hold:
         e["hold"] = hold   # kept out of every DEV catalog (android/tools/dev_fixture.py real) until a human resolves it
     return e

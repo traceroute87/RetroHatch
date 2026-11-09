@@ -1,0 +1,56 @@
+name: Suggest an app
+description: Suggest an RG Nano (OPK) or RG Rotate (Android APK) app for RetroHatch. It is only a suggestion - a maintainer reviews it; nothing is approved, signed or published automatically.
+title: "Suggest: "
+labels: ["submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! A suggestion is only a **lead**. It is looked at by a person; if it looks useful it is inspected from its real file, tested on the device, and only then can it be approved, signed and published. Nothing here installs or approves anything.
+  - type: input
+    id: repo
+    attributes:
+      label: Project page (GitHub, GitLab or Codeberg)
+      description: The original project, not a fork or mirror, if you know which is which.
+      placeholder: https://github.com/owner/name
+    validations:
+      required: true
+  - type: checkboxes
+    id: device
+    attributes:
+      label: Device
+      options:
+        - label: RG Nano (FunKeyOS, .opk)
+        - label: RG Rotate (Android, .apk)
+    validations:
+      required: true
+  - type: input
+    id: download
+    attributes:
+      label: Direct link to the release file
+      description: The .opk / .apk (or a release page that has it). Only GitHub release downloads can enter the catalog.
+      placeholder: https://github.com/owner/name/releases/tag/v1.0
+  - type: textarea
+    id: what
+    attributes:
+      label: What does it do, and why would someone want it on a handheld?
+      description: One or two plain sentences. Please do not paste marketing text you cannot back up.
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: Licence (if you know it)
+      placeholder: MIT, GPL-3.0, ...
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Does it run on the device?
+      description: Say how you know - e.g. "I run it on my RG Rotate" or "the README says it supports RG Nano" (with a link). "Unknown" is a fine answer; a file name alone proves nothing.
+  - type: checkboxes
+    id: ack
+    attributes:
+      label: Please confirm
+      options:
+        - label: I understand this is a suggestion only and nothing is approved or published automatically.
+          required: true

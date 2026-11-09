@@ -117,7 +117,16 @@
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
-   }
+   },
+   "group": "utilities",
+   "tags": [
+    "2fa",
+    "authenticator",
+    "encryption",
+    "fingerprint",
+    "hotp",
+    "otp"
+   ]
   },
   {
    "id": "daijish",
@@ -204,7 +213,14 @@
      "Signed with a certificate whose subject is CN=Android, O=Google Inc. (looks like an AOSP key, not a developer key). Check who holds that key before any approval."
     ]
    },
-   "hold": "signing certificate looks like an AOSP key: investigate who holds it first"
+   "hold": "signing certificate looks like an AOSP key: investigate who holds it first",
+   "group": "themes-launchers",
+   "tags": [
+    "daijishou",
+    "emulator-frontend",
+    "emulator-launcher",
+    "launcher"
+   ]
   },
   {
    "id": "droidify",
@@ -295,7 +311,13 @@
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
-   }
+   },
+   "group": "utilities",
+   "group_confidence": "low",
+   "tags": [
+    "fdroid",
+    "kotlin-flow"
+   ]
   },
   {
    "id": "gallery",
@@ -382,7 +404,11 @@
     "notes": [
      "arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device."
     ]
-   }
+   },
+   "group": "media",
+   "tags": [
+    "gallery"
+   ]
   },
   {
    "id": "lemuroid",
@@ -491,7 +517,16 @@
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
-   }
+   },
+   "group": "emulators",
+   "tags": [
+    "emulator",
+    "game-boy",
+    "genesis",
+    "libretro",
+    "libretro-frontend",
+    "n64"
+   ]
   },
   {
    "id": "materialfiles",
@@ -582,7 +617,12 @@
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
-   }
+   },
+   "group": "utilities",
+   "tags": [
+    "file-manager",
+    "material-design"
+   ]
   },
   {
    "id": "melonds",
@@ -667,7 +707,12 @@
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
-   }
+   },
+   "group": "emulators",
+   "tags": [
+    "emulator",
+    "nintendo-ds"
+   ]
   },
   {
    "id": "newpipe",
@@ -763,7 +808,16 @@
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
-   }
+   },
+   "group": "media",
+   "tags": [
+    "4k",
+    "bandcamp",
+    "download-videos",
+    "newpipe",
+    "peertube",
+    "soundcloud"
+   ]
   },
   {
    "id": "obtainium",
@@ -862,7 +916,16 @@
     "notes": [
      "arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device."
     ]
-   }
+   },
+   "group": "utilities",
+   "tags": [
+    "apk-update",
+    "apk-updater",
+    "app-updater",
+    "automation",
+    "github-apk-updater",
+    "gitlab"
+   ]
   },
   {
    "id": "pegasus",
@@ -959,7 +1022,16 @@
      "arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device."
     ]
    },
-   "hold": "licence not detected: resolve it first"
+   "hold": "licence not detected: resolve it first",
+   "group": "themes-launchers",
+   "tags": [
+    "cross-platform",
+    "customizable",
+    "emulator",
+    "frontend",
+    "games",
+    "qml"
+   ]
   }
  ]
 }

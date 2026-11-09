@@ -12,6 +12,17 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.EditText
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import app.retrohatch.rotate.model.Discover
+import app.retrohatch.rotate.model.DiscoverQuery
+import app.retrohatch.rotate.model.Filter
+import app.retrohatch.rotate.model.Groups
+import app.retrohatch.rotate.model.Presence
+import app.retrohatch.rotate.model.Sort
 import android.text.TextUtils
 import android.widget.Toast
 import android.widget.ProgressBar
@@ -92,8 +103,19 @@ class Ui(val host: MainActivity, val m: Metrics, val width: Int, initial: Loaded
     fun flow(l: Listing): InstallFlow = flows.getOrPut(l.app.id) {
         val f = InstallFlow(l, verified, File(host.filesDir, "downloads"), Downloader(mapUrl = DevHooks::mapUrl), PmApkInspector(host), packages,
             SessionInstaller(host), worker) { uiHandler.post(it) }
-        l.artifact.android?.let { a -> InstallEvents.listen(a.packageName) { e -> f.onInstallEvent(e) } }
+        l.artifact.android?.let { a -> InstallEvents.listen(a.packageName) { e -> f.onInstallEvent(e); noteInstalledChange(rebuildTop = false) } }
         f
+    }
+
+    /** One string for "which catalog packages are installed, and which versionCode". A change is the only reason to rebuild screens after a system screen closes. */
+    private fun snapshot(): String = listings.mapNotNull { it.artifact.android?.packageName }.joinToString(",") { (packages.installedVersion(it) ?: 0L).toString() }
+    private var seen: String = snapshot()
+
+    private fun noteInstalledChange(rebuildTop: Boolean) {
+        val now = snapshot()
+        if (now == seen) return
+        seen = now
+        host.rebuildAll(includeTop = rebuildTop)
     }
 
     /** What Android says about this entry's package (null: not installed). Needs only the manifest's launcher-activity <queries>, not QUERY_ALL_PACKAGES. */
@@ -105,6 +127,13 @@ class Ui(val host: MainActivity, val m: Metrics, val width: Int, initial: Loaded
     /** Never true for a downgrade or an equal build, and never for a copy the catalog's key cannot update. */
     fun updateAvailable(l: Listing, a: InstalledApp): Boolean = managed(l, a) && (l.artifact.android?.versionCode ?: 0L) > a.versionCode
 
+    /** What Discover is showing (search text, category, sort, filter). Kept here so it survives opening an app and coming back. */
+    var query = DiscoverQuery()
+
+    fun presence(l: Listing): Presence = installed(l).let { a ->
+        when { a == null -> Presence.NOT_INSTALLED; updateAvailable(l, a) -> Presence.UPDATE; else -> Presence.INSTALLED }
+    }
+
     /** Catalog apps (this device, verified catalog) that are on the device. */
     fun installedListings(): List<Pair<Listing, InstalledApp>> =
         if (!verified) emptyList() else listings.filter { it.installable }.mapNotNull { l -> installed(l)?.let { l to it } }
@@ -113,7 +142,11 @@ class Ui(val host: MainActivity, val m: Metrics, val width: Int, initial: Loaded
     fun uninstall(l: Listing): Boolean = l.artifact.android?.let { Uninstaller.start(host, it.packageName) } ?: false
 
     /** Back from an installer, uninstaller, settings or launched app: re-read what is on the device. */
-    fun onResume() { flows.values.forEach { it.refresh() }; host.rebuildAll() }
+    fun onResume() {
+        if (snapshot() == seen) return                                    // dialog cancelled, app opened and left: nothing changed, nothing is touched (focus stays)
+        flows.values.forEach { it.refresh() }                             // Details pages update themselves through their flow
+        noteInstalledChange(rebuildTop = host.topScreen() !is DetailsScreen)
+    }
 }
 
 abstract class Screen(val ui: Ui) {
@@ -152,6 +185,9 @@ abstract class Screen(val ui: Ui) {
         }
     }
 
+    /** The screen shows state other screens change (Discover: the search / category / sort kept in Ui): rebuild it when it comes back to the front. */
+    open val rebuildOnReturn = false
+
     /** L1 / R1: return true if this screen scrolled or moved by itself; false = the host jumps four rows. */
     open fun onShoulder(dir: Int): Boolean = false
 
@@ -179,9 +215,9 @@ class HomeScreen(ui: Ui) : Screen(ui) {
                 scaleType = ImageView.ScaleType.FIT_XY
             }, FrameLayout.LayoutParams(W.MATCH, W.MATCH))
             addView(ImageView(c).apply {
-                setImageBitmap(Art.fit(c, "art_logo", m.px(104), m.px(104)))
+                setImageBitmap(Art.fit(c, "art_logo", m.px(95), m.px(95)))
                 scaleType = ImageView.ScaleType.FIT_CENTER
-            }, FrameLayout.LayoutParams(W.MATCH, W.MATCH, Gravity.CENTER))
+            }, FrameLayout.LayoutParams(W.MATCH, m.px(95), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))   // sits below the experimental strip, never under it
             if (ui.preview || ui.dev) addView(banner().apply { alpha = 0.94f }, FrameLayout.LayoutParams(W.MATCH, m.px(13), Gravity.TOP))
         })
         val inst = ui.installedListings(); val upd = inst.count { (l, a) -> ui.updateAvailable(l, a) }
@@ -196,29 +232,119 @@ class HomeScreen(ui: Ui) : Screen(ui) {
     }
 }
 
+/** One app row (Discover, search results): tile with the real icon when installed, name, short description, an Installed / Update chip. */
+internal fun appRow(ui: Ui, l: Listing, onOpen: () -> Unit): View {
+    val c = ui.ctx; val m = ui.m
+    val inst = ui.installed(l)
+    val status = when {
+        inst == null -> null
+        ui.managed(l, inst) && ui.updateAvailable(l, inst) -> "Update" to Pal.ACC
+        ui.managed(l, inst) -> "Installed" to Pal.GREEN
+        else -> "Installed" to Pal.TXT2
+    }
+    return W.row(c, m, null, l.app.name, l.app.description.ifBlank { Groups.label(Groups.of(l.app)) }, 36, onOpen, leading = W.tile(c, m, m.px(24), inst?.icon), status = status)
+}
+
+/** Browse: a toolbar (Search, Category, Sort / Filter), one line saying what is shown, then the app rows. The query lives in [Ui] so it survives opening an app and coming back. */
 class DiscoverScreen(ui: Ui) : Screen(ui) {
     override val title = "Discover"
+    override val rebuildOnReturn = true
+    private var firstRow: View? = null
+    override fun initialFocus(root: View): View? = firstRow
 
     override fun build(): View {
         val c = ui.ctx; val m = ui.m
-        val content = if (ui.listings.isEmpty()) W.empty(c, m, "package-open", "No apps for ${ui.target.name} yet",
-            "Nothing in the catalog is built for this device. Entries for other handhelds are hidden.")
-        else {
-            val col = W.column(c, m)
-            ui.listings.forEach { l ->
-                val inst = ui.installed(l)
-                val status = when {
-                    inst == null -> null
-                    ui.managed(l, inst) && ui.updateAvailable(l, inst) -> "Update" to Pal.ACC
-                    ui.managed(l, inst) -> "Installed" to Pal.GREEN
-                    else -> "Installed" to Pal.TXT2
-                }
-                col.addView(W.row(c, m, null, l.app.name, l.app.description.ifBlank { l.app.category.replaceFirstChar { it.uppercase() } }, 36, { ui.push(DetailsScreen(ui, l)) },
-                    leading = W.tile(c, m, m.px(24), inst?.icon), status = status))
-            }
-            W.scroll(c, col)
+        val all = ui.listings
+        val q = ui.query
+        val shown = Discover.apply(all, q, ui::presence)
+        val bar = LinearLayout(c).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(m.px(6), m.px(2), m.px(6), 0)
+            layoutParams = W.lp(W.MATCH, W.WRAP)
+            fun add(b: View, i: Int) = addView(b, (b.layoutParams as LinearLayout.LayoutParams).also { if (i > 0) it.leftMargin = m.px(4) })
+            add(W.button(c, m, if (q.text.isBlank()) "Search" else "\"${q.text.trim()}\"", true, W.Kind.SECONDARY, "search", weight = 1.15f) { ui.push(SearchScreen(ui)) }, 0)
+            add(W.button(c, m, if (q.group == null) "Category" else Groups.label(q.group), true, W.Kind.SECONDARY, "layout-grid", weight = 1.2f) { ui.push(CategoryScreen(ui)) }, 1)
+            add(W.button(c, m, "Sort", true, W.Kind.SECONDARY, "arrow-up-down", weight = 0.75f) { ui.push(OptionsScreen(ui)) }, 2)
+            if (q.active) add(W.button(c, m, "", true, W.Kind.SECONDARY, "x", weight = 0.001f) { ui.query = DiscoverQuery(sort = q.sort); ui.host.rebuildAll() }.also { (it.layoutParams as LinearLayout.LayoutParams).width = m.px(29) }, 3)
         }
-        return frame(content)
+        val col = W.column(c, m)
+        col.addView(text(c, Discover.summary(q, shown.size, all.size), m.tiny, Pal.TXT2).apply { setPadding(m.px(2), 0, 0, m.px(3)) }, W.lp(W.MATCH, W.WRAP))
+        firstRow = null
+        if (all.isEmpty()) col.addView(W.empty(c, m, "package-open", "No apps for ${ui.target.name} yet", "Nothing in the catalog is built for this device. Entries for other handhelds are hidden."), W.lp(W.MATCH, W.WRAP))
+        else if (shown.isEmpty()) {
+            col.addView(W.empty(c, m, "search", "No matching apps", "Nothing matches the current search and filters. Try fewer words or another category.", compact = true))
+            col.addView(W.button(c, m, "Clear search and filters", true, W.Kind.PRIMARY, "x") { ui.query = DiscoverQuery(); ui.host.rebuildAll() })
+        } else shown.forEach { l -> col.addView(appRow(ui, l) { ui.push(DetailsScreen(ui, l)) }.also { if (firstRow == null) firstRow = it }) }
+        val body = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; layoutParams = W.lp(W.MATCH, 0, 1f); addView(bar); addView(W.scroll(c, col)) }
+        return frame(body)
+    }
+}
+
+/** Category browsing: only categories that hold apps, each with its count. */
+class CategoryScreen(ui: Ui) : Screen(ui) {
+    override val title = "Categories"
+    private val icons = mapOf("games" to "gamepad-2", "emulators" to "cpu", "ports" to "package-open", "utilities" to "wrench", "media" to "music", "themes-launchers" to "palette")
+    override fun build(): View {
+        val c = ui.ctx; val m = ui.m
+        val col = W.column(c, m, 8)
+        val groups = Discover.groups(ui.listings)
+        col.addView(W.row(c, m, "layout-grid", "All apps", null, 27, { choose(null) }, trailing = ui.listings.size.toString()))
+        groups.forEach { (id, label, n) -> col.addView(W.row(c, m, icons[id] ?: "package", label, null, 27, { choose(id) }, trailing = n.toString())) }
+        return frame(W.scroll(c, col), showPreview = false)
+    }
+    private fun choose(g: String?) { ui.query = ui.query.copy(group = g); ui.back(); ui.host.rebuildAll() }
+}
+
+/** Sort and filter: tap an option to apply it; the checkmark moves. */
+class OptionsScreen(ui: Ui) : Screen(ui) {
+    override val title = "Sort and filter"
+    override fun build(): View {
+        val c = ui.ctx; val m = ui.m
+        val col = W.column(c, m, 8)
+        col.addView(W.section(c, m, "Sort by"))
+        Sort.values().forEach { s -> col.addView(W.row(c, m, if (ui.query.sort == s) "check" else "circle", s.label, null, 23, { ui.query = ui.query.copy(sort = s); ui.host.rebuildAll() }, chevron = false)) }
+        col.addView(W.section(c, m, "Show"))
+        Filter.values().forEach { f -> col.addView(W.row(c, m, if (ui.query.filter == f) "check" else "circle", f.label, null, 23, { ui.query = ui.query.copy(filter = f); ui.host.rebuildAll() }, chevron = false)) }
+        return frame(W.scroll(c, col), showPreview = false)
+    }
+}
+
+/** Search by app name, description, developer or tag. Typing needs the on-screen keyboard (touch); the results update as you type and open like any other row. */
+class SearchScreen(ui: Ui) : Screen(ui) {
+    override val title = "Search"
+    private var box: EditText? = null
+    override fun initialFocus(root: View): View? = box
+    override fun focusables(root: View): List<View> = super.focusables(root)
+
+    override fun build(): View {
+        val c = ui.ctx; val m = ui.m
+        val results = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(m.px(6), m.px(3), m.px(6), m.px(4)) }
+        fun refresh(t: String) {
+            results.removeAllViews()
+            val hits = Discover.apply(ui.listings, DiscoverQuery(text = t), ui::presence)
+            if (t.isBlank()) results.addView(text(c, "Type a name, a developer or a word like emulator, music or 2fa.", m.small, Pal.TXT2).apply { setPadding(m.px(4), m.px(6), m.px(4), 0); gravity = Gravity.START })
+            else if (hits.isEmpty()) results.addView(text(c, "No apps match \"${t.trim()}\".", m.body, Pal.TXT2).apply { setPadding(m.px(4), m.px(6), m.px(4), 0); gravity = Gravity.START })
+            else hits.forEach { l -> results.addView(appRow(ui, l) { ui.query = ui.query.copy(text = t.trim()); ui.push(DetailsScreen(ui, l)) }) }
+        }
+        val field = EditText(c).apply {
+            setText(ui.query.text); setSelection(text.length)
+            hint = "Search apps"
+            setHintTextColor(Pal.DIS); setTextColor(Pal.TXT); setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, m.body)
+            isSingleLine = true; imeOptions = EditorInfo.IME_ACTION_SEARCH; inputType = android.text.InputType.TYPE_CLASS_TEXT
+            background = roundRect(Pal.CARD, m.r, Pal.ACC, 3)
+            setPadding(m.px(8), 0, m.px(8), 0)
+            layoutParams = W.lp(W.MATCH, m.px(29)).apply { setMargins(m.px(6), m.px(4), m.px(6), 0) }
+            addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) { val t = s?.toString().orEmpty(); ui.query = ui.query.copy(text = t); refresh(t) }
+                override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, d: Int) {}
+                override fun onTextChanged(s: CharSequence?, a: Int, b: Int, d: Int) {}
+            })
+            setOnEditorActionListener { v, _, _ -> (ui.ctx.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(v.windowToken, 0); true }
+        }
+        box = field
+        refresh(ui.query.text)
+        val body = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; layoutParams = W.lp(W.MATCH, 0, 1f); addView(field); addView(W.scroll(c, results)) }
+        return frame(body, showPreview = false)
     }
 }
 
@@ -234,6 +360,9 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
     private var head: TextView? = null
     private var sub: TextView? = null
     private var primary: View? = null
+    private var hero: FrameLayout? = null
+    private var heroKey: Any? = null
+    private var lastWanted: String? = null
 
     override fun onBack(): Boolean { if (flow.state is InstState.Downloading) { flow.cancelDownload(); return true }; return false }
     override fun initialFocus(root: View): View? = primary?.takeIf { it.isFocusable }
@@ -249,7 +378,7 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             layoutParams = W.lp(W.MATCH, W.WRAP).apply { bottomMargin = m.px(3) }
-            addView(W.tile(c, m, m.px(40), inst?.icon), W.lp(m.px(40), m.px(40)).apply { rightMargin = m.px(8) })
+            addView(FrameLayout(c).also { hero = it; heroKey = inst?.versionCode; it.addView(W.tile(c, m, m.px(40), inst?.icon)) }, W.lp(m.px(40), m.px(40)).apply { rightMargin = m.px(8) })
             addView(LinearLayout(c).apply {
                 orientation = LinearLayout.VERTICAL
                 addView(text(c, l.app.name, m.big, Pal.TXT, true).apply { isSingleLine = true; ellipsize = TextUtils.TruncateAt.END })
@@ -313,9 +442,14 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
             return
         }
         val hadFocus = ui.host.currentFocus.let { it != null && isInside(dyn, it) }
+        val wanted = (ui.host.currentFocus?.takeIf { isInside(dyn, it) }?.tag as? String) ?: lastWanted   // read BEFORE the old buttons are removed (removing them moves focus away)
         shownKind = s.javaClass
         dyn.removeAllViews(); bar = null
         val inst = ui.installed(l)
+        if (inst?.versionCode != heroKey) {                                   // installed, updated or uninstalled: show the app's real icon (or the package icon) now
+            heroKey = inst?.versionCode
+            hero?.let { h -> h.removeAllViews(); h.addView(W.tile(c, m, m.px(40), inst?.icon)) }
+        }
         val managed = inst != null && ui.managed(l, inst)
         val ver = inst?.let { versionText(it.versionName, it.versionCode) } ?: "-"
         // (icon, title, detail, colour)
@@ -376,7 +510,10 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
                 if (!ui.uninstall(l)) Toast.makeText(ui.ctx, "Could not open Android's uninstall screen", Toast.LENGTH_SHORT).show()
             })
         }
-        primary = acts.firstOrNull { it.isFocusable }
+        // stable keys so the selected action can be found again after the state (and the buttons) changed
+        val keys = acts.indices.map { i -> if (i == 0 && s !is InstState.Installed) "main" else null }.toMutableList()
+        acts.forEachIndexed { i, b -> b.tag = keys[i] ?: (b as? LinearLayout)?.let { ll -> (ll.getChildAt(ll.childCount - 1) as? TextView)?.text?.toString()?.lowercase() } }
+        primary = acts.firstOrNull { it.tag == wanted && it.isFocusable } ?: acts.firstOrNull { it.isFocusable }
         if (acts.isNotEmpty()) dyn.addView(LinearLayout(c).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = W.lp(W.MATCH, W.WRAP)
@@ -387,6 +524,7 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
                 setPadding(m.px(2), m.px(2), m.px(2), 0); gravity = Gravity.START
             }, W.lp(W.MATCH, W.WRAP))
         root.findViewWithTag<TextView>("label:B")?.text = if (s is InstState.Downloading) "Cancel" else "Back"
+        lastWanted = primary?.tag as? String
         if (hadFocus || !ui.host.isTouchMode()) primary?.requestFocus()
     }
 

@@ -19,6 +19,8 @@ data class AppEntry(
     val website: String?, val license: String, val category: String, val artifacts: List<Artifact>,
     /** Optional Android-only text (see catalog/schema/app.schema.json): paragraphs split on blank lines, and a short feature list. */
     val longDescription: String? = null, val features: List<String> = emptyList(),
+    /** Android-only display metadata: one primary group (games, emulators, ports, utilities, media, themes-launchers), search tags, release date, date added (YYYY-MM-DD). */
+    val group: String? = null, val tags: List<String> = emptyList(), val released: String? = null, val added: String? = null,
 )
 
 data class Catalog(val devices: List<DeviceProfile>, val apps: List<AppEntry>, val serial: Long? = null, val generated: String? = null) {
@@ -62,7 +64,7 @@ object CatalogMapper {
             }
             AppEntry(id, s(a, "name") ?: id, s(a, "description") ?: "", s(a, "developer") ?: "", s(a, "source") ?: "", s(a, "website"),
                 s(a, "license") ?: "unknown", s(a, "category") ?: "other", arts, s(a, "long_description"),
-                (a["features"] as? List<*>)?.filterIsInstance<String>() ?: emptyList())
+                (a["features"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(), s(a, "group"), (a["tags"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(), s(a, "released"), s(a, "added"))
         }
         return Catalog(devices, apps, doc["serial"] as? Long, s(doc, "generated"))
     }

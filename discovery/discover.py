@@ -26,6 +26,24 @@ def known_catalog():
     return src, ids
 
 
+# ---- questionable releases ------------------------------------------------------------------------------------------------
+
+LISTY = re.compile(r"^(awesome|best|top)[-_ ]|(^|[-_ ])(awesome list|curated list|list of|alternatives?)([-_ ]|$)", re.I)
+
+
+def suspicious_flags(c):
+    """Flags for a candidate record (search.py output) that look at the release itself: a download whose file name has nothing to do with the project (a re-badged or unrelated
+    upload), and projects that are lists rather than apps. Pure function of the record, so review.py can re-apply it to older search results. Never a verdict: a human decides."""
+    f = []
+    art = c.get("artifact") or {}
+    words = lambda t: {w for w in re.split(r"[^a-z0-9]+", (t or "").lower()) if len(w) >= 4}
+    if art.get("name") and words(c.get("name")) and not (words(c.get("name")) & words(art["name"])) and not (words(c.get("owner")) & words(art["name"])):
+        f.append("release-name-mismatch")
+    if LISTY.search((c.get("name") or "")) or LISTY.search(c.get("description") or ""):
+        f.append("list-not-an-app")
+    return f
+
+
 # ---- evidence analysis -------------------------------------------------------------------------
 
 def norm(s):

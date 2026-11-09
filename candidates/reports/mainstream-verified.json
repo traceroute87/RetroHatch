@@ -1,0 +1,1015 @@
+{
+ "schema": 1,
+ "checked": "2026-11-09",
+ "apps": [
+  {
+   "id": "retroarch",
+   "name": "RetroArch",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "1.22.2",
+     "file": "RetroArch_aarch64.apk",
+     "url": "https://buildbot.libretro.com/stable/1.22.2/android/RetroArch_aarch64.apk",
+     "published": "",
+     "kind": "listing",
+     "label": "libretro buildbot (official stable)",
+     "real_file": true,
+     "size": null,
+     "final_url": "https://buildbot.libretro.com/stable/1.22.2/android/RetroArch_aarch64.apk",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.retroarch.aarch64",
+      "version_code": 1763607214,
+      "version_name": "1.22.2_GIT",
+      "min_sdk": 16,
+      "target_sdk": 28,
+      "abis": [
+       "arm64-v8a",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "d7a5eab30902c9b2775af6fb4eac2d294a64634fb47dd1382bc3ac5bf669982e"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "7bd5d208dfe93cc8e2ea6c04608948ce1a045980f160a58ca2d0993aa20ad213",
+      "size": 183956821
+     }
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-3.0",
+    "archived": false,
+    "pushed": "2026-11-09",
+    "stars": 14571,
+    "fork": false,
+    "description": "Cross-platform, sophisticated frontend for the libretro API. Licensed GPLv3."
+   }
+  },
+  {
+   "id": "lemuroid",
+   "name": "Lemuroid",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "1.17.0",
+     "published": "2026-04-21",
+     "file": "lemuroid-app-free-dynamic-release.apk",
+     "url": "https://github.com/Swordfish90/Lemuroid/releases/download/1.17.0/lemuroid-app-free-dynamic-release.apk",
+     "assets": [
+      "lemuroid-app-free-dynamic-release.apk"
+     ],
+     "kind": "github",
+     "label": "Swordfish90/Lemuroid",
+     "real_file": true,
+     "size": 11985230,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/226883777/d44f8c3c-c70e-4d4c-a8dc-c323f3f3cf1a?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A01%3A04Z&rscd=attachment%3B+filename%3Dlemuroid-app-free-dynamic-release.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A00%3A39Z&ske=2026-11-09T19%3A01%3A04Z&sks=b&skv=2018-11-09&sig=%2B%2BgDX39WWWuheMQ5Niz7wpv9wewwqxmWDf9wsaDsoxA%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTgyOCwibmJmIjoxNzk0MjQ4MDI4LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.20ddvJIamabh3iufD2hjTTZVmkiv4Rs_xfQIMfV42CQ&response-content-disposition=attachment%3B%20filename%3Dlemuroid-app-free-dynamic-release.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.swordfish.lemuroid",
+      "version_code": 252,
+      "version_name": "1.17.0",
+      "min_sdk": 23,
+      "target_sdk": 35,
+      "abis": [
+       "arm64-v8a",
+       "armeabi-v7a",
+       "x86",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "4fa1cb59ea4d8ca8555315eba215205f667975ba8985bbe736904f21bfebbeaf"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "d44cfa0cdc3e43fd91df97f625938366ccef9793b06a80b9e6fad97a6cd88e51",
+      "size": 11985230
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-3.0",
+    "archived": false,
+    "pushed": "2026-10-16",
+    "stars": 4493,
+    "fork": false,
+    "description": "All in one emulator on Android!"
+   }
+  },
+  {
+   "id": "duckstation",
+   "name": "DuckStation",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "12126",
+     "file": "duckstation-12126.apk",
+     "url": "https://downloads.duckstation.org/android-testing/downloads/duckstation-12126.apk",
+     "published": "",
+     "kind": "listing",
+     "label": "downloads.duckstation.org (Android testing builds)",
+     "real_file": true,
+     "size": null,
+     "final_url": "https://downloads.duckstation.org/android-testing/downloads/duckstation-12126.apk",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.github.stenzek.duckstation",
+      "version_code": 12126,
+      "version_name": "0.1-12693-gcc4a0d678",
+      "min_sdk": 24,
+      "target_sdk": 37,
+      "abis": [
+       "arm64-v8a",
+       "armeabi-v7a",
+       "x86",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "a6357957d296b3b03edeb62da317cb347ecde63b6577977ffcbfe0d9a6975450"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "3e944243fa6d201d2c2c935f1a1b104fe7e2696c6f2a6b3d719fa212660d73f7",
+      "size": 112478343
+     }
+    },
+    {
+     "ok": false,
+     "tag": "latest",
+     "published": "2026-11-07",
+     "assets": [
+      "DuckStation-arm64.AppImage",
+      "DuckStation-armhf.AppImage",
+      "duckstation-mac-release.zip",
+      "duckstation-windows-arm64-installer.exe",
+      "duckstation-windows-arm64-release-symbols.7z",
+      "duckstation-windows-arm64-release.zip",
+      "duckstation-windows-x64-installer.exe",
+      "duckstation-windows-x64-release-symbols.7z"
+     ],
+     "why": "latest release has no matching APK (assets: DuckStation-arm64.AppImage, DuckStation-armhf.AppImage, duckstation-mac-release.zip, duckstation-windows-arm64-installer.exe, duckstation-windows-arm64-release-symbols.7z)",
+     "kind": "github",
+     "label": "stenzek/duckstation"
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "NOASSERTION",
+    "archived": false,
+    "pushed": "2026-11-08",
+    "stars": 10973,
+    "fork": false,
+    "description": "Fast PlayStation 1 emulator for x86-64/AArch32/AArch64/RV64"
+   }
+  },
+  {
+   "id": "nethersx2",
+   "name": "NetherSX2 (patched AetherSX2)",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "2.2n",
+     "published": "2025-12-25",
+     "file": "NetherSX2-v2.2n-4248.apk",
+     "url": "https://github.com/Trixarian/NetherSX2-patch/releases/download/2.2n/NetherSX2-v2.2n-4248.apk",
+     "assets": [
+      "NetherSX2-v2.2n-4248.apk"
+     ],
+     "kind": "github",
+     "label": "Trixarian/NetherSX2-patch",
+     "real_file": true,
+     "size": 21621788,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/681818078/8225e05a-b5ec-498d-bde3-e5656415277e?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A00%3A40Z&rscd=attachment%3B+filename%3DNetherSX2-v2.2n-4248.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A00%3A02Z&ske=2026-11-09T19%3A00%3A40Z&sks=b&skv=2018-11-09&sig=u4AtePy%2BhS2SojYnN7fplOHcBe7VYYrM6gbpzsZ2xy0%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTg0MywibmJmIjoxNzk0MjQ4MDQzLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.pDEhuDtYwdV8da8yfVpXcwM3AKx8txwAUiaq8Yr0ytc&response-content-disposition=attachment%3B%20filename%3DNetherSX2-v2.2n-4248.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "xyz.aethersx2.android",
+      "version_code": 15269,
+      "version_name": "v2.2n-4248",
+      "min_sdk": 26,
+      "target_sdk": 32,
+      "abis": [
+       "arm64-v8a"
+      ],
+      "signers_sha256": [
+       "9bf3772a94603282fb13c64ea8771d66817382f6aca9923e8a178e7219340296"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": false
+      },
+      "debuggable": false,
+      "sha256": "2029e30dcc1ba1ecb8d73313f18b429b40e6044c7785c52af08b948ef94b3ddf",
+      "size": 21621788
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "Unlicense",
+    "archived": false,
+    "pushed": "2026-09-22",
+    "stars": 2758,
+    "fork": false,
+    "description": "Continuation of NetherSX2 based on AetherSX2 4248"
+   }
+  },
+  {
+   "id": "armsx2",
+   "name": "ARMSX2",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "2.9.2",
+     "published": "2026-11-06",
+     "file": "ARMSX2-2.9.2-a11-armv8.2-sdk30.apk",
+     "url": "https://github.com/ARMSX2/ARMSX2/releases/download/2.9.2/ARMSX2-2.9.2-a11-armv8.2-sdk30.apk",
+     "assets": [
+      "ARMSX2-2.9.2-a11-armv8.2-sdk30.apk",
+      "ARMSX2-2.9.2-a13-armv8.2-sdk33.apk",
+      "ARMSX2-2.9.2-a15-armv8.2-sdk35.apk",
+      "ARMSX2-2.9.2-legacy-armv8.0-sdk26.apk",
+      "ARMSX2-2.9.2-Linux-arm64-16K-pages.AppImage",
+      "ARMSX2-2.9.2-Linux-arm64-4K-pages.AppImage"
+     ],
+     "kind": "github",
+     "label": "ARMSX2/ARMSX2",
+     "real_file": true,
+     "size": 78369361,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/1036246172/b05c085a-015c-44a5-85c1-825124b7bdbb?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A00%3A40Z&rscd=attachment%3B+filename%3DARMSX2-2.9.2-a11-armv8.2-sdk30.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A00%3A08Z&ske=2026-11-09T19%3A00%3A40Z&sks=b&skv=2018-11-09&sig=Z2m%2BqXX%2Fyre6AP2uJMGaV6ubb53oofQ%2F229paKdbJV4%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTg0OCwibmJmIjoxNzk0MjQ4MDQ4LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.LZgIHadyhXUsYuMCuew-yh2Nlt6C7wXJu7lHE3TIWPw&response-content-disposition=attachment%3B%20filename%3DARMSX2-2.9.2-a11-armv8.2-sdk30.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.armsx2",
+      "version_code": 1787,
+      "version_name": "2.9.2",
+      "min_sdk": 30,
+      "target_sdk": 37,
+      "abis": [
+       "arm64-v8a"
+      ],
+      "signers_sha256": [
+       "f942d6bbcf5c46971fc8ac02c53bb9f7c10ede226834412e8dac38f07c997ff5"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": false
+      },
+      "debuggable": false,
+      "sha256": "758cbd9dcb183a971eb6a0b2b1448860aafefdf138ff22fd90b621fcdcb12214",
+      "size": 78369361
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-3.0",
+    "archived": false,
+    "pushed": "2026-11-09",
+    "stars": 2449,
+    "fork": true,
+    "description": "ARMSX2 - The Playstation 2 Emulator for ARM64 Platforms"
+   }
+  },
+  {
+   "id": "ppsspp",
+   "name": "PPSSPP",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "1.20.4",
+     "file": "ppsspp.apk",
+     "url": "https://www.ppsspp.org/files/1_20_4/ppsspp.apk",
+     "published": "",
+     "kind": "page",
+     "label": "ppsspp.org direct APK",
+     "real_file": true,
+     "size": null,
+     "final_url": "https://www.ppsspp.org/files/1_20_4/ppsspp.apk",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "org.ppsspp.ppsspp",
+      "version_code": 120040000,
+      "version_name": "v1.20.4",
+      "min_sdk": 21,
+      "target_sdk": 36,
+      "abis": [
+       "arm64-v8a",
+       "armeabi-v7a",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "c5342629df16762391907b3297aad122b4c1a8a9e608dfb94217a08e3bbf13a2"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "dd702a31270ecd68db37afee311d6efe08b1d4da9601d2750ce1a73bbd316c3f",
+      "size": 45448397
+     }
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "PPSSPP | F-Droid - Free and Open Source Android App Repository",
+     "why": "",
+     "kind": "store",
+     "label": "F-Droid"
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "NOASSERTION",
+    "archived": false,
+    "pushed": "2026-11-09",
+    "stars": 14867,
+    "fork": false,
+    "description": "A PSP emulator for Android, Windows, Mac, Linux and iOS, written in C++. Want to contribute? Join us on Discord at https://discord.gg/5NJB6dD or just send pull requests / issues."
+   }
+  },
+  {
+   "id": "vita3k",
+   "name": "Vita3K",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "continuous",
+     "published": "2026-11-09",
+     "file": "android-latest.apk",
+     "url": "https://github.com/Vita3K/Vita3K/releases/download/continuous/android-latest.apk",
+     "assets": [
+      "android-latest.apk",
+      "macos-arm64-latest.dmg",
+      "macos-latest.dmg",
+      "ubuntu-aarch64-latest.zip",
+      "ubuntu-latest.zip",
+      "Vita3K-aarch64.AppImage",
+      "Vita3K-aarch64.AppImage.zsync",
+      "Vita3K-x86_64.AppImage"
+     ],
+     "kind": "github",
+     "label": "Vita3K/Vita3K",
+     "real_file": true,
+     "size": 29296186,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/119111364/fd0d99b0-6a60-4364-ba08-e6b2f23dfee2?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T18%3A59%3A43Z&rscd=attachment%3B+filename%3Dandroid-latest.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T17%3A58%3A55Z&ske=2026-11-09T18%3A59%3A43Z&sks=b&skv=2018-11-09&sig=bsmsOlN8OP1Hzul29aIw6tD5FzbGIAbckL223FjJUPo%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTg2MCwibmJmIjoxNzk0MjQ4MDYwLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.hm46VQL4C6Sh0T41t3lUCKhVkFH2AFP8t62GcpD97r0&response-content-disposition=attachment%3B%20filename%3Dandroid-latest.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "org.vita3k.emulator",
+      "version_code": 21,
+      "version_name": "0.2.1",
+      "min_sdk": 28,
+      "target_sdk": 35,
+      "abis": [
+       "arm64-v8a",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "eadeff93b5fb0317051111f77d56abbaa0e6716cc847969926aa36dac4beb202"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "31b0cd189d2ab272d1421844eafc414991b592d901a4edd2c68ecac6208c2457",
+      "size": 29296186
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-2.0",
+    "archived": false,
+    "pushed": "2026-11-09",
+    "stars": 5956,
+    "fork": false,
+    "description": "Experimental PlayStation Vita emulator"
+   }
+  },
+  {
+   "id": "mupen64plusfz",
+   "name": "Mupen64Plus FZ",
+   "channels": [
+    {
+     "ok": false,
+     "why": "no release published on GitHub",
+     "kind": "github",
+     "label": "fzurita/mupen64plus-ae"
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-3.0",
+    "archived": false,
+    "pushed": "2024-04-02",
+    "stars": 27,
+    "fork": true,
+    "description": "Mupen64Plus, Android Edition (AE) is a port of Mupen64Plus to Android. (Not officially supported by the Mupen64Plus team)"
+   }
+  },
+  {
+   "id": "melonds",
+   "name": "melonDS",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "2.0.1",
+     "published": "2026-05-06",
+     "file": "app-gitHub-prod-release.apk",
+     "url": "https://github.com/rafaelvcaetano/melonDS-android/releases/download/2.0.1/app-gitHub-prod-release.apk",
+     "assets": [
+      "app-gitHub-prod-release.apk"
+     ],
+     "kind": "github",
+     "label": "rafaelvcaetano/melonDS-android",
+     "real_file": true,
+     "size": 21061910,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/159060557/c3579061-5c12-414c-8111-d5ee4efebe61?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A04%3A03Z&rscd=attachment%3B+filename%3Dapp-gitHub-prod-release.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A03%3A26Z&ske=2026-11-09T19%3A04%3A03Z&sks=b&skv=2018-11-09&sig=NinN0bW75V9FpLEdcZxtFkhfwp%2BjiAP%2B7rom%2FHqQltQ%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTg2NywibmJmIjoxNzk0MjQ4MDY3LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ._Sqtm6OaA2EivWcKNxut1rfkqvgxTQJHfUwVrszbeKI&response-content-disposition=attachment%3B%20filename%3Dapp-gitHub-prod-release.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "me.magnum.melonds",
+      "version_code": 40,
+      "version_name": "2.0.1 GH",
+      "min_sdk": 24,
+      "target_sdk": 36,
+      "abis": [
+       "arm64-v8a",
+       "armeabi-v7a",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "0493bb8749289f0304cc868489dd68b930c19ccc4dce2da876bfe6b9bdbabebc"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "646eb4564c71b0817ace6474e92c169da16630d58826c43e0fe648896311ec94",
+      "size": 21061910
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-3.0",
+    "archived": false,
+    "pushed": "2026-11-09",
+    "stars": 1753,
+    "fork": false,
+    "description": "Android port of melonDS"
+   }
+  },
+  {
+   "id": "drastic",
+   "name": "DraStic DS Emulator",
+   "channels": [
+    {
+     "ok": false,
+     "http": 404,
+     "title": "",
+     "why": "listing returned HTTP 404",
+     "kind": "store",
+     "label": "Google Play (paid)"
+    }
+   ],
+   "repo_meta": null
+  },
+  {
+   "id": "azahar",
+   "name": "Azahar",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "2126.2",
+     "published": "2026-10-08",
+     "file": "azahar-android-vanilla-2126.2.apk",
+     "url": "https://github.com/azahar-emu/azahar/releases/download/2126.2/azahar-android-vanilla-2126.2.apk",
+     "assets": [
+      "azahar-android-googleplay-2126.2.aab",
+      "azahar-android-googleplay-2126.2.apk",
+      "azahar-android-vanilla-2126.2.aab",
+      "azahar-android-vanilla-2126.2.apk",
+      "azahar-libretro-android-arm64-v8a-2126.2.zip",
+      "azahar-libretro-ios-arm64-2126.2.zip",
+      "azahar-libretro-linux-x86_64-2126.2.zip",
+      "azahar-libretro-macos-arm64-2126.2.zip"
+     ],
+     "kind": "github",
+     "label": "azahar-emu/azahar",
+     "real_file": true,
+     "size": 50187175,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/767183985/29ece450-f64c-44f7-aee8-4a6da420b065?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T18%3A59%3A24Z&rscd=attachment%3B+filename%3Dazahar-android-vanilla-2126.2.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T17%3A59%3A13Z&ske=2026-11-09T18%3A59%3A24Z&sks=b&skv=2018-11-09&sig=SYyjYHIOypkCbYuCFrK35Dsr1IdhaF2oLz7EWgtwslg%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTg3MywibmJmIjoxNzk0MjQ4MDczLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.T4y7yDA8uz5dZeqc3JBGjQHPbFWapa2IihJveL17VhE&response-content-disposition=attachment%3B%20filename%3Dazahar-android-vanilla-2126.2.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "org.azahar_emu.azahar",
+      "version_code": 33989150,
+      "version_name": "2126.2-vanilla",
+      "min_sdk": 29,
+      "target_sdk": 37,
+      "abis": [
+       "arm64-v8a",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "5ba2563e0d13fae2aba067d1c230cd1c863a93005c10d648ce5b331792aa0af1"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "b511d1d38012c5ab0dfdb4479335059bb89ef17acfbf0ba45e79107ed4185ba3",
+      "size": 50187175
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-3.0",
+    "archived": false,
+    "pushed": "2026-11-06",
+    "stars": 8612,
+    "fork": false,
+    "description": "An open-source 3DS emulator project based on Citra."
+   }
+  },
+  {
+   "id": "dolphin",
+   "name": "Dolphin",
+   "channels": [
+    {
+     "ok": false,
+     "why": "official page HTTP 403 (the site blocks automated requests)",
+     "kind": "page",
+     "label": "dolphin-emu.org download page"
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "NOASSERTION",
+    "archived": false,
+    "pushed": "2026-11-08",
+    "stars": 15783,
+    "fork": false,
+    "description": "Dolphin is a GameCube / Wii emulator, allowing you to play games for these two platforms on PC with improvements."
+   }
+  },
+  {
+   "id": "flycast",
+   "name": "Flycast",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "v2.7",
+     "published": "2026-08-19",
+     "file": "flycast-2.7.apk",
+     "url": "https://github.com/flyinghead/flycast/releases/download/v2.7/flycast-2.7.apk",
+     "assets": [
+      "flycast-2.7.apk",
+      "flycast-2.7.appx",
+      "flycast-2.7.nro",
+      "flycast-macOS-2.7.zip",
+      "flycast-win64-2.7.zip",
+      "flycast-x86_64-2.7.AppImage"
+     ],
+     "kind": "github",
+     "label": "flyinghead/flycast",
+     "real_file": true,
+     "size": 36280670,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/131286494/112094f9-7c5b-4f2e-ad7d-ef6cb0b18a63?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T18%3A59%3A40Z&rscd=attachment%3B+filename%3Dflycast-2.7.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T17%3A58%3A54Z&ske=2026-11-09T18%3A59%3A40Z&sks=b&skv=2018-11-09&sig=XZ6%2FuSGhyXEA70VZcbnrHDyjeA8qBcjnvoa69juBav0%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTg4MSwibmJmIjoxNzk0MjQ4MDgxLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.kkHJ17ZWdhIB7M9k0TIAWxrpBrifpDEBM_qR4c6NDTo&response-content-disposition=attachment%3B%20filename%3Dflycast-2.7.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.flycast.emulator",
+      "version_code": 3302,
+      "version_name": "v2.7-1-g44e4c7b50",
+      "min_sdk": 21,
+      "target_sdk": 35,
+      "abis": [
+       "arm64-v8a",
+       "armeabi-v7a",
+       "x86",
+       "x86_64"
+      ],
+      "signers_sha256": [
+       "0774794c54c7e463004754e2caba432a2057d917e64c5e24460606a7471b1395"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "1ac54d77b8283f6d58d077396d0916ec12c15b7e4ada9d957836a64590756c00",
+      "size": 36280670
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-2.0",
+    "archived": false,
+    "pushed": "2026-11-09",
+    "stars": 2648,
+    "fork": false,
+    "description": "Flycast is a multiplatform Sega Dreamcast, Naomi, Naomi 2 and Atomiswave emulator"
+   }
+  },
+  {
+   "id": "redream",
+   "name": "Redream",
+   "channels": [
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": null
+  },
+  {
+   "id": "yabasanshiro2",
+   "name": "Yaba Sanshiro 2",
+   "channels": [
+    {
+     "ok": false,
+     "why": "no release published on GitHub",
+     "kind": "github",
+     "label": "devmiyax/yabause"
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": {
+    "status": 404
+   }
+  },
+  {
+   "id": "snes9xexplus",
+   "name": "Snes9x EX+",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "Pre-release",
+     "published": "2023-01-17",
+     "file": "Snes9xEXPlus.zip",
+     "url": "https://github.com/Rakashazi/emu-ex-plus-alpha/releases/download/Pre-release/Snes9xEXPlus.zip",
+     "assets": [
+      "2600Emu.zip",
+      "C64Emu.zip",
+      "EX-Emulators.zip",
+      "GbaEmu.zip",
+      "GbcEmu.zip",
+      "LynxEmu.zip",
+      "MdEmu.zip",
+      "MsxEmu.zip"
+     ],
+     "kind": "github",
+     "label": "Rakashazi/emu-ex-plus-alpha",
+     "real_file": true,
+     "size": 5900787,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/16972520/02d7a490-2f34-4ba7-be7f-dd6ccdee66dd?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A03%3A30Z&rscd=attachment%3B+filename%3DSnes9xEXPlus.zip&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A02%3A43Z&ske=2026-11-09T19%3A03%3A30Z&sks=b&skv=2018-11-09&sig=%2F14TeCAMHONZmURPgR%2B7Dp5yMVesew4Xqf5dgrMIZ1Y%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0ODM4OCwibmJmIjoxNzk0MjQ4MDg4LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.nosrChbDUa-trutt-_dV55qy5JirgBTUfAcQLzA9kh8&response-content-disposition=attachment%3B%20filename%3DSnes9xEXPlus.zip&response-content-type=application%2Foctet-stream",
+     "zip_of_apk": true
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-3.0",
+    "archived": false,
+    "pushed": "2026-04-13",
+    "stars": 1267,
+    "fork": false,
+    "description": "Multi-platform computer & game console emulation system including supporting code (EmuFramework) and core engine (Imagine)"
+   }
+  },
+  {
+   "id": "pizzaboy",
+   "name": "Pizza Boy GBA / GBC",
+   "channels": [
+    {
+     "ok": true,
+     "http": 200,
+     "title": "",
+     "why": "",
+     "kind": "store",
+     "label": "Google Play"
+    }
+   ],
+   "repo_meta": null
+  },
+  {
+   "id": "mame4droid",
+   "name": "MAME4droid",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "v1.41.2",
+     "published": "2026-09-16",
+     "file": "MAME4droid.2026-1.41.2-release.apk",
+     "url": "https://github.com/Seleuco/MAME4droid-2024/releases/download/v1.41.2/MAME4droid.2026-1.41.2-release.apk",
+     "assets": [
+      "MAME4droid.2026-1.41.2-release.apk"
+     ],
+     "kind": "github",
+     "label": "Seleuco/MAME4droid-2024",
+     "real_file": true,
+     "size": 169562047,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/733013052/6aa58f66-54b2-41db-acbb-5d4ecb42fd48?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T18%3A59%3A01Z&rscd=attachment%3B+filename%3DMAME4droid.2026-1.41.2-release.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T17%3A58%3A53Z&ske=2026-11-09T18%3A59%3A01Z&sks=b&skv=2018-11-09&sig=n9QSJjaqqCOHdfkRwnVjj1rwOHUOgKzE%2F5Qxc4RLUgg%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI1MTU0MywibmJmIjoxNzk0MjQ3OTQzLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.1ZHLX5cxPQ_dgFq0sSoGnyhR8Cwgz_K5rZSN3ylwBSw&response-content-disposition=attachment%3B%20filename%3DMAME4droid.2026-1.41.2-release.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.seleuco.mame4d2024",
+      "version_code": 145,
+      "version_name": "1.41.2",
+      "min_sdk": 29,
+      "target_sdk": 37,
+      "abis": [
+       "arm64-v8a"
+      ],
+      "signers_sha256": [
+       "218b28a42dba410d29adfd2233041032f521fbfb44b3d075dce406b135ab3077"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": false
+      },
+      "debuggable": false,
+      "sha256": "b2e05497f4c7b8b0d5ac84a4755569050f60a4c9c69c7e219f6783bd9c5bb2ad",
+      "size": 169562047
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "GPL-2.0",
+    "archived": false,
+    "pushed": "2026-09-20",
+    "stars": 420,
+    "fork": false,
+    "description": "MAME4droid (Current) is developed by David Valdeita (Seleuco) as a port of the latest MAME emulator by MAMEDev and contributors. It emulates arcade games and systems like ZX Spectrum, Amstrad CPC, MSX etc. This version of MAME support over 40000 different ROMs."
+   }
+  },
+  {
+   "id": "winlator",
+   "name": "Winlator",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "v11.2.0",
+     "published": "2026-08-19",
+     "file": "Winlator_11.2.apk",
+     "url": "https://github.com/brunodev85/winlator/releases/download/v11.2.0/Winlator_11.2.apk",
+     "assets": [
+      "Winlator_11.2.apk"
+     ],
+     "kind": "github",
+     "label": "brunodev85/winlator",
+     "real_file": true,
+     "size": 157549075,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/671061529/fd973427-c3b4-4e2a-a05b-b0cf71875225?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A00%3A40Z&rscd=attachment%3B+filename%3DWinlator_11.2.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A00%3A08Z&ske=2026-11-09T19%3A00%3A40Z&sks=b&skv=2018-11-09&sig=Owq8gIMlYPy0P%2B9ZE5TERSgH9iV16waAVuV%2Bq8uI0Hg%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI1MTcwNywibmJmIjoxNzk0MjQ4MTA3LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.oczJgO8cMzwLhMP2vkry-unWhGEcRp1Z0UQhIMj4pS8&response-content-disposition=attachment%3B%20filename%3DWinlator_11.2.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.winlator",
+      "version_code": 33,
+      "version_name": "11.2",
+      "min_sdk": 26,
+      "target_sdk": 28,
+      "abis": [
+       "arm64-v8a"
+      ],
+      "signers_sha256": [
+       "e576bf5035e4bba4efb2c5099f9d74a95cc3abe8e3b6b0c72219cc07eac8c8fb"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": false
+      },
+      "debuggable": true,
+      "sha256": "ea5c81bf0e5b90a6b9ccb8007121ab6738c8646a5a60b341ce0ac2b33f1d100a",
+      "size": 157549075
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "LGPL-2.1",
+    "archived": false,
+    "pushed": "2026-11-02",
+    "stars": 19890,
+    "fork": false,
+    "description": "Android application for running Windows applications with Wine and Box86/Box64"
+   }
+  },
+  {
+   "id": "daijishou",
+   "name": "Daijishō",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "v1.5.0",
+     "published": "2026-01-15",
+     "file": "416.apk",
+     "url": "https://github.com/TapiocaFox/Daijishou/releases/download/v1.5.0/416.apk",
+     "assets": [
+      "416.apk"
+     ],
+     "kind": "github",
+     "label": "TapiocaFox/Daijishou",
+     "real_file": true,
+     "size": 17912484,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/466666051/4e4fcfec-b957-4df9-a6ee-20c2c27472ae?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A10%3A48Z&rscd=attachment%3B+filename%3D416.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A10%3A41Z&ske=2026-11-09T19%3A10%3A48Z&sks=b&skv=2018-11-09&sig=NYEnubY1gXL5ssFE1K7Ftarzw%2By4rCe4XluzA1hD92w%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTkxOCwibmJmIjoxNzk0MjQ4MTE4LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.ddQJSTbd_MVRVIhf9BlqDth1HlSwADo0Al-k6yz_JgE&response-content-disposition=attachment%3B%20filename%3D416.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "com.magneticchen.daijishou",
+      "version_code": 416,
+      "version_name": "1.5.0",
+      "min_sdk": 26,
+      "target_sdk": 35,
+      "abis": [],
+      "signers_sha256": [
+       "c1dc929edf4c062eaeee609ec009c7859e34050e62058282d1eaf5e8b2c22f51"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": true
+      },
+      "debuggable": false,
+      "sha256": "c09989b5d938f41cc1d53d2f38fa3b1261a40bc4d8dcf8367cce83353457df51",
+      "size": 17912484
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "MIT",
+    "archived": false,
+    "pushed": "2026-11-09",
+    "stars": 1975,
+    "fork": false,
+    "description": "Daijishō is a retro launcher that manages your retro games libraries. This repo is for assets and served as a main page."
+   }
+  },
+  {
+   "id": "esde",
+   "name": "ES-DE",
+   "channels": [
+    {
+     "ok": false,
+     "tag": "v3.5.0",
+     "published": "2026-09-30",
+     "why": "the three latest releases attach no APK (assets: ES-DE_3.4.0-x64.exe, ES-DE_x64.AppImage, ES-DE_3.4.0-x64.dmg, ES-DE_3.4.0-arm64.dmg)",
+     "kind": "gitlab",
+     "label": "es-de/emulationstation-de"
+    },
+    {
+     "ok": false,
+     "http": 403,
+     "title": "",
+     "why": "listing returned HTTP 403",
+     "kind": "store",
+     "label": "Patreon (paid APK, official)"
+    },
+    {
+     "ok": true,
+     "http": 200,
+     "title": "ES-DE Frontend | Galaxy Store",
+     "why": "",
+     "kind": "store",
+     "label": "Samsung Galaxy Store (paid)"
+    }
+   ],
+   "repo_meta": null
+  },
+  {
+   "id": "pegasus",
+   "name": "Pegasus Frontend",
+   "channels": [
+    {
+     "ok": true,
+     "tag": "weekly_2024w38",
+     "published": "2024-10-05",
+     "file": "pegasus-fe_alpha16-82-gc3462e68_android64.apk",
+     "url": "https://github.com/mmatyas/pegasus-frontend/releases/download/weekly_2024w38/pegasus-fe_alpha16-82-gc3462e68_android64.apk",
+     "assets": [
+      "pegasus-fe_alpha16-82-gc3462e68_android.apk",
+      "pegasus-fe_alpha16-82-gc3462e68_android64.apk",
+      "pegasus-fe_alpha16-82-gc3462e68_macos-static.zip",
+      "pegasus-fe_alpha16-82-gc3462e68_odroid-c1-static.zip",
+      "pegasus-fe_alpha16-82-gc3462e68_odroid-c2-static.zip",
+      "pegasus-fe_alpha16-82-gc3462e68_odroid-xu3-static.zip",
+      "pegasus-fe_alpha16-82-gc3462e68_rpi1-static.zip",
+      "pegasus-fe_alpha16-82-gc3462e68_rpi2-static.zip"
+     ],
+     "kind": "github",
+     "label": "mmatyas/pegasus-frontend",
+     "real_file": true,
+     "size": 18165810,
+     "final_url": "https://release-assets.githubusercontent.com/github-production-release-asset/89860403/6a07e72c-01ce-4120-bb05-bf7fe10b727f?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-09T19%3A03%3A13Z&rscd=attachment%3B+filename%3Dpegasus-fe_alpha16-82-gc3462e68_android64.apk&rsct=application%2Fvnd.android.package-archive&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-09T18%3A02%3A43Z&ske=2026-11-09T19%3A03%3A13Z&sks=b&skv=2018-11-09&sig=V6pgBKgVixf%2FHRbp%2BDcAGuRCESh3vNJQlfL%2Bpaq7IAM%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5NDI0OTkyNCwibmJmIjoxNzk0MjQ4MTI0LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.TgxWuZKyxorbW_JaZVZk5MDZXUoMRJp0tYrHMtgUuDE&response-content-disposition=attachment%3B%20filename%3Dpegasus-fe_alpha16-82-gc3462e68_android64.apk&response-content-type=application%2Fvnd.android.package-archive",
+     "zip_of_apk": false,
+     "manifest": {
+      "package": "org.pegasus_frontend.android",
+      "version_code": 1945,
+      "version_name": "alpha16-82-gc3462e68",
+      "min_sdk": 21,
+      "target_sdk": 30,
+      "abis": [
+       "arm64-v8a"
+      ],
+      "signers_sha256": [
+       "99ea1ec9971be91de245778dfb3c5cdde835243bde274fc1236c1cae54b27a78"
+      ],
+      "fits": {
+       "rg_rotate_android12_arm64": true,
+       "emulator_x86_64": false
+      },
+      "debuggable": false,
+      "sha256": "e8211f8607a21b1cdd3436dd133be21538411eeec32e273c3343f8715d0eba0a",
+      "size": 18165810
+     }
+    }
+   ],
+   "repo_meta": {
+    "status": 200,
+    "license": "NOASSERTION",
+    "archived": false,
+    "pushed": "2026-10-29",
+    "stars": 1931,
+    "fork": false,
+    "description": "A cross platform, customizable graphical frontend for launching emulators and managing your game collection."
+   }
+  },
+  {
+   "id": "beacon",
+   "name": "Beacon",
+   "channels": [],
+   "repo_meta": null
+  }
+ ]
+}

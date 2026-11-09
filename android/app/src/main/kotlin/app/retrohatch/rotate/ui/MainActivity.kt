@@ -36,6 +36,7 @@ class MainActivity : Activity() {
         setContentView(root)
         window.insetsController?.let { it.hide(WindowInsets.Type.systemBars()); it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE }
         DevHooks.init(this)
+        root.viewTreeObserver.addOnGlobalFocusChangeListener { _, n -> if (n != null) focusables().indexOf(n).let { if (it >= 0) lastFocusIdx = it } }
         ui = Ui(this, Metrics(side / 240f), b.width(), loadCatalog(), Targets.RG_ROTATE, store)
         push(HomeScreen(ui))
         if (savedInstanceState == null) ui.refresh()   // once per start: fetch, verify, cache; on any failure the cached catalog stays
@@ -67,19 +68,33 @@ class MainActivity : Activity() {
     fun reloadCatalog() { ui.setCatalog(loadCatalog()); rebuildAll() }
 
     /** Rebuild every screen on the stack from the current state (catalog, refresh status) and put the highlight back where it was. */
-    fun rebuildAll() {
+    fun rebuildAll(includeTop: Boolean = true) {
         if (stack.isEmpty()) return
         val top = stack.last()
-        val idx = focusables().indexOf(currentFocus)
+        val idx = focusables().indexOf(currentFocus).let { if (it >= 0) it else lastFocusIdx }
         stack.forEach { e ->
+            if (e === top && !includeTop) return@forEach           // a screen that updates itself (App Details) is left alone: no flicker, focus untouched
             val v = e.screen.build()
             if (e === top) { root.removeView(e.view); root.addView(v, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)) }
             e.view = v; e.focus = null
         }
-        top.view.post { if (!top.view.isInTouchMode) (focusables().getOrNull(maxOf(idx, 0)) ?: focusables().firstOrNull())?.requestFocus() }
+        if (includeTop) top.view.post { if (!top.view.isInTouchMode) { lastFocusIdx = idx; restoreFocus() } }
+    }
+
+    fun topScreen(): Screen? = stack.lastOrNull()?.screen
+
+    /** The row / button that was selected last on the top screen (by position). Survives rebuilds and system screens. */
+    private var lastFocusIdx = 0
+    private fun restoreFocus() { val f = focusables(); (f.getOrNull(lastFocusIdx) ?: f.firstOrNull())?.requestFocus() }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // back from Android's installer / uninstaller with the D-pad: the highlight must be on screen already, so the first press moves it
+        if (hasFocus && stack.isNotEmpty() && !isTouchMode() && currentFocus == null) root.post { if (currentFocus == null) restoreFocus() }
     }
 
     fun push(s: Screen) {
+        lastFocusIdx = 0
         stack.lastOrNull()?.let { it.focus = currentFocus; root.removeView(it.view) }
         val v = s.build()
         stack.add(Entry(s, v))
@@ -96,7 +111,9 @@ class MainActivity : Activity() {
         root.removeView(gone.view)
         val e = stack.last()
         root.addView(e.view, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        lastFocusIdx = focusables().indexOf(e.focus).coerceAtLeast(0)
         e.view.post { if (!e.view.isInTouchMode) (e.focus ?: focusables().firstOrNull())?.requestFocus() }
+        if (e.screen.rebuildOnReturn) rebuildAll()
     }
 
     /** The A button / hint-bar A: activate the highlighted row (or the first one). */
@@ -124,7 +141,8 @@ class MainActivity : Activity() {
             KeyEvent.KEYCODE_BUTTON_L1, KeyEvent.KEYCODE_PAGE_UP -> { if (up) jump(-1); return true }
             KeyEvent.KEYCODE_BUTTON_R1, KeyEvent.KEYCODE_PAGE_DOWN -> { if (up) jump(1); return true }
             KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                if (currentFocus == null && e.action == KeyEvent.ACTION_DOWN) { focusFirst(); if (currentFocus != null) return true }
+                // touch mode: the first press only shows the highlight (Android's own convention), on the row that was selected last
+                if (currentFocus == null && e.action == KeyEvent.ACTION_DOWN) { restoreFocus(); if (currentFocus != null) return true }
             }
         }
         return super.dispatchKeyEvent(e)

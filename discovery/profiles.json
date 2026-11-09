@@ -6,7 +6,17 @@
       "topic:funkey-s",
       "\"RG Nano\" in:readme,description",
       "funkeyos in:readme,description",
-      "funkey-s opk in:readme,description"
+      "funkey-s opk in:readme,description",
+      "topic:opk",
+      "topic:funkey",
+      "\"funkey s\" in:readme,description",
+      "\"anbernic rg nano\" in:readme,description",
+      "retrofw opk in:readme,description",
+      "opendingux opk in:readme,description",
+      "gcw zero opk in:readme,description",
+      "topic:retrofw",
+      "topic:opendingux",
+      "\"rg-nano\" in:name,description"
     ],
     "direct": [
       "rg nano",
@@ -46,16 +56,38 @@
       "\"RG Rotate\" in:readme,description",
       "topic:android topic:retro-handheld",
       "topic:android topic:emulator-frontend",
-      "android handheld apk in:readme,description"
+      "android handheld apk in:readme,description",
+      "\"Anbernic RG Rotate\" in:readme,description",
+      "topic:libretro topic:android",
+      "topic:android topic:gamepad",
+      "\"retro handheld\" android in:description",
+      "\"android handheld\" emulator in:readme,description",
+      "\"Retroid Pocket\" android in:readme,description",
+      "topic:android topic:homebrew",
+      "topic:android topic:launcher stars:>20",
+      "topic:android topic:file-manager stars:>50",
+      "topic:android topic:music-player stars:>50",
+      "topic:android-game gamepad in:readme stars:>20",
+      "topic:retroarch topic:android"
     ],
     "direct": [
       "rg rotate",
-      "rgrotate"
+      "rgrotate",
+      "anbernic rotate"
     ],
     "family": [
       "android handheld",
       "android 12",
-      "api 31"
+      "api 31",
+      "retro handheld",
+      "gamepad support",
+      "controller support",
+      "d-pad",
+      "dpad",
+      "720x720",
+      "square screen",
+      "game controller",
+      "physical buttons"
     ],
     "package_ext": [
       ".apk"
@@ -68,8 +100,11 @@
       "trimui",
       "rg35xx",
       "retroid",
-      "steam deck"
+      "steam deck",
+      "android tv only",
+      "wear os",
+      "smartwatch"
     ],
-    "notes": "RG Rotate: Android 12 (API 31), Unisoc T618 (arm64), 3 GB RAM, 720x720 touchscreen, physical D-pad and buttons. Package = APK from a GitHub release (tools/apk_inspect.py). discovery/crawl.py still runs the rg-nano profile only."
+    "notes": "RG Rotate: Android 12 (API 31), Unisoc T618 (arm64), 3 GB RAM, 720x720 touchscreen, physical D-pad and buttons. Package = APK from a GitHub release (tools/apk_inspect.py). discovery/crawl.py still runs the rg-nano profile only; discovery/search.py runs the queries of both profiles (GitHub repository search, latest release, README) and feeds discovery/review.py."
   }
 }

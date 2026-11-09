@@ -1,0 +1,53 @@
+{
+ "checked": "2026-11-09",
+ "missing": [
+  "retroarch",
+  "duckstation",
+  "nethersx2",
+  "armsx2",
+  "ppsspp",
+  "vita3k",
+  "mupen64plusfz",
+  "drastic",
+  "azahar",
+  "dolphin",
+  "flycast",
+  "redream",
+  "yabasanshiro2",
+  "snes9xexplus",
+  "pizzaboy",
+  "mame4droid",
+  "winlator",
+  "esde",
+  "beacon"
+ ],
+ "direct": [
+  "retroarch",
+  "lemuroid",
+  "duckstation",
+  "nethersx2",
+  "armsx2",
+  "ppsspp",
+  "vita3k",
+  "melonds",
+  "azahar",
+  "flycast",
+  "snes9xexplus",
+  "mame4droid",
+  "winlator",
+  "daijishou",
+  "pegasus"
+ ],
+ "store_only": [
+  "mupen64plusfz",
+  "dolphin",
+  "redream",
+  "yabasanshiro2",
+  "pizzaboy",
+  "esde"
+ ],
+ "unresolved": [
+  "drastic",
+  "beacon"
+ ]
+}

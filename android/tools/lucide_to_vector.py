@@ -9,7 +9,8 @@ from pathlib import Path
 VERSION = "0.468.0"
 ICONS = ["compass", "layout-grid", "refresh-cw", "settings", "download", "package-plus", "trash-2", "external-link", "search", "arrow-left", "chevron-right",
          "wifi", "wifi-off", "triangle-alert", "circle-check", "circle-x", "circle-arrow-up", "info", "shield-check", "lock", "database", "smartphone", "globe",
-         "code", "scale", "hard-drive", "tag", "user", "package", "package-open", "loader-circle", "list", "cpu", "circle-check-big", "x", "play"]
+         "code", "scale", "hard-drive", "tag", "user", "package", "package-open", "loader-circle", "list", "cpu", "circle-check-big", "x", "play",
+         "gamepad-2", "wrench", "music", "palette", "list-filter", "check", "arrow-up-down", "circle"]
 OUT = Path(__file__).resolve().parents[1] / "app" / "src" / "main" / "res" / "drawable"
 NS = "{http://www.w3.org/2000/svg}"
 

@@ -92,7 +92,20 @@ def main():
            "domains": {h: {"urls": sorted(d["urls"])[:5], "from": sorted(d["from"])} for h, d in sorted(seen.items(), key=lambda kv: -len(kv[1]["urls"]))[:60]}, "wayback": way,
            "notice": "Archived downloads are historical leads only: approved=false, never installed."}
     (out / "web-discovery-evidence.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps(checks, indent=1))
+    pp = [l for l in LOG if "pullpush" in l["url"]]
+    wb = [l for l in LOG if "web.archive.org" in l["url"]]
+    if not checks["pullpush_http_ok"] or not checks["pullpush_valid_json_with_data"]: result = "UNAVAILABLE"
+    elif not checks["wayback_http_ok"]: result = "DEGRADED"
+    elif not (checks["recall_rgnano_domain_found"] and checks["recall_rockbox_page_enumerated"]): result = "PARTIAL"
+    else: result = "OK"
+    doc["result"] = result
+    (out / "web-discovery-evidence.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    show = lambda l: f"- {l['url'][:90]} -> {'HTTP ' + str(l['status']) if l['status'] > 0 else l.get('error', 'not sent (cap)')} in {l['seconds']}s {l['rate_limit'] or ''}"
+    print(f"## web-discovery probe: {result}\n(optional channel: UNAVAILABLE/DEGRADED is reported, not a production failure)\n")
+    print("PullPush requests:", *map(show, pp), "Wayback requests:", *map(show, wb), sep="\n")
+    print("\n" + json.dumps(checks, indent=1))
+    if result != "OK":
+        print(f"::warning title=web-discovery {result}::PullPush ok={checks['pullpush_http_ok']} domains={checks['domains_found']} wayback ok={checks['wayback_http_ok']}; see step summary")
     sys.exit(0)
 
 

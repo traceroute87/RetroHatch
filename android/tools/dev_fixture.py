@@ -261,6 +261,8 @@ def real(ids=None, tested_file=None):
             comp["evidence"] = [{"sha256": pk["sha256"], "date": t["date"], "tester": "emulator rotate720 (x86_64, Android 12 API 31)", "note": t["note"]}]
         app = {"schema": 1, "id": re.sub(r"[^a-z0-9-]", "", i.lower()), "name": a["name"], "description": desc, "developer": repo.split("/")[3], "source": repo, "license": a["license"],
                **({"long_description": txt["long_description"]} if txt.get("long_description") else {}), **({"features": txt["features"]} if txt.get("features") else {}),
+               "group": txt.get("group") or a.get("group") or "utilities", **({"tags": (txt.get("tags") or a.get("tags") or [])[:8]} if (txt.get("tags") or a.get("tags")) else {}),
+               **({"released": a["evidence"]["release"]["published"][:10]} if a.get("evidence", {}).get("release", {}).get("published") else {}), "added": txt.get("added") or time.strftime("%Y-%m-%d"),
                "category": "application", "artifacts": [{"device": "rg-rotate", "firmware": "android-12", "format": "apk", "status": "available", "version": a["version"], "url": pk["url"],
                                                           "sha256": pk["sha256"], "size": pk["size"], "android": pk["android"], "compatibility": comp}]}
         (d / "apps" / f"{app['id']}.json").write_text(json.dumps(app, indent=2) + "\n")

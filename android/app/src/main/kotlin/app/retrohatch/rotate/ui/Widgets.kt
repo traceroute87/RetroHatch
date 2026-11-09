@@ -113,7 +113,7 @@ object W {
      * [leading] replaces the icon (app tiles).
      */
     fun row(c: Context, m: Metrics, iconName: String?, title: String, subtitle: String?, heightNano: Int, onClick: () -> Unit, enabled: Boolean = true,
-            titleSize: Float = m.body, leading: View? = null, pill: String? = null, status: Pair<String, Int>? = null, trailing: String? = null): View = LinearLayout(c).apply {
+            titleSize: Float = m.body, leading: View? = null, pill: String? = null, status: Pair<String, Int>? = null, trailing: String? = null, chevron: Boolean = true): View = LinearLayout(c).apply {
         orientation = LinearLayout.HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
         background = rowBackground(m)
@@ -136,7 +136,7 @@ object W {
         addView(col, lp(0, WRAP, 1f))
         if (status != null) addView(chip(c, m, status.first, status.second, follow = true), lp(WRAP, WRAP).apply { leftMargin = m.px(4) })
         else if (trailing != null) addView(text(c, trailing, m.small, Pal.TXT2, true).apply { setTextColor(focusTint(Pal.TXT2)); isDuplicateParentStateEnabled = true }, lp(WRAP, WRAP).apply { leftMargin = m.px(4) })
-        addView(icon(c, "chevron-right", m.px(11), Pal.TXT2, follow = true), lp(m.px(11), m.px(11)).apply { leftMargin = m.px(3) })
+        if (chevron) addView(icon(c, "chevron-right", m.px(11), Pal.TXT2, follow = true), lp(m.px(11), m.px(11)).apply { leftMargin = m.px(3) })
         setOnClickListener { if (isEnabled) onClick() }
     }
 
@@ -210,14 +210,15 @@ object W {
     }
 
     /** Centered empty state with a large Lucide icon. */
-    fun empty(c: Context, m: Metrics, iconName: String, title: String, body: String, color: Int = Pal.TXT2): View = LinearLayout(c).apply {
+    fun empty(c: Context, m: Metrics, iconName: String, title: String, body: String, color: Int = Pal.TXT2, compact: Boolean = false): View = LinearLayout(c).apply {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER
-        layoutParams = lp(MATCH, 0, 1f)
-        setPadding(m.px(18), 0, m.px(18), m.px(8))
-        addView(icon(c, iconName, m.px(36), color), lp(m.px(36), m.px(36)).apply { bottomMargin = m.px(8) })
-        addView(text(c, title, m.title, Pal.TXT, true).apply { gravity = Gravity.CENTER }, lp(MATCH, WRAP))
-        addView(text(c, body, m.body * 0.9f, Pal.TXT2).apply { gravity = Gravity.CENTER; setPadding(0, m.px(4), 0, 0); setLineSpacing(0f, 1.1f) }, lp(MATCH, WRAP))
+        layoutParams = if (compact) lp(MATCH, WRAP) else lp(MATCH, 0, 1f)
+        val icon = if (compact) m.px(20) else m.px(36)
+        setPadding(m.px(18), if (compact) m.px(10) else 0, m.px(18), m.px(8))
+        addView(icon(c, iconName, icon, color), lp(icon, icon).apply { bottomMargin = m.px(if (compact) 5 else 8) })
+        addView(text(c, title, if (compact) m.body else m.title, Pal.TXT, true).apply { gravity = Gravity.CENTER }, lp(MATCH, WRAP))
+        addView(text(c, body, if (compact) m.small else m.body * 0.9f, Pal.TXT2).apply { gravity = Gravity.CENTER; setPadding(0, m.px(4), 0, 0); setLineSpacing(0f, 1.1f) }, lp(MATCH, WRAP))
     }
 
     enum class Kind { PRIMARY, SECONDARY, DANGER }
