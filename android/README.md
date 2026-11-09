@@ -54,3 +54,12 @@ Uninstall, background downloads, scheduled refresh, a signed production Android 
 
 **Package visibility:** no `QUERY_ALL_PACKAGES`. Tested on API 31: an installer is not automatically allowed to see what it installed, so the manifest has a `<queries>` entry for launchable apps (catalog package names are unknown at build time). Apps without a launcher activity are not detected as installed.
 Nothing here publishes a catalog or touches the production signing key.
+
+## Real Android apps (candidates, DEV catalog)
+`discovery/profiles.json` has an `rg-rotate` profile; `discovery/sources.txt` lists 10 curated GitHub repositories for it. `python tools/apk_inspect.py fetch OWNER/REPO` downloads
+the latest release APK and reads its REAL identity with the SDK tools (package, versionCode, minSdk, ABIs, signing-certificate SHA-256, signature schemes, GitHub's own digest);
+`apk_inspect.py inventory` writes `candidates/inventory-rg-rotate.json` (same inventory format as the Nano's; `python tools/make_inventory.py --device rg-rotate` makes the snapshot).
+Everything is UNAPPROVED. `fits_from_metadata` is a reading of the manifest, not a test; `tested.emulator_x86_64_api31` is `not tested` unless an emulator run is recorded there.
+`python android/tools/dev_fixture.py real IDS [tested.json]` signs a DEV-only catalog from those entries (real URLs and hashes, labelled EXPERIMENTAL / UNAPPROVED, approval record says it is not
+a human approval); `python -u android/tools/e2e.py 12 NAME PACKAGE` installs one of them through the app on the emulator. No production catalog is built or signed.
+

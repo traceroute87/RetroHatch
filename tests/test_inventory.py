@@ -76,7 +76,7 @@ assert sd["gambattesdlretrocore"].startswith("Emulator core") and sd["gmenu2x"].
 for a in apps:
     if a["status"] == "source-only": assert sd[a["id"]].startswith("Source only") and not a["packages"], a["id"]
     if a["status"] == "unverified": assert sd[a["id"]].startswith("Package not inspected"), a["id"]
-assert {a["status"] for a in apps} == set(M.STATUS)
+assert {a["status"] for a in apps} == set(M.STATUS) - {"apk-verified"}   # apk-verified belongs to the Android inventory (checked below)
 
 # ---- known limitations are recorded ----
 lim = {l["id"]: l["note"] for l in inv["known_limits"]}
@@ -131,3 +131,22 @@ assert all(a["packages"] and a["packages"][0]["url"].startswith("https://gitlab.
 bad = copy.deepcopy(inv); bad["applications"][0]["hidden"] = " "
 assert any("hidden needs a reason" in e for e in M.problems(bad))                                    # a hidden entry must say why
 assert len(snap) + len(hidden) + sum(a["kind"] == "support" for a in apps) == len(apps) == 133        # nothing disappeared: shown + hidden + support
+
+# ---- Android inventory (RG Rotate): candidates/inventory-rg-rotate.json, same format, APK identities read from real files
+ROT = json.loads((ROOT / "candidates" / "inventory-rg-rotate.json").read_text(encoding="utf-8"))
+assert ROT["device"] == "rg-rotate" and ROT["status"].startswith("UNAPPROVED") and len(ROT["applications"]) == 10
+assert M.problems(ROT) == [], M.problems(ROT)
+for a in ROT["applications"]:
+    (p,) = a["packages"]
+    assert a["status"] == "apk-verified" and p["format"] == "apk" and p["signature"] == "apk" and re.fullmatch(r"[0-9a-f]{64}", p["sha256"])
+    assert re.fullmatch(r"https://github\.com/[\w.-]+/[\w.-]+/releases/download/[^/]+/[^/]+\.apk", p["url"]) and p["url"].startswith(a["sources"][0]["url"] + "/releases/download/")
+    assert p["android"]["signer_sha256"] == a["evidence"]["apk"]["signers_sha256"] and p["android"]["package"] == a["evidence"]["apk"]["package"]
+    assert a["evidence"]["release"]["github_digest_matches"] is True or a["evidence"]["release"]["github_digest_matches"] is None
+    assert a["evidence"]["tested"]["rg_rotate_hardware"] == "not tested"            # nothing was run on real hardware
+    assert "approval" not in a and "hardware_test" not in a
+assert len({a["packages"][0]["android"]["package"] for a in ROT["applications"]}) == 10
+bad = copy.deepcopy(ROT); bad["applications"][0]["packages"][0]["android"]["signer_sha256"] = []
+assert any("apk package needs" in e for e in M.problems(bad))
+bad = copy.deepcopy(ROT); bad["applications"][0]["packages"][0]["signature"] = ""
+assert M.problems(bad)
+print("android inventory tests OK")

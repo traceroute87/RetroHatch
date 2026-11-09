@@ -1,0 +1,957 @@
+{
+ "schema": 2,
+ "device": "rg-rotate",
+ "status": "UNAPPROVED candidate inventory, read-only. Not part of the signed catalog: nothing here is approved, hardware-tested or installable.",
+ "known_limits": [
+  {
+   "id": "not-a-crawl",
+   "note": "These entries come from curated repository sources (discovery/sources.txt, device rg-rotate) read with tools/apk_inspect.py (GitHub releases API plus the Android SDK's aapt2 and apksigner). discovery/crawl.py still runs the rg-nano profile only; it was not extended to find Android apps on its own."
+  },
+  {
+   "id": "metadata-only",
+   "note": "'fits_from_metadata' is judged from the APK's minSdk and native ABIs. It is not a test. Nothing was run on RG Rotate hardware."
+  },
+  {
+   "id": "release-hosts",
+   "note": "Only GitHub release downloads can enter a signed catalog (tools/trust.py: url must be a release download of the entry's own source repository). F-Droid and vendor sites are not used."
+  }
+ ],
+ "package_evidence": {
+  "note": "Raw APK identities are in each entry's packages[].android and evidence.apk, read from the downloaded files on 2026-11-09."
+ },
+ "applications": [
+  {
+   "id": "aegis",
+   "name": "Aegis",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "A free, secure and open source app for Android to manage your 2-step verification tokens.",
+   "topics": [
+    "2fa",
+    "android",
+    "authenticator",
+    "encryption",
+    "fingerprint",
+    "hotp",
+    "otp",
+    "secure",
+    "totp"
+   ],
+   "version": "3.4.3",
+   "license": "GPL-3.0",
+   "last_activity": "2026-09-06",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 23, arm64-v8a, armeabi-v7a, x86, x86_64",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/beemdevelopment/Aegis"
+    }
+   ],
+   "packages": [
+    {
+     "name": "aegis-v3.4.3.apk",
+     "url": "https://github.com/beemdevelopment/Aegis/releases/download/v3.4.3/aegis-v3.4.3.apk",
+     "size": 6881897,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "fa091c91912c0d56ec3553394fac4158f9a9d178e93bcbb35419601d788cb528",
+     "android": {
+      "package": "com.beemdevelopment.aegis",
+      "version_code": 82,
+      "signer_sha256": [
+       "c6db80a8e14e5230c1de8415ef820d13dc901d8fe33cf3acb57b6862d858a823"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "com.beemdevelopment.aegis",
+     "version_code": 82,
+     "version_name": "3.4.3",
+     "min_sdk": 23,
+     "target_sdk": 36,
+     "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+     ],
+     "signers_sha256": [
+      "c6db80a8e14e5230c1de8415ef820d13dc901d8fe33cf3acb57b6862d858a823"
+     ],
+     "signer_dn": [
+      "CN=Beem Development"
+     ],
+     "signature_schemes": [
+      "v1",
+      "v2"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "v3.4.3",
+     "published": "2026-09-06",
+     "page": "https://github.com/beemdevelopment/Aegis/releases/tag/v3.4.3",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": []
+   }
+  },
+  {
+   "id": "client",
+   "name": "Droid-ify",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "Clutterfree F-Droid client, [mirror] https://codeberg.org/droidify/client",
+   "topics": [
+    "android",
+    "android-application",
+    "fdroid",
+    "kotlin",
+    "kotlin-android",
+    "kotlin-flow"
+   ],
+   "version": "0.7.8",
+   "license": "GPL-3.0",
+   "last_activity": "2026-09-12",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 23, arm64-v8a, armeabi-v7a, x86, x86_64",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/Droid-ify/client"
+    }
+   ],
+   "packages": [
+    {
+     "name": "app-release.apk",
+     "url": "https://github.com/Droid-ify/client/releases/download/v0.7.8/app-release.apk",
+     "size": 5997579,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "3e7934ff9b811c2f77794793381241095a02bac2d163bf922cb5a5a0ed25ca82",
+     "android": {
+      "package": "com.looker.droidify",
+      "version_code": 780,
+      "signer_sha256": [
+       "ed8859c55af311162658b94af982b9f091dcd27628d4de3486d1217ebf3c9935"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "com.looker.droidify",
+     "version_code": 780,
+     "version_name": "0.7.8",
+     "min_sdk": 23,
+     "target_sdk": 37,
+     "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+     ],
+     "signers_sha256": [
+      "ed8859c55af311162658b94af982b9f091dcd27628d4de3486d1217ebf3c9935"
+     ],
+     "signer_dn": [
+      "CN=Mohit Sharma, OU=null, O=null, L=Ahmedabad, ST=Gujarat, C=IN"
+     ],
+     "signature_schemes": [
+      "v1",
+      "v2",
+      "v3"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "v0.7.8",
+     "published": "2026-09-12",
+     "page": "https://github.com/Droid-ify/client/releases/tag/v0.7.8",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": []
+   }
+  },
+  {
+   "id": "daijishou",
+   "name": "Daijishō",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "Daijishō is a retro launcher that manages your retro games libraries. This repo is for assets and served as a main page.",
+   "topics": [
+    "android",
+    "daijishou",
+    "emulator-frontend",
+    "emulator-launcher",
+    "launcher"
+   ],
+   "version": "1.5.0",
+   "license": "MIT",
+   "last_activity": "2026-11-04",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 26, no native code",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/TapiocaFox/Daijishou"
+    }
+   ],
+   "packages": [
+    {
+     "name": "416.apk",
+     "url": "https://github.com/TapiocaFox/Daijishou/releases/download/v1.5.0/416.apk",
+     "size": 17912484,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "c09989b5d938f41cc1d53d2f38fa3b1261a40bc4d8dcf8367cce83353457df51",
+     "android": {
+      "package": "com.magneticchen.daijishou",
+      "version_code": 416,
+      "signer_sha256": [
+       "c1dc929edf4c062eaeee609ec009c7859e34050e62058282d1eaf5e8b2c22f51"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "com.magneticchen.daijishou",
+     "version_code": 416,
+     "version_name": "1.5.0",
+     "min_sdk": 26,
+     "target_sdk": 35,
+     "abis": [],
+     "signers_sha256": [
+      "c1dc929edf4c062eaeee609ec009c7859e34050e62058282d1eaf5e8b2c22f51"
+     ],
+     "signer_dn": [
+      "CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US"
+     ],
+     "signature_schemes": [
+      "v2",
+      "v3"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "v1.5.0",
+     "published": "2026-01-15",
+     "page": "https://github.com/TapiocaFox/Daijishou/releases/tag/v1.5.0",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": [
+     "Signed with a certificate whose subject is CN=Android, O=Google Inc. (looks like an AOSP key, not a developer key). Check who holds that key before any approval."
+    ]
+   }
+  },
+  {
+   "id": "gallery",
+   "name": "Gallery",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "Browse your memories without any interruptions with this photo and video gallery",
+   "topics": [
+    "android",
+    "foss",
+    "gallery",
+    "kotlin",
+    "open-source"
+   ],
+   "version": "1.14.2",
+   "license": "GPL-3.0",
+   "last_activity": "2026-11-07",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 26, arm64-v8a",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/FossifyOrg/Gallery"
+    }
+   ],
+   "packages": [
+    {
+     "name": "gallery-42-foss-arm64-v8a-release.apk",
+     "url": "https://github.com/FossifyOrg/Gallery/releases/download/1.14.2/gallery-42-foss-arm64-v8a-release.apk",
+     "size": 17483618,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "dd1d87612745c17c469559e56043c7838a701035d33783999ee9bd2441fe92ee",
+     "android": {
+      "package": "org.fossify.gallery",
+      "version_code": 42,
+      "signer_sha256": [
+       "affdb124d3f4720c2f98dbca9eacba0514fba4306e20a2786c861c3c0d6ff292"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "org.fossify.gallery",
+     "version_code": 42,
+     "version_name": "1.14.2",
+     "min_sdk": 26,
+     "target_sdk": 36,
+     "abis": [
+      "arm64-v8a"
+     ],
+     "signers_sha256": [
+      "affdb124d3f4720c2f98dbca9eacba0514fba4306e20a2786c861c3c0d6ff292"
+     ],
+     "signer_dn": [
+      "C=IN, O=Fossify, CN=Naveen Singh"
+     ],
+     "signature_schemes": [
+      "v2"
+     ],
+     "debuggable": false,
+     "launchable": false
+    },
+    "release": {
+     "tag": "1.14.2",
+     "published": "2026-11-07",
+     "page": "https://github.com/FossifyOrg/Gallery/releases/tag/1.14.2",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": false
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": [
+     "arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device."
+    ]
+   }
+  },
+  {
+   "id": "lemuroid",
+   "name": "Lemuroid",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "All in one emulator on Android!",
+   "topics": [
+    "android",
+    "android-app",
+    "emulator",
+    "game-boy",
+    "genesis",
+    "hacktoberfest",
+    "kotlin",
+    "kotlin-android",
+    "libretro",
+    "libretro-frontend",
+    "n64",
+    "nes",
+    "nintendo",
+    "nintendo-ds",
+    "playstation",
+    "psp",
+    "sega",
+    "sega-master-system",
+    "snes"
+   ],
+   "version": "1.17.0",
+   "license": "GPL-3.0",
+   "last_activity": "2026-10-16",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 23, arm64-v8a, armeabi-v7a, x86, x86_64",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/Swordfish90/Lemuroid"
+    }
+   ],
+   "packages": [
+    {
+     "name": "lemuroid-app-free-dynamic-release.apk",
+     "url": "https://github.com/Swordfish90/Lemuroid/releases/download/1.17.0/lemuroid-app-free-dynamic-release.apk",
+     "size": 11985230,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "d44cfa0cdc3e43fd91df97f625938366ccef9793b06a80b9e6fad97a6cd88e51",
+     "android": {
+      "package": "com.swordfish.lemuroid",
+      "version_code": 252,
+      "signer_sha256": [
+       "4fa1cb59ea4d8ca8555315eba215205f667975ba8985bbe736904f21bfebbeaf"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "com.swordfish.lemuroid",
+     "version_code": 252,
+     "version_name": "1.17.0",
+     "min_sdk": 23,
+     "target_sdk": 35,
+     "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+     ],
+     "signers_sha256": [
+      "4fa1cb59ea4d8ca8555315eba215205f667975ba8985bbe736904f21bfebbeaf"
+     ],
+     "signer_dn": [
+      "CN=Filippo Scognamiglio, L=Pavia, ST=Italy"
+     ],
+     "signature_schemes": [
+      "v1",
+      "v2"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "1.17.0",
+     "published": "2026-04-21",
+     "page": "https://github.com/Swordfish90/Lemuroid/releases/tag/1.17.0",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": {
+      "result": "installed-through-retrohatch-and-launched",
+      "date": "2026-11-09",
+      "note": "Downloaded from the developer's GitHub release by RetroHatch (DEV build) over TLS, size/SHA-256/package/versionCode/signer checked, installed after confirming in Android's installer, then launched and still running after 8 s with no crash entry. Android 12 (API 31) x86_64 EMULATOR only; NOT tested on RG Rotate hardware.",
+      "installed_signers_match_catalog": true,
+      "versionCode": 252
+     },
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": []
+   }
+  },
+  {
+   "id": "materialfiles",
+   "name": "Material Files",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "Material Design file manager for Android",
+   "topics": [
+    "android",
+    "android-application",
+    "file-manager",
+    "kotlin",
+    "kotlin-android",
+    "material-design"
+   ],
+   "version": "1.7.5",
+   "license": "GPL-3.0",
+   "last_activity": "2026-10-15",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 23, arm64-v8a, armeabi-v7a, x86, x86_64",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/zhanghai/MaterialFiles"
+    }
+   ],
+   "packages": [
+    {
+     "name": "app-release-universal.apk",
+     "url": "https://github.com/zhanghai/MaterialFiles/releases/download/v1.7.5/app-release-universal.apk",
+     "size": 13747821,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "f2e7f028fbddf51d7ee90ace27a1ae4b247511e12514d1def6c9e52435feac40",
+     "android": {
+      "package": "me.zhanghai.android.files",
+      "version_code": 40,
+      "signer_sha256": [
+       "873b9b60c77cf7f3cd5fae66d0fe112c4a86973e118ee8a29c346c4c673c97f0"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "me.zhanghai.android.files",
+     "version_code": 40,
+     "version_name": "1.7.5",
+     "min_sdk": 23,
+     "target_sdk": 36,
+     "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+     ],
+     "signers_sha256": [
+      "873b9b60c77cf7f3cd5fae66d0fe112c4a86973e118ee8a29c346c4c673c97f0"
+     ],
+     "signer_dn": [
+      "CN=Hai Zhang"
+     ],
+     "signature_schemes": [
+      "v1",
+      "v2",
+      "v3"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "v1.7.5",
+     "published": "2026-09-20",
+     "page": "https://github.com/zhanghai/MaterialFiles/releases/tag/v1.7.5",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": []
+   }
+  },
+  {
+   "id": "melondsandroid",
+   "name": "melonDS",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "Android port of melonDS",
+   "topics": [
+    "android",
+    "emulator",
+    "nintendo-ds"
+   ],
+   "version": "2.0.1 GH",
+   "license": "GPL-3.0",
+   "last_activity": "2026-11-09",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 24, arm64-v8a, armeabi-v7a, x86_64",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/rafaelvcaetano/melonDS-android"
+    }
+   ],
+   "packages": [
+    {
+     "name": "app-gitHub-prod-release.apk",
+     "url": "https://github.com/rafaelvcaetano/melonDS-android/releases/download/2.0.1/app-gitHub-prod-release.apk",
+     "size": 21061910,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "646eb4564c71b0817ace6474e92c169da16630d58826c43e0fe648896311ec94",
+     "android": {
+      "package": "me.magnum.melonds",
+      "version_code": 40,
+      "signer_sha256": [
+       "0493bb8749289f0304cc868489dd68b930c19ccc4dce2da876bfe6b9bdbabebc"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "me.magnum.melonds",
+     "version_code": 40,
+     "version_name": "2.0.1 GH",
+     "min_sdk": 24,
+     "target_sdk": 36,
+     "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86_64"
+     ],
+     "signers_sha256": [
+      "0493bb8749289f0304cc868489dd68b930c19ccc4dce2da876bfe6b9bdbabebc"
+     ],
+     "signer_dn": [
+      "CN=Rafael Caetano"
+     ],
+     "signature_schemes": [
+      "v2"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "2.0.1",
+     "published": "2026-05-06",
+     "page": "https://github.com/rafaelvcaetano/melonDS-android/releases/tag/2.0.1",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": []
+   }
+  },
+  {
+   "id": "newpipe",
+   "name": "NewPipe",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "A libre lightweight streaming front-end for Android.",
+   "topics": [
+    "4k",
+    "android",
+    "bandcamp",
+    "download-videos",
+    "newpipe",
+    "peertube",
+    "soundcloud",
+    "translation",
+    "video",
+    "watch",
+    "youtube-video"
+   ],
+   "version": "0.29.2",
+   "license": "GPL-3.0",
+   "last_activity": "2026-11-07",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 23, arm64-v8a, armeabi-v7a, x86, x86_64",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/TeamNewPipe/NewPipe"
+    }
+   ],
+   "packages": [
+    {
+     "name": "NewPipe_v0.29.2.apk",
+     "url": "https://github.com/TeamNewPipe/NewPipe/releases/download/v0.29.2/NewPipe_v0.29.2.apk",
+     "size": 16980865,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "318bd6a51f216027ba340f2934e59fa9c0d078d0f2f526a4af84354aee60651f",
+     "android": {
+      "package": "org.schabi.newpipe",
+      "version_code": 1016,
+      "signer_sha256": [
+       "cb84069bd68116bafae5ee4ee5b08a567aa6d898404e7cb12f9e756df5cf5cab"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "org.schabi.newpipe",
+     "version_code": 1016,
+     "version_name": "0.29.2",
+     "min_sdk": 23,
+     "target_sdk": 35,
+     "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+     ],
+     "signers_sha256": [
+      "cb84069bd68116bafae5ee4ee5b08a567aa6d898404e7cb12f9e756df5cf5cab"
+     ],
+     "signer_dn": [
+      "CN=Christian Schabesberger, C=DE"
+     ],
+     "signature_schemes": [
+      "v1",
+      "v2",
+      "v3"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "v0.29.2",
+     "published": "2026-11-07",
+     "page": "https://github.com/TeamNewPipe/NewPipe/releases/tag/v0.29.2",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": []
+   }
+  },
+  {
+   "id": "obtainium",
+   "name": "Obtainium",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "Get Android app updates straight from the source.",
+   "topics": [
+    "android",
+    "apk",
+    "apk-update",
+    "apk-updater",
+    "app-updater",
+    "automation",
+    "foss",
+    "github",
+    "github-apk-updater",
+    "gitlab",
+    "notifications",
+    "obtainium",
+    "privacy",
+    "security",
+    "update-checker",
+    "updater"
+   ],
+   "version": "1.7.4",
+   "license": "GPL-3.0",
+   "last_activity": "2026-11-01",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 26, arm64-v8a",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/ImranR98/Obtainium"
+    }
+   ],
+   "packages": [
+    {
+     "name": "app-arm64-v8a-release.apk",
+     "url": "https://github.com/ImranR98/Obtainium/releases/download/v1.7.4/app-arm64-v8a-release.apk",
+     "size": 34609838,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "f9216f721a7713b75929e0806bc18586f8fcf7328fbbff99b6aef1debb9eef80",
+     "android": {
+      "package": "dev.imranr.obtainium",
+      "version_code": 23623,
+      "signer_sha256": [
+       "b353601f6a1d5fd6603ae2f50be80cf301367b86b6ab8b1f66243da96cd57362"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "dev.imranr.obtainium",
+     "version_code": 23623,
+     "version_name": "1.7.4",
+     "min_sdk": 26,
+     "target_sdk": 36,
+     "abis": [
+      "arm64-v8a"
+     ],
+     "signers_sha256": [
+      "b353601f6a1d5fd6603ae2f50be80cf301367b86b6ab8b1f66243da96cd57362"
+     ],
+     "signer_dn": [
+      "CN=Imran Remtulla, OU=Unknown, O=Unknown, L=Toronto, ST=Ontario, C=CA"
+     ],
+     "signature_schemes": [
+      "v2",
+      "v3"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "v1.7.4",
+     "published": "2026-11-01",
+     "page": "https://github.com/ImranR98/Obtainium/releases/tag/v1.7.4",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": false
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": [
+     "arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device."
+    ]
+   }
+  },
+  {
+   "id": "pegasusfrontend",
+   "name": "Pegasus",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "A cross platform, customizable graphical frontend for launching emulators and managing your game collection.",
+   "topics": [
+    "cross-platform",
+    "customizable",
+    "emulator",
+    "frontend",
+    "games",
+    "hacktoberfest",
+    "qml",
+    "qt5",
+    "raspberry-pi",
+    "retrogaming"
+   ],
+   "version": "alpha16-82-gc3462e68",
+   "license": "unknown",
+   "last_activity": "2026-10-29",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 21, arm64-v8a",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/mmatyas/pegasus-frontend"
+    }
+   ],
+   "packages": [
+    {
+     "name": "pegasus-fe_alpha16-82-gc3462e68_android64.apk",
+     "url": "https://github.com/mmatyas/pegasus-frontend/releases/download/weekly_2024w38/pegasus-fe_alpha16-82-gc3462e68_android64.apk",
+     "size": 18165810,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "e8211f8607a21b1cdd3436dd133be21538411eeec32e273c3343f8715d0eba0a",
+     "android": {
+      "package": "org.pegasus_frontend.android",
+      "version_code": 1945,
+      "signer_sha256": [
+       "99ea1ec9971be91de245778dfb3c5cdde835243bde274fc1236c1cae54b27a78"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "org.pegasus_frontend.android",
+     "version_code": 1945,
+     "version_name": "alpha16-82-gc3462e68",
+     "min_sdk": 21,
+     "target_sdk": 30,
+     "abis": [
+      "arm64-v8a"
+     ],
+     "signers_sha256": [
+      "99ea1ec9971be91de245778dfb3c5cdde835243bde274fc1236c1cae54b27a78"
+     ],
+     "signer_dn": [
+      "CN=Matyas Mustoha, O=Pegasus, L=Szentes, C=HU, OU=Gaming, ST=Csongrad"
+     ],
+     "signature_schemes": [
+      "v1",
+      "v2",
+      "v3"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "weekly_2024w38",
+     "published": "2024-10-05",
+     "page": "https://github.com/mmatyas/pegasus-frontend/releases/tag/weekly_2024w38",
+     "github_digest_matches": null
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": false
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": [
+     "No licence detected by GitHub for this repository: it cannot enter a catalog until the licence is confirmed by hand.",
+     "Latest release is old (2024-10-05).",
+     "arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device."
+    ]
+   }
+  }
+ ]
+}

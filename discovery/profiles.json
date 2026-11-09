@@ -40,5 +40,36 @@
       "gcw zero",
       "pocketgo"
     ]
+  },
+  "rg-rotate": {
+    "queries": [
+      "\"RG Rotate\" in:readme,description",
+      "topic:android topic:retro-handheld",
+      "topic:android topic:emulator-frontend",
+      "android handheld apk in:readme,description"
+    ],
+    "direct": [
+      "rg rotate",
+      "rgrotate"
+    ],
+    "family": [
+      "android handheld",
+      "android 12",
+      "api 31"
+    ],
+    "package_ext": [
+      ".apk"
+    ],
+    "other": [
+      "rg nano",
+      "rgnano",
+      "funkeyos",
+      "miyoo",
+      "trimui",
+      "rg35xx",
+      "retroid",
+      "steam deck"
+    ],
+    "notes": "RG Rotate: Android 12 (API 31), Unisoc T618 (arm64), 3 GB RAM, 720x720 touchscreen, physical D-pad and buttons. Package = APK from a GitHub release (tools/apk_inspect.py). discovery/crawl.py still runs the rg-nano profile only."
   }
 }

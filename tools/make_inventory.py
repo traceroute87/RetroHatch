@@ -22,7 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 INV, OUT = ROOT / "candidates" / "inventory.json", ROOT / "candidates" / "rg-nano.json"
 KINDS = {"app": "", "core": "Emulator core, not a stand-alone app. ", "system": "System add-on, changes the menu or firmware. ", "support": None}   # support: inventory only
-STATUS = {"package-verified": "", "listed": "", "unverified": "Package not inspected (audit note). ", "source-only": "Source only, no release package. "}
+STATUS = {"package-verified": "", "listed": "", "unverified": "Package not inspected (audit note). ", "source-only": "Source only, no release package. ",
+          "apk-verified": "APK identity read from the file; not tested on RG Rotate hardware. "}   # apk-verified: the Android inventory (--device rg-rotate)
 CATS = {"games", "emulators", "media", "utilities", "engines", "other"}   # ids the UI reads
 ID = re.compile(r"[a-z0-9]{2,48}")
 HTTPS = re.compile(r"https://[^\s]+")
@@ -37,16 +38,22 @@ def problems(inv):
         if a.get("kind") not in KINDS: errs.append(f"{w}: unknown kind {a.get('kind')!r}")
         if a.get("status") not in STATUS: errs.append(f"{w}: unknown status {a.get('status')!r}")
         if not a.get("name"): errs.append(f"{w}: no name")
-        if a.get("claim", {}).get("kind", "") not in ("rg-nano", "family", ""): errs.append(f"{w}: claim kind")
+        if a.get("claim", {}).get("kind", "") not in ("rg-nano", "family", "android", ""): errs.append(f"{w}: claim kind")
         if "category" in a and (a["category"] not in CATS or not a.get("category_basis")): errs.append(f"{w}: category needs a known id and its basis")
         for s in a.get("sources", []):
             if s.get("type") not in ("repo", "wiki") or not HTTPS.fullmatch(s.get("url", "")): errs.append(f"{w}: bad source {s}")
         for p in a.get("packages", []):
             if p.get("url") and not HTTPS.fullmatch(p["url"]): errs.append(f"{w}: package URL is not https")
-            if p.get("signature", "") not in ("", "squashfs") or p.get("container", "") not in ("", "zip") or not isinstance(p.get("size", 0), int): errs.append(f"{w}: bad package fields")
+            if p.get("signature", "") not in ("", "squashfs", "apk") or p.get("container", "") not in ("", "zip") or not isinstance(p.get("size", 0), int): errs.append(f"{w}: bad package fields")
+            if p.get("format") == "apk":
+                an = p.get("android") or {}
+                if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+", an.get("package", "")) or not isinstance(an.get("version_code"), int) or not an.get("signer_sha256")
+                        or not all(re.fullmatch(r"[0-9a-f]{64}", x) for x in an["signer_sha256"]) or not re.fullmatch(r"[0-9a-f]{64}", p.get("sha256", "")) or p.get("signature") != "apk"):
+                    errs.append(f"{w}: apk package needs android.package/version_code/signer_sha256, a sha256 and signature 'apk'")
             if "sha256" in p and not re.fullmatch(r"[0-9a-f]{64}", p["sha256"]): errs.append(f"{w}: bad sha256")
         seen_sig = any(p.get("signature") == "squashfs" for p in a.get("packages", []))
         if (a.get("status") == "package-verified") != seen_sig: errs.append(f"{w}: status package-verified needs (and only needs) a squashfs-verified package")
+        if (a.get("status") == "apk-verified") != any(p.get("signature") == "apk" for p in a.get("packages", [])): errs.append(f"{w}: status apk-verified needs (and only needs) an apk-verified package")
         if "hidden" in a and not (isinstance(a["hidden"], str) and a["hidden"].strip()): errs.append(f"{w}: hidden needs a reason")
         if a.get("status") == "source-only" and a.get("packages"): errs.append(f"{w}: source-only entries have no package")
         if a.get("icon_file") and not (OUT.parent / a["icon_file"]).is_file(): errs.append(f"{w}: icon file {a['icon_file']} is missing")
@@ -90,7 +97,11 @@ def snapshot(inv):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="validate only; exit 1 on a problem or when the snapshot is out of date")
+    ap.add_argument("--device", default="rg-nano", choices=["rg-nano", "rg-rotate"], help="rg-rotate: candidates/inventory-rg-rotate.json -> candidates/rg-rotate.json (Android APKs)")
     a = ap.parse_args()
+    global INV, OUT
+    if a.device == "rg-rotate":
+        INV, OUT = ROOT / "candidates" / "inventory-rg-rotate.json", ROOT / "candidates" / "rg-rotate.json"
     inv = json.loads(INV.read_text(encoding="utf-8"))
     errs = problems(inv)
     text = json.dumps(snapshot(inv), ensure_ascii=False, separators=(",", ":")).replace('},{"id"', '},\n{"id"') + "\n"

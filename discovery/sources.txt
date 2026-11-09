@@ -23,3 +23,16 @@
 # Known limitation: this index source FAILED in GitHub Actions run 41921300975 (reported by the maintainer; cause not analysed). Generic page-following
 # stays in the crawler until the index is proven; candidates/inventory.json records the same limit.
 index  https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications  rg-nano
+
+# RG Rotate (Android 12, arm64, 720x720). Curated repositories with a plain GitHub-release APK, read by tools/apk_inspect.py (not crawled: discovery/crawl.py runs the
+# rg-nano profile). Each yields an UNAPPROVED candidate in candidates/inventory-rg-rotate.json; nothing here is approved or tested on the device.
+repo   https://github.com/Swordfish90/Lemuroid            rg-rotate    # retro emulation frontend
+repo   https://github.com/rafaelvcaetano/melonDS-android  rg-rotate    # Nintendo DS emulator
+repo   https://github.com/mmatyas/pegasus-frontend        rg-rotate    # game launcher; last release 2024, no licence detected by GitHub
+repo   https://github.com/TapiocaFox/Daijishou            rg-rotate    # handheld launcher
+repo   https://github.com/zhanghai/MaterialFiles          rg-rotate    # file manager
+repo   https://github.com/beemdevelopment/Aegis           rg-rotate    # 2FA tokens
+repo   https://github.com/Droid-ify/client                rg-rotate    # open-source app store client
+repo   https://github.com/TeamNewPipe/NewPipe             rg-rotate    # media player client
+repo   https://github.com/FossifyOrg/Gallery              rg-rotate    # gallery
+repo   https://github.com/ImranR98/Obtainium              rg-rotate    # app updater

@@ -845,7 +845,8 @@ assert len(big_[0]) == C.SOURCES_MAX and [(n, w) for n, _, w in big_[1]] == [(C.
 # the shipped file is valid and lists only the verified FunKey wiki index; its commented examples are valid once uncommented
 real_txt = (Path(__file__).resolve().parent.parent / "discovery/sources.txt").read_text(encoding="utf-8")
 real_ok, real_bad = C.read_sources(real_txt)
-assert not real_bad and [(k, key, devs) for k, key, _, devs, _ in real_ok] == [("index", "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications", ["rg-nano"])], (real_ok, real_bad)
+assert not real_bad and [(k, key, devs) for k, key, _, devs, _ in real_ok if "rg-nano" in devs] == [("index", "https://wiki.funkey-project.com/wiki/List_of_third-party_OPK_applications", ["rg-nano"])], (real_ok, real_bad)   # the Nano crawl sees one source
+assert [k for k, _, _, devs, _ in real_ok if devs == ["rg-rotate"]] == ["repo"] * 10, real_ok   # the 10 RG Rotate (Android) repositories are validated here, not crawled (crawl.py runs the rg-nano profile)
 comments_only = "\n".join(l for l in real_txt.splitlines() if l.startswith("#"))
 assert C.read_sources(comments_only) == ([], [])
 ex_ = [l[2:] for l in real_txt.splitlines() if l.startswith(("# repo ", "# index "))]

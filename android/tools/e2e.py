@@ -17,6 +17,9 @@ It drives the real UI (uiautomator dump + taps) and Android's own package instal
   9  offline            server down: the cached catalog is still shown, the refresh reports the failure
   10 invalid updates    bad signature / tampered / unknown key / rollback: rejected, the last valid catalog stays
   11 no matching apps   valid catalog without an RG Rotate entry: accepted, "No apps for RG Rotate yet"
+  12 real app           a REAL APK from its developer's GitHub release, through the DEV catalog built by `dev_fixture.py real IDS`: download over real TLS,
+                        verify, install after the user confirms; then the installed file's signer is compared with the catalog and the app is launched
+                        (e2e.py 12 <catalog id> <package> <expected app name in Discover>)
 Screenshots and results go to android/build/e2e/."""
 import json, os, re, subprocess, sys, time, xml.etree.ElementTree as ET
 from pathlib import Path
@@ -374,6 +377,50 @@ def s11():
     assert has("1 for other devices", 5) or has("for other devices", 5)
 
 
+def s12():
+    """Real app through RetroHatch. argv: 12 NAME PACKAGE (NAME = the entry's title in Discover)."""
+    name, pkg = sys.argv[2], sys.argv[3]
+    meta = json.loads((FX / "catalogs" / "real" / "expect.json").read_text())[pkg]
+    server(True)
+    sh(f"pm uninstall {pkg}", check=False); sh(f"am force-stop {APP}", check=False); sh(f"pm clear {APP}")
+    serve_catalog("real")
+    sh(f"appops set {APP} REQUEST_INSTALL_PACKAGES allow"); sh("settings put secure immersive_mode_confirmations confirmed")
+    launch(); open_entry(name)
+    assert has("EXPERIMENTAL", 5), "the entry must say it is experimental/unapproved"; shot("12a_details_real")
+    tap("Download", exact=True)
+    assert has("Ready to install", 240), "real download + verification"; shot("12b_ready_to_install")
+    assert pkg not in sh(f"pm list packages {pkg}", check=False)
+    tap("Install", exact=True); time.sleep(2); shot("12c_android_installer")
+    assert find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and "install" in n["text"].lower(), 25)
+    installer_button("Install")
+    for _ in range(90):
+        if pkg in sh(f"pm list packages {pkg}", check=False):
+            break
+        time.sleep(1)
+    assert pkg in sh(f"pm list packages {pkg}", check=False), "not installed"
+    path = sh(f"pm path {pkg}").strip().splitlines()[0].removeprefix("package:")
+    pulled = OUT / "installed_base.apk"
+    adb("pull", path, str(pulled))
+    out = subprocess.run([str(sorted((SDK / "build-tools").glob("*/apksigner.bat"))[-1]), "verify", "--print-certs", str(pulled)], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
+    signers = sorted(set(re.findall(r"^Signer #\d+ certificate SHA-256 digest: ([0-9a-f]{64})", out, re.M)))
+    assert signers == sorted(meta["signer_sha256"]), (signers, meta["signer_sha256"])
+    code = re.search(r"versionCode=(\d+)", sh(f"dumpsys package {pkg}")).group(1)
+    assert int(code) == meta["version_code"], code
+    n = find(lambda n: n["text"].lower() in ("done", "open") and "retrohatch" not in n["pkg"], 10)
+    if n:
+        sh(f"input tap {n['cx']} {n['cy']}")
+    sh("input keyevent KEYCODE_HOME"); time.sleep(1)
+    sh("logcat -c")
+    sh(f"monkey -p {pkg} -c android.intent.category.LAUNCHER 1"); time.sleep(8)
+    alive = bool(sh(f"pidof {pkg}", check=False).strip()); crash = pkg in sh("logcat -d -b crash", check=False)
+    shot("12d_real_app_launched")
+    sh(f"am start -n {APP}/.ui.MainActivity"); time.sleep(3)
+    assert has("Installed", 15); shot("12e_retrohatch_shows_installed")
+    (OUT / "real_install.json").write_text(json.dumps({"package": pkg, "version_code": int(code), "installed_signers": signers, "catalog_signers": meta["signer_sha256"],
+                                                     "launched_and_alive_after_8s": alive, "crash_log_mentions_package": crash, "date": time.strftime("%Y-%m-%d")}, indent=1))
+    assert alive and not crash, f"launch: alive={alive} crash={crash}"
+
+
 def run_tool(name, *args):
     t = sorted((SDK / "build-tools").glob("*/" + name + ("*.exe" if os.name == "nt" else "")), reverse=True)[0]
     return subprocess.run([str(t), *args], capture_output=True, text=True).stdout
@@ -387,8 +434,8 @@ def main():
     adb("install", "-r", str(ANDROID / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"))
     server(True)
     try:
-        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7, "8": s8, "9": s9, "10": s10, "11": s11}
-        for k in (sys.argv[1:] or every):                  # e2e.py 8 9 10  runs only those scenarios (8 -> 9 -> 10 build on each other's app state)
+        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7, "8": s8, "9": s9, "10": s10, "11": s11, "12": scenario("12 real APK from the developer's GitHub release, installed through RetroHatch")(s12)}
+        for k in (sys.argv[1:2] if sys.argv[1:2] == ["12"] else sys.argv[1:] or [x for x in every if x != "12"]):                  # e2e.py 8 9 10  runs only those scenarios (8 -> 9 -> 10 build on each other's app state)
             every[k]()
     finally:
         server(False)
