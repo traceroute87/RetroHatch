@@ -62,7 +62,13 @@ object CatalogPolicy {
     @Suppress("UNCHECKED_CAST")
     private fun objs(v: Any?): List<Map<String, Any?>>? = (v as? List<*>)?.let { l -> if (l.all { it is Map<*, *> }) l as List<Map<String, Any?>> else null }
 
-    fun check(doc: Map<String, Any?>): String? {
+    /**
+     * [allowExperimental]: set ONLY for a catalog signed by a DEV fixture key (debug builds). Such a catalog may carry artifacts with compatibility level
+     * "experimental": no human approval and no test evidence are required for them, but everything else still is (https GitHub release URL of the entry's own
+     * source repo, sha256, size, android identity, known licence, not revoked). Level "verified" keeps ALL the production gates, also in a DEV catalog.
+     * Production keys never get this: tools/trust.py and every release build reject an "experimental" artifact.
+     */
+    fun check(doc: Map<String, Any?>, allowExperimental: Boolean = false): String? {
         val (tokens, depth) = shape(doc)
         if (tokens > MAX_TOKENS || depth > MAX_DEPTH) return "index too complex for the device verifier ($tokens tokens, depth $depth)"
         val extra = doc.keys - TOP - "expires"
@@ -136,7 +142,8 @@ object CatalogPolicy {
                 val sha = art["sha256"]; val url = art["url"]
                 if (sha !is String || !SHA.matches(sha) || url !is String || !URLISH.matches(url) || !isInt(art["size"]) || (art["size"] as Long) < 1) return "$w: artifact fields"
                 val comp = art["compatibility"] as? Map<*, *> ?: return "$w: bad compatibility"
-                if (comp["level"] != "verified") return "$w: compatibility level '${comp["level"]}' is not publishable"
+                val experimental = allowExperimental && comp["level"] == "experimental"
+                if (comp["level"] != "verified" && !experimental) return "$w: compatibility level '${comp["level"]}' is not publishable"
                 val ev = (comp["evidence"] as? List<*>) ?: emptyList<Any?>()
                 var matched = false
                 for (e in ev) {
@@ -144,7 +151,7 @@ object CatalogPolicy {
                     if (m["sha256"] !is String || !SHA.matches(m["sha256"] as String) || m["date"] !is String || !DATE.matches(m["date"] as String)) return "$w: evidence"
                     if (m["sha256"] == sha) matched = true
                 }
-                if (!matched) return "$w: verified needs evidence whose sha256 matches the artifact"
+                if (!matched && !experimental) return "$w: verified needs evidence whose sha256 matches the artifact"
                 if (art["format"] == "opk") {
                     if ("android" in art) return "$w: android is only for apk artifacts"
                     val dn = (art["install"] as? Map<*, *>)?.get("dest_name") as? String ?: return "$w: artifact has no install.dest_name"
@@ -155,9 +162,11 @@ object CatalogPolicy {
                 }
                 if (!releaseOk(app["source"] as String, url)) return "$w: url is not a release download of the source repo"
                 val key = listOf(aid, art["device"], art["firmware"], sha)
-                val a = appr[key] ?: return "$w: no human approval for this exact sha256"
-                used.add(key)
-                if (a["size"] != art["size"] || !releaseOk(app["source"] as String, url, a["release"] as String)) return "$w: approval does not match artifact size/release"
+                if (!experimental) {
+                    val a = appr[key] ?: return "$w: no human approval for this exact sha256"
+                    used.add(key)
+                    if (a["size"] != art["size"] || !releaseOk(app["source"] as String, url, a["release"] as String)) return "$w: approval does not match artifact size/release"
+                }
                 if ((aid to sha) in revoked) return "$w: artifact is revoked"
             }
         }

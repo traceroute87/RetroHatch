@@ -70,7 +70,7 @@ class Ui(val host: MainActivity, val m: Metrics, val width: Int, initial: Loaded
 
     /** Fetch, verify and cache the online catalog in the background. Screens are rebuilt when it ends. A rejected or failed refresh changes nothing but the status. */
     fun refresh() {
-        if (refreshing) return
+        if (refreshing || !DevHooks.refreshEnabled) return   // debug build on real hardware: no emulator-only server, bundled catalog only
         refreshing = true
         host.rebuildAll()
         netWorker.execute {
@@ -116,7 +116,7 @@ abstract class Screen(val ui: Ui) {
     }
 
     protected fun banner(): View =
-        if (ui.dev) W.previewStrip(ui.ctx, ui.m, "DEV FIXTURE CATALOG  -  signed with a test key, not production", Pal.ACC) else W.previewStrip(ui.ctx, ui.m)
+        if (ui.dev) W.previewStrip(ui.ctx, ui.m, "EXPERIMENTAL DEV CATALOG  -  " + (if ((ui.source as? CatalogSource.Signed)?.cached == true) "cached" else "bundled, offline") + "  -  test key", Pal.ACC) else W.previewStrip(ui.ctx, ui.m)
 
     /** Standard frame: header, optional preview strip, content, hint bar. */
     protected fun frame(content: View, showPreview: Boolean = ui.preview || ui.dev): View {
@@ -174,7 +174,7 @@ class DiscoverScreen(ui: Ui) : Screen(ui) {
         else {
             val col = W.column(c, m)
             ui.listings.forEach { l ->
-                col.addView(W.row(c, m, "ic_package_28", l.app.name, l.app.category.replaceFirstChar { it.uppercase() } + "  -  " + l.app.developer + (if (ui.installedVersion(l) != null) "  -  installed" else ""), 42,
+                col.addView(W.row(c, m, "ic_package_28", l.app.name, (if (l.artifact.level != "verified") "EXPERIMENTAL  -  " else "") + l.app.category.replaceFirstChar { it.uppercase() } + "  -  " + l.app.developer + (if (ui.installedVersion(l) != null) "  -  installed" else ""), 42,
                     { ui.push(DetailsScreen(ui, l)) }, tile = true))
             }
             W.scroll(c, col)
@@ -228,7 +228,8 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
         col.addView(W.table(c, m, listOf(
             "Version" to (a.version ?: "-"), "Device" to ui.target.name,
             "Package" to (a.android?.let { "${it.packageName}  (code ${it.versionCode})" } ?: a.format.uppercase()),
-            "License" to l.app.license.let { if (it == "unknown") "Unknown" else it }, "Size" to size(a.size))))
+            "License" to l.app.license.let { if (it == "unknown") "Unknown" else it }, "Size" to size(a.size)) +
+            (if (a.level != "verified") listOf("Status" to "EXPERIMENTAL / UNVERIFIED") else emptyList())))
         if (l.app.source.startsWith("https://") && !l.app.source.contains(".invalid") && !l.app.source.contains("retrohatch-fixture")) {
             col.addView(W.row(c, m, "ic_info_20", "Website", null, 24, {
                 try { ui.host.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(l.app.source))) }
@@ -257,10 +258,11 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
             is InstState.Unavailable -> Triple(if (ui.preview) "Preview only" else "Not available", s.reason, if (ui.preview) Pal.ERR else Pal.TXT)
             is InstState.Ready ->
                 if (s.installed != null) Triple("Update available", "Installed code ${s.installed}; the signed catalog has ${l.artifact.android!!.versionCode}. ${size(l.artifact.size)}.", Pal.ACC)
-                else Triple("Ready to download", "Verified build for ${ui.target.name}, ${size(l.artifact.size)}. It is checked against the signed SHA-256 before anything is installed.", Pal.TXT)
+                else Triple(if (l.artifact.level != "verified") "Experimental - ready to download" else "Ready to download",
+                    (if (l.artifact.level != "verified") "Not approved, not tested on ${ui.target.name}. " else "Verified build for ${ui.target.name}. ") + "${size(l.artifact.size)}. It is checked against the signed SHA-256, package and signer before anything is installed.", Pal.TXT)
             is InstState.Downloading -> Triple("Downloading  ${pct(s)}%", "${size(s.done)} of ${size(s.total)}", Pal.ACC)
             InstState.Verifying -> Triple("Verifying", "Checking size, SHA-256, package name and signing certificate.", Pal.ACC)
-            InstState.Downloaded -> Triple("Ready to install", "SHA-256, package and signing certificate match the catalog. Android will ask you to confirm.", Pal.GREEN)
+            InstState.Downloaded -> Triple("Ready to install", "SHA-256, package and signing certificate match the catalog." + (if (l.artifact.level != "verified") " Experimental, unverified on ${ui.target.name}." else "") + " Android will ask you to confirm.", Pal.GREEN)
             InstState.Installing -> Triple("Waiting for Android", "Confirm in the system installer screen.", Pal.ACC)
             InstState.NeedsPermission -> Triple("Allow installs", "Turn on \"Allow from this source\" for RetroHatch in Android's settings, come back, and press Install.", Pal.ACC)
             InstState.InstallCancelled -> Triple("Install cancelled", "You declined in Android's installer. Nothing was installed.", Pal.TXT)
@@ -385,8 +387,8 @@ class SettingsScreen(ui: Ui) : Screen(ui) {
                 is CatalogSource.Preview -> "PREVIEW sample (unsigned)"
             },
             "Trust" to when (src) { is CatalogSource.Signed -> "serial ${src.serial}, key ${src.keyId}"; is CatalogSource.Preview -> src.reason },
-            "Refresh" to (if (ui.refreshing) "in progress..." else st?.let { "${when_(it)}: ${it.text}" } ?: "never"),
-            "Online" to DevHooks.mapUrl(CatalogConfig.BASE).removePrefix("https://"),
+            "Refresh" to (if (!DevHooks.refreshEnabled) "off: debug build on hardware, bundled experimental catalog only" else if (ui.refreshing) "in progress..." else st?.let { "${when_(it)}: ${it.text}" } ?: "never"),
+            "Online" to if (DevHooks.refreshEnabled) DevHooks.mapUrl(CatalogConfig.BASE).removePrefix("https://") else "not used (no catalog published)",
             "Pinned key" to Trust.keyId(Trust.PRODUCTION_KEY_HEX.chunked(2).map { it.toInt(16).toByte() }.toByteArray()),
             "Entries" to "$total in catalog",
             "For ${ui.target.name}" to "${ui.listings.size}",

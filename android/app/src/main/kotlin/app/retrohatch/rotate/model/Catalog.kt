@@ -118,7 +118,7 @@ object CatalogLoader {
         if (signedIndex != null) {
             try {
                 // devKeys (DEBUG builds only) are test-fixture keys; a catalog they verify is labelled DEV everywhere and is never "production"
-                val v = Trust.verify(signedIndex, signedSig ?: ByteArray(0), trusted + devKeys, state)
+                val v = Trust.verify(signedIndex, signedSig ?: ByteArray(0), trusted + devKeys, state, experimentalKeyIds = devKeys.map { Trust.keyId(Trust.unhex(it)) }.toSet())
                 val dev = devKeys.any { Trust.keyId(Trust.unhex(it)) == v.keyId } && trusted.none { Trust.keyId(Trust.unhex(it)) == v.keyId }
                 return LoadedCatalog(CatalogSource.Signed(v.state.serial, v.keyId, v.doc["generated"] as? String, dev), CatalogMapper.fromDoc(v.doc), v.state)
             } catch (e: TrustException) {

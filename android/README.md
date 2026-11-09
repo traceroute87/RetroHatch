@@ -63,3 +63,10 @@ Everything is UNAPPROVED. `fits_from_metadata` is a reading of the manifest, not
 `python android/tools/dev_fixture.py real IDS [tested.json]` signs a DEV-only catalog from those entries (real URLs and hashes, labelled EXPERIMENTAL / UNAPPROVED, approval record says it is not
 a human approval); `python -u android/tools/e2e.py 12 NAME PACKAGE` installs one of them through the app on the emulator. No production catalog is built or signed.
 
+## Experimental library (debug builds)
+`python android/tools/dev_fixture.py real - build/android-candidates/tested.json` signs a DEV catalog of every inventory entry without a `hold` (8 apps; Pegasus and Daijishou are on hold) and bundles it into
+the debug APK (`app/src/debug/assets/dev/catalog`), so Discover lists them with no server. Every artifact is level `experimental`: shown as EXPERIMENTAL / UNVERIFIED, no approval record, nothing claimed about RG Rotate.
+Only a DEV-class key may carry `experimental` entries (`Trust.verify(experimentalKeyIds=...)`); `tools/trust.py` and release builds reject such an index, and `verified` entries keep every production gate even in
+a DEV catalog. Downloads, size/SHA-256/package/versionCode/signer checks and the Android confirmation screen are the unchanged M2 workflow. An arm64-only APK is listed and verified for RG Rotate; the x86_64
+emulator cannot install it (`e2e.py 13` stops after verification).
+

@@ -7,10 +7,10 @@
   python android/tools/dev_fixture.py build    build the labelled test APK (:fixtureapp), read its identity with the SDK tools, and write the signed DEV
                                                catalogs plus the files the test server hands out into android/build/devfixture/
   python android/tools/dev_fixture.py serve    HTTPS test server on 0.0.0.0:8443 (the emulator reaches the PC at 10.0.2.2)
-  python android/tools/dev_fixture.py real IDS [TESTED.json]
-                                               signed DEV catalog of REAL Android apps from candidates/inventory-rg-rotate.json (ids, comma separated): real GitHub
-                                               release URLs, real hashes and signer certificates, EXPERIMENTAL / UNAPPROVED. Written to build/devfixture/catalogs/real.
-                                               Without TESTED.json the evidence note says "install test pending"; with it, the real emulator result is recorded.
+  python android/tools/dev_fixture.py real [IDS] [TESTED.json]
+                                               signed DEV catalog of REAL Android apps from candidates/inventory-rg-rotate.json (all entries without a `hold`, or the comma
+                                               separated ids): real GitHub release URLs, hashes and signer certificates, every artifact level "experimental" (EXPERIMENTAL /
+                                               UNVERIFIED, no approval). Written to build/devfixture/catalogs/real and, for debug builds, to app/src/debug/assets/dev/catalog.
 
 The catalog entries name GitHub-shaped release URLs (https://github.com/retrohatch-fixture/...) so the same publish gates as the real catalog apply
 (tools/trust.py check_index). The DEBUG app maps that prefix to the local server (src/debug DevHooks) and trusts the DEV CA (debug-overrides only).
@@ -219,55 +219,69 @@ def build():
     print(json.dumps(meta, indent=2))
 
 
-def real(ids, tested_file=None):
-    """DEV test catalog of real apps. Metadata comes from the inventory (read from the real APKs), nothing is typed in by hand. Signed with the DEV key only."""
+def real(ids=None, tested_file=None):
+    """DEV experimental catalog of real apps (all inventory entries without a `hold`, or the given ids). Metadata comes from candidates/inventory-rg-rotate.json (read
+    from the real APKs); nothing is typed in by hand. Every artifact is level "experimental": no approval, no claim of testing on RG Rotate. It is signed with the DEV key
+    only. tools/trust.py and release builds REJECT such an index on purpose; only debug builds, which trust the DEV key, accept experimental entries."""
     need_crypto()
-    import trust as T
+    import trust as T, validate
     from cryptography.hazmat.primitives.serialization import load_pem_private_key
     if not (KEYS / "catalog-dev.key").exists():
         init()
     inv = json.loads((ROOT / "candidates" / "inventory-rg-rotate.json").read_text(encoding="utf-8"))
     tested = json.loads(Path(tested_file).read_text(encoding="utf-8")) if tested_file else {}
-    want = [i.strip() for i in ids.split(",") if i.strip()]
     by = {a["id"]: a for a in inv["applications"]}
-    missing = [i for i in want if i not in by]
-    if missing:
-        raise SystemExit(f"not in the inventory: {missing}")
+    want = [i.strip() for i in ids.split(",") if i.strip()] if ids else [a["id"] for a in inv["applications"] if not a.get("hold")]
+    for i in want:
+        if i not in by:
+            raise SystemExit(f"not in the inventory: {i}")
+        if by[i].get("hold"):
+            raise SystemExit(f"{i} is on hold: {by[i]['hold']}")
+        if by[i]["license"] == "unknown":
+            raise SystemExit(f"{i}: licence unknown, cannot enter a catalog")
     d = OUT / "cats" / "real"
     if d.exists():
         shutil.rmtree(d)
     for sub in ("apps", "devices"):
         (d / sub).mkdir(parents=True)
     shutil.copy(ROOT / "catalog" / "devices" / "rg-rotate.json", d / "devices")
-    approvals = []
     for i in want:
         a = by[i]
         (pk,) = a["packages"]
-        if a["license"] == "unknown":
-            raise SystemExit(f"{i}: licence unknown, cannot enter a catalog")
         repo = a["sources"][0]["url"]
-        tag = a["evidence"]["release"]["tag"]
-        t = tested.get(a["sources"][0]["url"].removeprefix("https://github.com/"))
-        ev = ({"sha256": pk["sha256"], "date": t["date"], "tester": "emulator rotate720 (x86_64, Android 12 API 31)", "note": t["note"]} if t else
-              {"sha256": pk["sha256"], "date": time.strftime("%Y-%m-%d"), "tester": "dev catalog", "note": "Install test pending: this DEV entry exists so the emulator test can run. It is not a test result."})
-        app = {"schema": 1, "id": i if re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", i) else re.sub(r"[^a-z0-9-]", "", i.lower()), "name": a["name"],
-               "description": "EXPERIMENTAL, UNAPPROVED (DEV test catalog, not a human approval). " + a["description"], "developer": repo.split("/")[3], "source": repo,
-               "license": a["license"], "category": "application",
-               "artifacts": [{"device": "rg-rotate", "firmware": "android-12", "format": "apk", "status": "available", "version": a["version"], "url": pk["url"], "sha256": pk["sha256"],
-                              "size": pk["size"], "android": pk["android"], "compatibility": {"level": "verified", "evidence": [ev]}}]}
+        t = tested.get(repo.removeprefix("https://github.com/"))
+        desc = "EXPERIMENTAL / UNVERIFIED: not approved, not tested on RG Rotate hardware. " + a["description"]
+        comp = {"level": "experimental"}
+        if t:
+            desc += f" Emulator: installed through RetroHatch and launched on {t['date']} (x86_64, Android 12)."
+            comp["evidence"] = [{"sha256": pk["sha256"], "date": t["date"], "tester": "emulator rotate720 (x86_64, Android 12 API 31)", "note": t["note"]}]
+        elif not a["evidence"]["fits_from_metadata"]["emulator_x86_64"]:
+            desc += " arm64-only: cannot run on the x86_64 emulator."
+        app = {"schema": 1, "id": re.sub(r"[^a-z0-9-]", "", i.lower()), "name": a["name"], "description": desc, "developer": repo.split("/")[3], "source": repo, "license": a["license"],
+               "category": "application", "artifacts": [{"device": "rg-rotate", "firmware": "android-12", "format": "apk", "status": "available", "version": a["version"], "url": pk["url"],
+                                                          "sha256": pk["sha256"], "size": pk["size"], "android": pk["android"], "compatibility": comp}]}
         (d / "apps" / f"{app['id']}.json").write_text(json.dumps(app, indent=2) + "\n")
-        approvals.append({"app": app["id"], "device": "rg-rotate", "firmware": "android-12", "sha256": pk["sha256"], "size": pk["size"], "release": f"{repo}/releases/tag/{tag}",
-                          "approved_by": "DEV test catalog only - NOT a human approval", "date": time.strftime("%Y-%m-%d")})
-    (d / "approvals.json").write_text(json.dumps({"schema": 1, "approvals": approvals, "revoked": []}, indent=2) + "\n")
-    key = load_pem_private_key((KEYS / "catalog-dev.key").read_bytes(), None)
-    doc = T.build(d, 10, time.strftime("%Y-%m-%d"))
+    errs = validate.check(d, validate.ROOT / "schema")                 # the shared schema and cross-file rules
+    if errs:
+        raise SystemExit("catalog invalid: " + "; ".join(errs[:3]))
+    doc = {"format": 1, "serial": (datetime.date.today() - datetime.date(2026, 1, 1)).days * 1440 + datetime.datetime.now().hour * 60 + datetime.datetime.now().minute,   # grows every minute, fits the verifier's 2^31 limit
+           "generated": time.strftime("%Y-%m-%d"),
+           "devices": [json.loads((d / "devices" / "rg-rotate.json").read_text())], "apps": [json.loads(p.read_text()) for p in sorted((d / "apps").glob("*.json"))], "approvals": [], "revoked": []}
+    errs = T.strict_patterns(doc)
+    if errs or T.shape(doc)[0] > T.MAX_TOKENS:
+        raise SystemExit("index format: " + "; ".join(errs[:3]))
     idx = T.canonical(doc)
+    key = load_pem_private_key((KEYS / "catalog-dev.key").read_bytes(), None)
+    # direct DEV signing on purpose: T.sign() refuses an index without approvals and levels other than "verified" (production rules)
+    sig = T.canonical({"v": 1, "alg": "ed25519", "key_id": T.key_id(T.raw_pub(key)), "sig": base64.b64encode(key.sign(idx)).decode()})
     out = OUT / "catalogs" / "real"
     out.mkdir(parents=True, exist_ok=True)
-    (out / "index.json").write_bytes(idx)
-    (out / "index.json.sig").write_bytes(T.sign(idx, key))
+    (out / "index.json").write_bytes(idx); (out / "index.json.sig").write_bytes(sig)
     (out / "expect.json").write_text(json.dumps({by[i]["packages"][0]["android"]["package"]: by[i]["packages"][0]["android"] for i in want}, indent=1) + chr(10))   # what the e2e test compares the installed app with
-    print(f"signed DEV catalog with {len(want)} real app(s) -> {out}")
+    bundled = DEBUG_SRC / "assets" / "dev" / "catalog"                 # debug builds ship this signed DEV snapshot, so the app lists the apps without any server
+    bundled.mkdir(parents=True, exist_ok=True)
+    (bundled / "index.json").write_bytes(idx); (bundled / "index.json.sig").write_bytes(sig)
+    print(f"signed DEV catalog (EXPERIMENTAL, serial {doc['serial']}) with {len(want)} real app(s): {', '.join(want)}\n  -> {out}\n  -> {bundled} (bundled into the debug APK)")
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -300,4 +314,4 @@ def serve():
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "build"
-    real(*sys.argv[2:4]) if cmd == "real" else {"init": init, "build": build, "serve": serve}[cmd]()
+    real(*(sys.argv[2:4] if sys.argv[2:3] != ["-"] else [None] + sys.argv[3:4])) if cmd == "real" else {"init": init, "build": build, "serve": serve}[cmd]()

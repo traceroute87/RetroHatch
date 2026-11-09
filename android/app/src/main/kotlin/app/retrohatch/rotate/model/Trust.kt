@@ -41,7 +41,8 @@ object Trust {
     }
 
     /** [stateFor] (keyId -> newest accepted state for THAT key's trust class) replaces [state] when given: production and DEV rollback state never mix. */
-    fun verify(index: ByteArray, sigDoc: ByteArray, trusted: List<String> = PRODUCTION_KEYS, state: TrustState? = null, stateFor: ((String) -> TrustState?)? = null): Verified {
+    fun verify(index: ByteArray, sigDoc: ByteArray, trusted: List<String> = PRODUCTION_KEYS, state: TrustState? = null, stateFor: ((String) -> TrustState?)? = null,
+               experimentalKeyIds: Set<String> = emptySet()): Verified {
         if (trusted.isEmpty()) throw TrustException("no trusted key configured")
         if (index.isEmpty() || sigDoc.isEmpty()) throw TrustException("missing index or signature")
         if (index.size > MAX_INDEX || sigDoc.size > MAX_SIG) throw TrustException("index or signature too large")
@@ -64,7 +65,7 @@ object Trust {
         if (!ed25519Verify(pub, index, sig)) throw TrustException("bad signature")
         val doc = StrictJson.parseObject(index)                      // parse only after the signature holds
         if (!StrictJson.canonical(doc).contentEquals(index)) throw TrustException("index is not in canonical form")
-        CatalogPolicy.check(doc)?.let { throw TrustException("signed index violates policy: $it") }
+        CatalogPolicy.check(doc, allowExperimental = kid in experimentalKeyIds)?.let { throw TrustException("signed index violates policy: $it") }
         val h = sha256Hex(index)
         val serial = doc["serial"] as Long
         val st = if (stateFor != null) stateFor(kid) else state

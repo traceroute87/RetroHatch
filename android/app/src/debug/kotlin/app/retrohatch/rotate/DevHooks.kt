@@ -13,7 +13,13 @@ object DevHooks {
     const val ENABLED = true
     private var map: List<Pair<String, String>> = emptyList()
 
+    /** True only on an Android emulator. 10.0.2.2 exists nowhere else, so on real hardware the URL map stays empty and the online catalog refresh is off. */
+    val onEmulator: Boolean = android.os.Build.HARDWARE.let { it == "goldfish" || it == "ranchu" } || android.os.Build.FINGERPRINT.let { it.startsWith("generic") || it.contains("emulator") } ||
+        android.os.Build.PRODUCT.startsWith("sdk") || android.os.Build.PRODUCT.contains("emulator")
+    val refreshEnabled: Boolean get() = onEmulator
+
     fun init(ctx: Context) {
+        if (!onEmulator) return
         map = read(ctx, "dev/url_map.txt").mapNotNull { l -> l.split("=", limit = 2).takeIf { it.size == 2 }?.let { it[0].trim() to it[1].trim() } }
     }
 

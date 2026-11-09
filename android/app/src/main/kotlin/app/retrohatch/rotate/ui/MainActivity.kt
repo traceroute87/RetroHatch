@@ -50,7 +50,9 @@ class MainActivity : Activity() {
     private fun loadCatalog(): LoadedCatalog {
         fun asset(p: String) = try { assets.open(p).use { it.readBytes() } } catch (e: java.io.IOException) { null }
         val bi = asset("catalog/index.json"); val bs = asset("catalog/index.json.sig")
-        return CatalogRepository.load(store, Trust.PRODUCTION_KEYS, DevHooks.devKeys(this), if (bi != null && bs != null) Pair(bi, bs) else null, asset("preview/index.json"))
+        val di = asset("dev/catalog/index.json"); val ds = asset("dev/catalog/index.json.sig")   // debug builds only (src/debug/assets)
+        return CatalogRepository.load(store, Trust.PRODUCTION_KEYS, DevHooks.devKeys(this), if (bi != null && bs != null) Pair(bi, bs) else null, asset("preview/index.json"),
+            if (di != null && ds != null) Pair(di, ds) else null)
     }
 
     /** A refresh stored a new verified catalog. */

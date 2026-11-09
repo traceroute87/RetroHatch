@@ -143,7 +143,9 @@ def entry(i, tested=None):
     if not i["fits"]["emulator_x86_64"]:
         notes.append("arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device.")
     t = (tested or {}).get(i["repo"])
-    return {"id": re.sub(r"[^a-z0-9]", "", name.lower())[:48], "name": i["label"] or name, "kind": "app", "status": "apk-verified",
+    hold = ("licence not detected: resolve it first" if i["license"] == "unknown" else
+            "signing certificate looks like an AOSP key: investigate who holds it first" if any("Google Inc" in d and "CN=Android" in d for d in i["signer_dn"]) else "")
+    e = {"id": (re.sub(r"[^a-z0-9]", "", (i["label"] or name).lower()) or re.sub(r"[^a-z0-9]", "", name.lower()))[:48], "name": i["label"] or name, "kind": "app", "status": "apk-verified",
             "description": i["description"] or f"Android app {i['package']}", "topics": i["topics"], "version": i["version_name"], "license": i["license"],
             "last_activity": i["pushed_at"], "claim": {"kind": "android", "text": f"Android APK: minSdk {i['min_sdk']}, " + (", ".join(i["abis"]) or "no native code"), "where": "apk manifest"},
             "sources": [{"type": "repo", "url": i["repo_url"]}],
@@ -153,6 +155,9 @@ def entry(i, tested=None):
                          "release": {"tag": i["tag"], "published": i["published"], "page": i["release_url"], "github_digest_matches": i["github_digest_matches"]},
                          "fits_from_metadata": i["fits"],
                          "tested": {"emulator_x86_64_api31": t or "not tested", "rg_rotate_hardware": "not tested"}, "notes": notes}}
+    if hold:
+        e["hold"] = hold   # kept out of every DEV catalog (android/tools/dev_fixture.py real) until a human resolves it
+    return e
 
 
 def inventory(src, tested):

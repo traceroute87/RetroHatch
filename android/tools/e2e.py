@@ -161,7 +161,7 @@ def launch(dev_banner=True):
     sh(f"am start -n {APP}/.ui.MainActivity")
     time.sleep(3)
     if dev_banner:
-        assert has("DEV FIXTURE CATALOG", 30), "the signed DEV catalog did not arrive"
+        assert has("EXPERIMENTAL DEV CATALOG", 30), "the signed DEV catalog did not arrive"
 
 
 def open_entry(title):
@@ -421,6 +421,20 @@ def s12():
     assert alive and not crash, f"launch: alive={alive} crash={crash}"
 
 
+def s13():
+    """An arm64-only app must be listed, downloaded and VERIFIED for RG Rotate even though the x86_64 emulator cannot run it. Nothing is installed. argv: 13 NAME."""
+    name = sys.argv[2]
+    server(True)
+    sh(f"am force-stop {APP}", check=False); sh(f"pm clear {APP}")
+    serve_catalog("real")
+    sh(f"appops set {APP} REQUEST_INSTALL_PACKAGES allow"); sh("settings put secure immersive_mode_confirmations confirmed")
+    launch(); open_entry(name)
+    assert has("EXPERIMENTAL / UNVERIFIED", 5), "status row"; shot("13a_details_arm64")
+    tap("Download", exact=True)
+    assert has("Ready to install", 240), "arm64-only APK must still download and verify (package, versionCode, signer)"; shot("13b_arm64_verified_not_installed")
+    assert "Ready to install" in " ".join(n["text"] for n in nodes())
+
+
 def run_tool(name, *args):
     t = sorted((SDK / "build-tools").glob("*/" + name + ("*.exe" if os.name == "nt" else "")), reverse=True)[0]
     return subprocess.run([str(t), *args], capture_output=True, text=True).stdout
@@ -434,8 +448,9 @@ def main():
     adb("install", "-r", str(ANDROID / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"))
     server(True)
     try:
-        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7, "8": s8, "9": s9, "10": s10, "11": s11, "12": scenario("12 real APK from the developer's GitHub release, installed through RetroHatch")(s12)}
-        for k in (sys.argv[1:2] if sys.argv[1:2] == ["12"] else sys.argv[1:] or [x for x in every if x != "12"]):                  # e2e.py 8 9 10  runs only those scenarios (8 -> 9 -> 10 build on each other's app state)
+        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7, "8": s8, "9": s9, "10": s10, "11": s11, "12": scenario("12 real APK from the developer's GitHub release, installed through RetroHatch")(s12),
+                 "13": scenario("13 arm64-only app: listed, downloaded and verified, NOT installed (cannot run on the x86_64 emulator)")(s13)}
+        for k in (sys.argv[1:2] if sys.argv[1:2] in (["12"], ["13"]) else sys.argv[1:] or [x for x in every if x not in ("12", "13")]):                  # e2e.py 8 9 10  runs only those scenarios (8 -> 9 -> 10 build on each other's app state)
             every[k]()
     finally:
         server(False)

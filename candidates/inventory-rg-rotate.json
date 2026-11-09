@@ -107,14 +107,107 @@
      "emulator_x86_64": true
     },
     "tested": {
-     "emulator_x86_64_api31": "not tested",
+     "emulator_x86_64_api31": {
+      "result": "installed-through-retrohatch-and-launched",
+      "date": "2026-11-09",
+      "note": "Downloaded from the developer's GitHub release by RetroHatch (DEV build) over TLS, size/SHA-256/package/versionCode/signer checked, installed after confirming in Android's installer, then launched and still running after 8 s with no crash entry. Android 12 (API 31) x86_64 EMULATOR only; NOT tested on RG Rotate hardware.",
+      "installed_signers_match_catalog": true,
+      "versionCode": 82
+     },
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
    }
   },
   {
-   "id": "client",
+   "id": "daijish",
+   "name": "Daijishō",
+   "kind": "app",
+   "status": "apk-verified",
+   "description": "Daijishō is a retro launcher that manages your retro games libraries. This repo is for assets and served as a main page.",
+   "topics": [
+    "android",
+    "daijishou",
+    "emulator-frontend",
+    "emulator-launcher",
+    "launcher"
+   ],
+   "version": "1.5.0",
+   "license": "MIT",
+   "last_activity": "2026-11-04",
+   "claim": {
+    "kind": "android",
+    "text": "Android APK: minSdk 26, no native code",
+    "where": "apk manifest"
+   },
+   "sources": [
+    {
+     "type": "repo",
+     "url": "https://github.com/TapiocaFox/Daijishou"
+    }
+   ],
+   "packages": [
+    {
+     "name": "416.apk",
+     "url": "https://github.com/TapiocaFox/Daijishou/releases/download/v1.5.0/416.apk",
+     "size": 17912484,
+     "format": "apk",
+     "signature": "apk",
+     "container": "",
+     "from": "release",
+     "sha256": "c09989b5d938f41cc1d53d2f38fa3b1261a40bc4d8dcf8367cce83353457df51",
+     "android": {
+      "package": "com.magneticchen.daijishou",
+      "version_code": 416,
+      "signer_sha256": [
+       "c1dc929edf4c062eaeee609ec009c7859e34050e62058282d1eaf5e8b2c22f51"
+      ]
+     }
+    }
+   ],
+   "evidence": {
+    "apk": {
+     "package": "com.magneticchen.daijishou",
+     "version_code": 416,
+     "version_name": "1.5.0",
+     "min_sdk": 26,
+     "target_sdk": 35,
+     "abis": [],
+     "signers_sha256": [
+      "c1dc929edf4c062eaeee609ec009c7859e34050e62058282d1eaf5e8b2c22f51"
+     ],
+     "signer_dn": [
+      "CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US"
+     ],
+     "signature_schemes": [
+      "v2",
+      "v3"
+     ],
+     "debuggable": false,
+     "launchable": true
+    },
+    "release": {
+     "tag": "v1.5.0",
+     "published": "2026-01-15",
+     "page": "https://github.com/TapiocaFox/Daijishou/releases/tag/v1.5.0",
+     "github_digest_matches": true
+    },
+    "fits_from_metadata": {
+     "rg_rotate_android12_arm64": true,
+     "emulator_x86_64": true
+    },
+    "tested": {
+     "emulator_x86_64_api31": "not tested",
+     "rg_rotate_hardware": "not tested"
+    },
+    "notes": [
+     "Signed with a certificate whose subject is CN=Android, O=Google Inc. (looks like an AOSP key, not a developer key). Check who holds that key before any approval."
+    ]
+   },
+   "hold": "signing certificate looks like an AOSP key: investigate who holds it first"
+  },
+  {
+   "id": "droidify",
    "name": "Droid-ify",
    "kind": "app",
    "status": "apk-verified",
@@ -202,92 +295,6 @@
      "rg_rotate_hardware": "not tested"
     },
     "notes": []
-   }
-  },
-  {
-   "id": "daijishou",
-   "name": "Daijishō",
-   "kind": "app",
-   "status": "apk-verified",
-   "description": "Daijishō is a retro launcher that manages your retro games libraries. This repo is for assets and served as a main page.",
-   "topics": [
-    "android",
-    "daijishou",
-    "emulator-frontend",
-    "emulator-launcher",
-    "launcher"
-   ],
-   "version": "1.5.0",
-   "license": "MIT",
-   "last_activity": "2026-11-04",
-   "claim": {
-    "kind": "android",
-    "text": "Android APK: minSdk 26, no native code",
-    "where": "apk manifest"
-   },
-   "sources": [
-    {
-     "type": "repo",
-     "url": "https://github.com/TapiocaFox/Daijishou"
-    }
-   ],
-   "packages": [
-    {
-     "name": "416.apk",
-     "url": "https://github.com/TapiocaFox/Daijishou/releases/download/v1.5.0/416.apk",
-     "size": 17912484,
-     "format": "apk",
-     "signature": "apk",
-     "container": "",
-     "from": "release",
-     "sha256": "c09989b5d938f41cc1d53d2f38fa3b1261a40bc4d8dcf8367cce83353457df51",
-     "android": {
-      "package": "com.magneticchen.daijishou",
-      "version_code": 416,
-      "signer_sha256": [
-       "c1dc929edf4c062eaeee609ec009c7859e34050e62058282d1eaf5e8b2c22f51"
-      ]
-     }
-    }
-   ],
-   "evidence": {
-    "apk": {
-     "package": "com.magneticchen.daijishou",
-     "version_code": 416,
-     "version_name": "1.5.0",
-     "min_sdk": 26,
-     "target_sdk": 35,
-     "abis": [],
-     "signers_sha256": [
-      "c1dc929edf4c062eaeee609ec009c7859e34050e62058282d1eaf5e8b2c22f51"
-     ],
-     "signer_dn": [
-      "CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US"
-     ],
-     "signature_schemes": [
-      "v2",
-      "v3"
-     ],
-     "debuggable": false,
-     "launchable": true
-    },
-    "release": {
-     "tag": "v1.5.0",
-     "published": "2026-01-15",
-     "page": "https://github.com/TapiocaFox/Daijishou/releases/tag/v1.5.0",
-     "github_digest_matches": true
-    },
-    "fits_from_metadata": {
-     "rg_rotate_android12_arm64": true,
-     "emulator_x86_64": true
-    },
-    "tested": {
-     "emulator_x86_64_api31": "not tested",
-     "rg_rotate_hardware": "not tested"
-    },
-    "notes": [
-     "Signed with a certificate whose subject is CN=Android, O=Google Inc. (looks like an AOSP key, not a developer key). Check who holds that key before any approval."
-    ]
    }
   },
   {
@@ -578,7 +585,7 @@
    }
   },
   {
-   "id": "melondsandroid",
+   "id": "melonds",
    "name": "melonDS",
    "kind": "app",
    "status": "apk-verified",
@@ -858,7 +865,7 @@
    }
   },
   {
-   "id": "pegasusfrontend",
+   "id": "pegasus",
    "name": "Pegasus",
    "kind": "app",
    "status": "apk-verified",
@@ -951,7 +958,8 @@
      "Latest release is old (2024-10-05).",
      "arm64-only native code: cannot run on the x86_64 emulator, needs a real arm64 device."
     ]
-   }
+   },
+   "hold": "licence not detected: resolve it first"
   }
  ]
 }

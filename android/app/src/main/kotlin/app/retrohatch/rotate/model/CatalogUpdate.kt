@@ -80,7 +80,8 @@ class CatalogUpdater(
                 return RefreshResult.Failed("download failed")
             }
             try {
-                val v = Trust.verify(index, sig, prodKeys + devKeys, stateFor = { kid -> classOf(kid)?.let { store.state(it) } })
+                val v = Trust.verify(index, sig, prodKeys + devKeys, stateFor = { kid -> classOf(kid)?.let { store.state(it) } },
+                    experimentalKeyIds = devKeys.map { Trust.keyId(Trust.unhex(it)) }.toSet())
                 val cls = classOf(v.keyId) ?: return RefreshResult.Rejected("unknown signing key")
                 val have = store.state(cls)
                 val cached = store.readCache(cls)
@@ -103,7 +104,8 @@ object CatalogRepository {
      * Order: production cache, DEV cache (only if DEV keys exist, i.e. debug builds), bundled production snapshot, else the PREVIEW sample.
      * Every candidate is verified again against its own class's keys and rollback state, so a damaged or swapped cache file is dropped.
      */
-    fun load(store: CatalogStore, prodKeys: List<String>, devKeys: List<String>, bundled: Pair<ByteArray, ByteArray>?, preview: ByteArray?): LoadedCatalog {
+    fun load(store: CatalogStore, prodKeys: List<String>, devKeys: List<String>, bundled: Pair<ByteArray, ByteArray>?, preview: ByteArray?,
+             devBundled: Pair<ByteArray, ByteArray>? = null): LoadedCatalog {
         var why: String? = null
         fun tryOne(c: Pair<ByteArray, ByteArray>?, cls: KeyClass, cached: Boolean, label: String): LoadedCatalog? {
             if (c == null) return null
@@ -117,6 +119,7 @@ object CatalogRepository {
         tryOne(store.readCache(KeyClass.PROD), KeyClass.PROD, true, "Cached")?.let { return it }
         if (devKeys.isNotEmpty()) tryOne(store.readCache(KeyClass.DEV), KeyClass.DEV, true, "Cached DEV")?.let { return it }
         tryOne(bundled, KeyClass.PROD, false, "Bundled")?.let { return it }
+        if (devKeys.isNotEmpty()) tryOne(devBundled, KeyClass.DEV, false, "Bundled DEV")?.let { return it }   // debug builds ship a signed DEV snapshot of the real-app candidates
         return CatalogLoader.load(null, null, preview).let { LoadedCatalog(CatalogSource.Preview(why ?: (it.source as CatalogSource.Preview).reason), it.catalog) }
     }
 }
