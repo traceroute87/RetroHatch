@@ -27,6 +27,7 @@ object CatalogPolicy {
     private val APP_KEYS = setOf("schema", "id", "name", "description", "developer", "website", "source", "license", "category", "artifacts", "long_description", "features", "group", "tags", "released", "added")
     private val ART_KEYS = setOf("device", "firmware", "format", "status", "unavailable_reason", "version", "url", "sha256", "size", "install", "android", "compatibility")
     private val PKG = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
+    private val EXT_KEYS = setOf("id", "name", "description", "developer", "source", "website", "license", "group", "tags", "released", "added", "label", "url", "reason", "price", "version")
     private val GROUPS = setOf("games", "emulators", "ports", "utilities", "media", "themes-launchers")
     private val TAG = Regex("[a-z0-9][a-z0-9+-]{1,23}")
     private val CATEGORIES = setOf("application", "utility", "launcher", "theme", "port", "other")
@@ -73,7 +74,7 @@ object CatalogPolicy {
     fun check(doc: Map<String, Any?>, allowExperimental: Boolean = false): String? {
         val (tokens, depth) = shape(doc)
         if (tokens > MAX_TOKENS || depth > MAX_DEPTH) return "index too complex for the device verifier ($tokens tokens, depth $depth)"
-        val extra = doc.keys - TOP - "expires"
+        val extra = doc.keys - TOP - "expires" - (if (allowExperimental) setOf("external") else emptySet())     // "external": Android-only, DEV catalogs only
         if (extra.isNotEmpty() || (TOP - doc.keys).isNotEmpty()) return "index keys wrong: missing ${(TOP - doc.keys).sorted()}, unexpected ${extra.sorted()}"
         if (doc["format"] != FORMAT) return "unsupported format ${doc["format"]}"
         val serial = doc["serial"]
@@ -178,6 +179,23 @@ object CatalogPolicy {
             }
         }
         if (artifacts > MAX_ITEMS) return "too many artifacts for the device verifier"
+        if ("external" in doc) {
+            val ids = apps.map { it["id"] }.toMutableSet()
+            val ext = objs(doc["external"]) ?: return "external must be a list of objects"
+            if (ext.size > MAX_ITEMS) return "too many external listings"
+            for (e in ext) {
+                val eid = e["id"] as? String ?: return "external listing without id"
+                if (!ID.matches(eid) || !ids.add(eid)) return "external $eid: bad or duplicate id"
+                if ("artifacts" in e || "sha256" in e || "download" in e) return "external $eid: an external listing carries no download"
+                if (!EXT_KEYS.containsAll(e.keys) || !e.keys.containsAll(listOf("id", "name", "description", "developer", "source", "license", "label", "url", "reason"))) return "external $eid: wrong fields"
+                if (listOf("name", "description", "developer", "license", "label", "reason").any { e[it] !is String || (e[it] as String).isEmpty() }) return "external $eid: bad field value"
+                if ((e["label"] as String).length > 40 || (e["reason"] as String).length > 240 || (e["description"] as String).length > 300) return "external $eid: text too long"
+                for (k in listOf("source", "url", "website")) e[k]?.let { if (it !is String || !URLISH.matches(it)) return "external $eid: bad $k" }
+                e["group"]?.let { if (it !in GROUPS) return "external $eid: bad group" }
+                e["tags"]?.let { t -> if (t !is List<*> || t.size > 8 || t.any { it !is String || !TAG.matches(it) }) return "external $eid: bad tags" }
+                for (k in listOf("released", "added")) e[k]?.let { if (it !is String || !DATE.matches(it)) return "external $eid: bad $k" }
+            }
+        }
         (appr.keys - used).firstOrNull()?.let { return "approval $it matches no published artifact" }
         return null
     }

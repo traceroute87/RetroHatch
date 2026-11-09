@@ -1,0 +1,6164 @@
+{
+ "schema": 1,
+ "generated": "2026-11-09",
+ "device": "rg-rotate",
+ "device_abis": [
+  "arm64-v8a",
+  "armeabi",
+  "armeabi-v7a"
+ ],
+ "note": "Curated from build/discovery/android-500-candidates.json (reproducible with discovery/curate.py). mode=install entries carry the APK facts read from the file; mode=external entries are listings only. Leads, never approvals.",
+ "apps": [
+  {
+   "id": "8-bit-wonders",
+   "name": "8-Bit Wonders",
+   "group": "emulators",
+   "tags": [
+    "emulator"
+   ],
+   "description": "Flexible and easy to use Commodore 8-bit emulation with builtin games",
+   "developer": "Rainer Hock",
+   "source": "https://eightbitwonders.gitlab.io/app/",
+   "license": "GPL-2.0-or-later",
+   "package": "de.rainerhock.eightbitwonders",
+   "released": "2026-09-22",
+   "version": "0.8.11",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software"
+   ],
+   "min_sdk": 19,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/de.rainerhock.eightbitwonders/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "armsx2",
+   "name": "ARMSX2",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for PlayStation 2.",
+   "developer": "armsx2",
+   "source": "https://github.com/armsx2/armsx2",
+   "license": "GPL-3.0",
+   "package": "com.armsx2",
+   "released": "2026-11-06",
+   "version": "2.9.2",
+   "recommended_by": [
+    "retrohandhelds-rotate",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed",
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)",
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 30,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/ARMSX2/ARMSX2/releases/download/2.9.2/ARMSX2-2.9.2-a11-armv8.2-sdk30.apk",
+    "file": "ARMSX2-2.9.2-a11-armv8.2-sdk30.apk",
+    "tag": "2.9.2",
+    "size": 78369361,
+    "sha256": "758cbd9dcb183a971eb6a0b2b1448860aafefdf138ff22fd90b621fcdcb12214",
+    "version_code": 1787,
+    "version_name": "2.9.2",
+    "min_sdk": 30,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "f942d6bbcf5c46971fc8ac02c53bb9f7c10ede226834412e8dac38f07c997ff5"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "azahar",
+   "name": "Azahar",
+   "group": "emulators",
+   "tags": [
+    "lime3ds"
+   ],
+   "description": "Emulator for Nintendo 3DS.",
+   "developer": "azahar-emu",
+   "source": "https://github.com/azahar-emu/azahar",
+   "license": "GPL-2.0",
+   "package": "org.azahar_emu.azahar",
+   "released": "2026-10-08",
+   "version": "2126.2-vanilla",
+   "recommended_by": [
+    "rgc-guide",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)",
+    "recommended in the Retro Game Corps Android emulation guide"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/azahar-emu/azahar/releases/download/2126.2/azahar-android-vanilla-2126.2.apk",
+    "file": "azahar-android-vanilla-2126.2.apk",
+    "tag": "2126.2",
+    "size": 50187175,
+    "sha256": "b511d1d38012c5ab0dfdb4479335059bb89ef17acfbf0ba45e79107ed4185ba3",
+    "version_code": 33989150,
+    "version_name": "2126.2-vanilla",
+    "min_sdk": 29,
+    "abis": [
+     "arm64-v8a",
+     "x86_64"
+    ],
+    "signers": [
+     "5ba2563e0d13fae2aba067d1c230cd1c863a93005c10d648ce5b331792aa0af1"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "bkemu",
+   "name": "BkEmu",
+   "group": "emulators",
+   "tags": [
+    "system"
+   ],
+   "description": "Elektronika BK-0010/11M Emulator",
+   "developer": "3cky",
+   "source": "https://github.com/3cky/bkemu-android",
+   "license": "GPL-3.0-only",
+   "package": "su.comp.bk",
+   "released": "2026-10-08",
+   "version": "1.2.3",
+   "recommended_by": [],
+   "sources": [
+    "izzy"
+   ],
+   "reasons": [
+    "describes itself as an emulator/libretro frontend"
+   ],
+   "min_sdk": 23,
+   "abis": [],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/3cky/bkemu-android/releases/download/bkemu-1.2.3/bkemu-android-1.2.3.apk",
+    "file": "bkemu-android-1.2.3.apk",
+    "tag": "bkemu-1.2.3",
+    "size": 3037034,
+    "sha256": "2568c6b9ee853f743f5d5dff119421eb16c591c68b2daed02ee2beda0d765f60",
+    "version_code": 1002003,
+    "version_name": "1.2.3",
+    "min_sdk": 23,
+    "abis": [],
+    "signers": [
+     "6b6820d9fe13c2a1acdfeeb4e1c42b238585b080518ba5407bc77ed23edf8cb6"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "console-launcher",
+   "name": "Console Launcher",
+   "group": "emulators",
+   "tags": [],
+   "description": "Console Launcher is an Android launcher and emulation frontend. This repo hosts themes for the app and provides the most up-to-date versions. - likeich/console-launcher",
+   "developer": "likeich",
+   "source": "https://github.com/likeich/console-launcher",
+   "license": "unknown",
+   "package": "com.k2.consolelauncher",
+   "released": "",
+   "version": "v2.0.0-beta.6.12",
+   "recommended_by": [
+    "rgc-guide",
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "rgc-guide",
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "recommended in the Retro Game Corps Android emulation guide",
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 27,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "store-link-only-until-verified"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Google Play",
+    "url": "https://play.google.com/store/apps/details?id=com.k2.consolelauncher&amp;hl=en_US",
+    "reason": "No licence was found; RetroHatch does not install unlicensed software.",
+    "price": null
+   },
+   "needs": [
+    "legal/licence review",
+    "device testing"
+   ]
+  },
+  {
+   "id": "dolphin-emulator",
+   "name": "Dolphin Emulator",
+   "group": "emulators",
+   "tags": [
+    "emulator"
+   ],
+   "description": "Emulator for GameCube, Wii.",
+   "developer": "dolphin-emu",
+   "source": "https://github.com/dolphin-emu/dolphin",
+   "license": "GPL-2.0-or-later",
+   "package": "org.dolphinemu.dolphinemu",
+   "released": "2026-03-24",
+   "version": "2603a",
+   "recommended_by": [
+    "rgc-guide",
+    "retrohandhelds-rotate",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "fdroid",
+    "obtainium",
+    "rgc-guide",
+    "mainstream-seed",
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "store-link-only-until-verified"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/org.dolphinemu.dolphinemu/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "dolphin-mmjr2-vbi",
+   "name": "Dolphin-MMJR2-VBI",
+   "group": "emulators",
+   "tags": [],
+   "description": "A fork of Dolphin MMJR2 - with added VBI Skip hack and further fixes ported over from Dolphin Official. - Medard22/Dolphin-MMJR2-VBI",
+   "developer": "medard22",
+   "source": "https://github.com/medard22/dolphin-mmjr2-vbi",
+   "license": "unknown",
+   "package": "org.dolphinemu.mmjr",
+   "released": "",
+   "version": "U24.07.02-2407",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://github.com/Medard22/Dolphin-MMJR2-VBI",
+    "reason": "No licence was found; RetroHatch does not install unlicensed software.",
+    "price": null
+   },
+   "needs": [
+    "legal/licence review",
+    "device testing"
+   ]
+  },
+  {
+   "id": "duckstation",
+   "name": "Duckstation",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for PlayStation.",
+   "developer": "stenzek",
+   "source": "https://github.com/stenzek/duckstation",
+   "license": "CC-BY-NC-ND-4.0",
+   "package": "com.github.stenzek.duckstation",
+   "released": "",
+   "version": "12126",
+   "recommended_by": [
+    "rgc-guide",
+    "retrohandhelds-rotate",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "rgc-guide",
+    "mainstream-seed",
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "recommended in the Retro Game Corps Android emulation guide",
+    "mainstream emulator/frontend seed (requested by name)"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "store-link-only-until-verified"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Google Play",
+    "url": "https://play.google.com/store/apps/details?id=com.github.stenzek.duckstation&amp;hl=en_US&amp;gl=US",
+    "reason": "The official download is hosted on downloads.duckstation.org; RetroHatch's trust policy accepts only GitHub release downloads of the app's own repository.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "flycast",
+   "name": "Flycast",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for Dreamcast, NAOMI, Atomiswave.",
+   "developer": "flyinghead",
+   "source": "https://github.com/flyinghead/flycast",
+   "license": "GPL-2.0",
+   "package": "com.flycast.emulator",
+   "released": "2026-08-19",
+   "version": "v2.7-1-g44e4c7b50",
+   "recommended_by": [
+    "rgc-guide",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)",
+    "recommended in the Retro Game Corps Android emulation guide"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/flyinghead/flycast/releases/download/v2.7/flycast-2.7.apk",
+    "file": "flycast-2.7.apk",
+    "tag": "v2.7",
+    "size": 36280670,
+    "sha256": "1ac54d77b8283f6d58d077396d0916ec12c15b7e4ada9d957836a64590756c00",
+    "version_code": 3302,
+    "version_name": "v2.7-1-g44e4c7b50",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "0774794c54c7e463004754e2caba432a2057d917e64c5e24460606a7471b1395"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "lemuroid",
+   "name": "Lemuroid",
+   "group": "emulators",
+   "tags": [
+    "emulator"
+   ],
+   "description": "Emulator for multi-system (libretro cores).",
+   "developer": "swordfish90",
+   "source": "https://github.com/swordfish90/lemuroid",
+   "license": "GPL-3.0-or-later",
+   "package": "com.swordfish.lemuroid",
+   "released": "2026-04-29",
+   "version": "1.17.0",
+   "recommended_by": [
+    "mainstream-seed"
+   ],
+   "sources": [
+    "fdroid",
+    "mainstream-seed"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software",
+    "mainstream emulator/frontend seed (requested by name)"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/swordfish90/lemuroid/releases/download/1.17.0/lemuroid-app-free-dynamic-release.apk",
+    "file": "lemuroid-app-free-dynamic-release.apk",
+    "tag": "1.17.0",
+    "size": 11985230,
+    "sha256": "d44cfa0cdc3e43fd91df97f625938366ccef9793b06a80b9e6fad97a6cd88e51",
+    "version_code": 252,
+    "version_name": "1.17.0",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "4fa1cb59ea4d8ca8555315eba215205f667975ba8985bbe736904f21bfebbeaf"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "mame4droid-current",
+   "name": "MAME4droid",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for Arcade (MAME).",
+   "developer": "seleuco",
+   "source": "https://github.com/seleuco/mame4droid-2024",
+   "license": "GPL-2.0",
+   "package": "com.seleuco.mame4d2024",
+   "released": "2026-09-16",
+   "version": "v1.41.2",
+   "recommended_by": [
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://github.com/Seleuco/MAME4droid-2024",
+    "reason": "The APK is larger than RetroHatch downloads (200 MB).",
+    "price": null
+   },
+   "needs": [
+    "direct APK source",
+    "device testing"
+   ]
+  },
+  {
+   "id": "melonds",
+   "name": "melonDS",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for Nintendo DS, DSi.",
+   "developer": "rafaelvcaetano",
+   "source": "https://github.com/rafaelvcaetano/melonds-android",
+   "license": "GPL-3.0",
+   "package": "me.magnum.melonds",
+   "released": "2026-05-06",
+   "version": "2.0.1 GH",
+   "recommended_by": [
+    "rgc-guide",
+    "retrohandhelds-rotate",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "obtainium",
+    "mainstream-seed",
+    "retrohandhelds-rotate",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/rafaelvcaetano/melonDS-android/releases/download/2.0.1/app-gitHub-prod-release.apk",
+    "file": "app-gitHub-prod-release.apk",
+    "tag": "2.0.1",
+    "size": 21061910,
+    "sha256": "646eb4564c71b0817ace6474e92c169da16630d58826c43e0fe648896311ec94",
+    "version_code": 40,
+    "version_name": "2.0.1 GH",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86_64"
+    ],
+    "signers": [
+     "0493bb8749289f0304cc868489dd68b930c19ccc4dce2da876bfe6b9bdbabebc"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "nethersx2-classic",
+   "name": "NetherSX2 (patched AetherSX2)",
+   "group": "emulators",
+   "tags": [
+    "aethersx2"
+   ],
+   "description": "Emulator for PlayStation 2.",
+   "developer": "trixarian",
+   "source": "https://github.com/trixarian/nethersx2-patch",
+   "license": "Unlicense",
+   "package": "xyz.aethersx2.android",
+   "released": "2025-12-25",
+   "version": "v2.2n-4248",
+   "recommended_by": [
+    "rgc-guide",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)",
+    "recommended in the Retro Game Corps Android emulation guide"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "legal/licence review",
+    "device testing"
+   ],
+   "external": {
+    "label": "Project page",
+    "url": "https://github.com/trixarian/nethersx2-patch",
+    "reason": "A patched build of the closed-source, abandoned AetherSX2: the right to redistribute the APK is unclear, so RetroHatch only links to the project.",
+    "price": null
+   }
+  },
+  {
+   "id": "pizza-boy-gba-gbc",
+   "name": "Pizza Boy GBA / GBC",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for Game Boy Advance, Game Boy Color.",
+   "developer": "unknown",
+   "source": "https://play.google.com/store/apps/details?id=it.dbtecno.pizzaboypro",
+   "license": "proprietary",
+   "package": "it.dbtecno.pizzaboypro",
+   "released": "",
+   "version": "",
+   "recommended_by": [
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)"
+   ],
+   "min_sdk": null,
+   "abis": null,
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Google Play",
+    "url": "https://play.google.com/store/apps/details?id=it.dbtecno.pizzaboypro",
+    "reason": "Closed source. The developer's website did not resolve when checked.",
+    "price": "free (ads) / Pro paid"
+   },
+   "needs": [
+    "direct APK source",
+    "device testing"
+   ]
+  },
+  {
+   "id": "ppsspp",
+   "name": "PPSSPP",
+   "group": "emulators",
+   "tags": [
+    "emulator"
+   ],
+   "description": "Emulator for PlayStation Portable.",
+   "developer": "Henrik Rydgård",
+   "source": "https://github.com/hrydgard/ppsspp",
+   "license": "GPL-2.0-or-later",
+   "package": "org.ppsspp.ppsspp",
+   "released": "2025-07-24",
+   "version": "1.19.3",
+   "recommended_by": [
+    "rgc-guide",
+    "retrohandhelds-rotate",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "fdroid",
+    "obtainium",
+    "rgc-guide",
+    "mainstream-seed",
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 9,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "store-link-only-until-verified"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/org.ppsspp.ppsspp/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "retroarch",
+   "name": "RetroArch",
+   "group": "emulators",
+   "tags": [
+    "emulator",
+    "libretro"
+   ],
+   "description": "Emulator for multi-system (libretro cores).",
+   "developer": "libretro",
+   "source": "https://github.com/libretro/retroarch",
+   "license": "GPL-3.0-only",
+   "package": "com.retroarch",
+   "released": "2025-11-22",
+   "version": "1.22.2",
+   "recommended_by": [
+    "mainstream-seed"
+   ],
+   "sources": [
+    "fdroid",
+    "obtainium",
+    "mainstream-seed"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 16,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.retroarch/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "snes9x-ex",
+   "name": "Snes9x EX+",
+   "group": "emulators",
+   "tags": [
+    "emuex"
+   ],
+   "description": "Emulator for Super Nintendo.",
+   "developer": "rakashazi",
+   "source": "https://github.com/rakashazi/emu-ex-plus-alpha",
+   "license": "GPL-3.0",
+   "package": "com.explusalpha.Snes9xPlus",
+   "released": "2023-01-17",
+   "version": "Pre-release",
+   "recommended_by": [
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)"
+   ],
+   "min_sdk": null,
+   "abis": null,
+   "needs_game_files": "yes",
+   "flags": [
+    "official ZIP of APKs on a pre-release; APK not extracted",
+    "manifest not read",
+    "manifest not readable"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://www.explusalpha.com/",
+    "reason": "Download or compatibility details are incomplete.",
+    "price": "free (EmuEx apps are also sold on Google Play)"
+   },
+   "needs": [
+    "direct APK source",
+    "device testing"
+   ]
+  },
+  {
+   "id": "usp-zx-spectrum-emulator",
+   "name": "USP - ZX Spectrum Emulator",
+   "group": "emulators",
+   "tags": [
+    "emulator"
+   ],
+   "description": "﻿Unreal Speccy Portable - ZX Spectrum Emulator",
+   "developer": "SMT, Dexus, Alone Coder, deathsoft, djdron, scor",
+   "source": "https://bitbucket.org/djdron/unrealspeccyp",
+   "license": "GPL-3.0-or-later",
+   "package": "app.usp",
+   "released": "2026-08-03",
+   "version": "0.0.86.29",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/app.usp/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "vita3k",
+   "name": "Vita3K",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for PlayStation Vita.",
+   "developer": "vita3k",
+   "source": "https://github.com/vita3k/vita3k",
+   "license": "GPL-2.0",
+   "package": "org.vita3k.emulator",
+   "released": "2026-11-09",
+   "version": "continuous",
+   "recommended_by": [
+    "rgc-guide",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "obtainium",
+    "mainstream-seed",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "category Emulator and it plays games/console software",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 28,
+   "abis": [
+    "arm64-v8a",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://vita3k.org/",
+    "reason": "Rolling or pre-release build: not pinned to a stable release.",
+    "price": null
+   },
+   "needs": [
+    "direct APK source",
+    "device testing"
+   ]
+  },
+  {
+   "id": "winlator",
+   "name": "Winlator",
+   "group": "emulators",
+   "tags": [],
+   "description": "Emulator for Windows x86 games (Wine + Box64).",
+   "developer": "brunodev85",
+   "source": "https://github.com/brunodev85/winlator",
+   "license": "LGPL-2.1",
+   "package": "com.winlator",
+   "released": "2026-08-19",
+   "version": "11.2",
+   "recommended_by": [
+    "rgc-guide",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)",
+    "recommended in the Retro Game Corps Android emulation guide"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/brunodev85/winlator/releases/download/v11.2.0/Winlator_11.2.apk",
+    "file": "Winlator_11.2.apk",
+    "tag": "v11.2.0",
+    "size": 157549075,
+    "sha256": "ea5c81bf0e5b90a6b9ccb8007121ab6738c8646a5a60b341ce0ac2b33f1d100a",
+    "version_code": 33,
+    "version_name": "11.2",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "e576bf5035e4bba4efb2c5099f9d74a95cc3abe8e3b6b0c72219cc07eac8c8fb"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "alex-vs-bus-the-race",
+   "name": "Alex vs Bus: The Race",
+   "group": "games",
+   "tags": [],
+   "description": "A platform runner game in which Alex needs to catch the bus on time",
+   "developer": "M374LX",
+   "source": "https://github.com/m374lx/alexvsbus",
+   "license": "GPL-3.0-or-later",
+   "package": "com.github.m374lx.alexvsbus",
+   "released": "2025-06-22",
+   "version": "2025.06.16.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "mentions gamepad / controller / D-pad / keyboard control",
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 16,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/m374lx/alexvsbus/releases/download/2025.06.16.0/alexvsbus-android-2025.06.16.0.apk",
+    "file": "alexvsbus-android-2025.06.16.0.apk",
+    "tag": "2025.06.16.0",
+    "size": 2104856,
+    "sha256": "ecec13afdae16e9f7c362673c74c2915839a95b48adc8c74e77fb8fb2d709e89",
+    "version_code": 5,
+    "version_name": "2025.06.16.0",
+    "min_sdk": 16,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "5c5c72ff0f5ff713f434dc3bf386574cc05a158bf686f81f9fa982d35778d2d3"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "andor-s-trail",
+   "name": "Andor's Trail",
+   "group": "games",
+   "tags": [],
+   "description": "Quest-driven RPG",
+   "developer": "Andor's Trail Project Team",
+   "source": "https://github.com/andorstrailrelease/andors-trail",
+   "license": "GPL-2.0-only",
+   "package": "com.gpl.rpg.AndorsTrail",
+   "released": "2026-09-15",
+   "version": "0.8.18",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 21,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/andorstrailrelease/andors-trail/releases/download/v0.8.18/AndorsTrail_v0.8.18.apk",
+    "file": "AndorsTrail_v0.8.18.apk",
+    "tag": "v0.8.18",
+    "size": 39287819,
+    "sha256": "22e0b8523958b9f20f14df8d05306aba354d859a7305016a5448abd43c21b830",
+    "version_code": 89,
+    "version_name": "0.8.18",
+    "min_sdk": 21,
+    "abis": [],
+    "signers": [
+     "35125157cf7929b43b9c05e54837c83b45d3ca3742c8b5f40c302fd5f5abfe5f"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "astro-strike",
+   "name": "Astro Strike",
+   "group": "games",
+   "tags": [],
+   "description": "Twin-stick space combat in 2D and 3D with wraparound arenas",
+   "developer": "DerpBiscuit",
+   "source": "https://gitlab.com/DerpBiscuit/astro-strike",
+   "license": "CC0-1.0",
+   "package": "com.astrostrike.game",
+   "released": "2026-10-22",
+   "version": "1.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.astrostrike.game/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "blockstv",
+   "name": "BlocksTV",
+   "group": "games",
+   "tags": [],
+   "description": "Neon falling-block puzzle for Android TV, remotes and gamepads",
+   "developer": "Alex Cantini",
+   "source": "https://github.com/22pumba22/blockstv",
+   "license": "MIT",
+   "package": "com.alexcantini.blockstv",
+   "released": "2026-11-09",
+   "version": "0.9.2",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "mentions gamepad / controller / D-pad / keyboard control"
+   ],
+   "min_sdk": 23,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.alexcantini.blockstv/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "bluke",
+   "name": "Bluke",
+   "group": "games",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "Use your phone as a Bluetooth keyboard, gamepad, trackpad, and media remote",
+   "developer": "arnv.dev",
+   "source": "https://github.com/arnav-kr/bluke",
+   "license": "AGPL-3.0-or-later",
+   "package": "dev.arnv.bluke",
+   "released": "2026-10-12",
+   "version": "1.1.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "mentions gamepad / controller / D-pad / keyboard control"
+   ],
+   "min_sdk": 28,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/arnav-kr/bluke/releases/download/v1.1.0/bluke-1.1.0.apk",
+    "file": "bluke-1.1.0.apk",
+    "tag": "v1.1.0",
+    "size": 4222864,
+    "sha256": "8c34f683315c7ccacdc5f3cf78bf6e8d7b8546bfb83f7275d112dd8ae58b5487",
+    "version_code": 10,
+    "version_name": "1.1.0",
+    "min_sdk": 28,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "6e5caec57e14accf1eb3271d43571d5e2ce9bdeed5de6924d7aa1cc1ded4dbdc"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "braincup-brain-training",
+   "name": "Braincup - Brain Training",
+   "group": "games",
+   "tags": [],
+   "description": "Train your focus, memory and math skills.",
+   "developer": "Simon Schubert",
+   "source": "https://github.com/simonschubert/braincup",
+   "license": "Apache-2.0",
+   "package": "com.inspiredandroid.braincup",
+   "released": "2026-10-12",
+   "version": "3.8.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/simonschubert/braincup/releases/download/v3.8.1/Braincup-3.8.1-android.apk",
+    "file": "Braincup-3.8.1-android.apk",
+    "tag": "v3.8.1",
+    "size": 11879896,
+    "sha256": "5c0c41776ea52f2db3c73afecc65c982fccde8481c2c88df32a80c78ec8ce9d2",
+    "version_code": 163,
+    "version_name": "3.8.1",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "51db6caa954a13512f74405a631d7c51f4bfad7d81071a2d9fb2c8904951d989"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "cascada",
+   "name": "Cascada",
+   "group": "games",
+   "tags": [],
+   "description": "Casual logic game with marbles for two players",
+   "developer": "Miguel Páez",
+   "source": "https://gitlab.com/miguelython/cascada",
+   "license": "GPL-3.0-only",
+   "package": "com.game.Cascada",
+   "released": "2025-02-23",
+   "version": "1.0.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.game.Cascada/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "doors-of-doom",
+   "name": "Doors of Doom",
+   "group": "games",
+   "tags": [],
+   "description": "Adventure into the dungeon of infinite doors! Behind each, a monster awaits!",
+   "developer": "msx80",
+   "source": "https://github.com/msx80/doorsofdoomomicron",
+   "license": "Apache-2.0",
+   "package": "com.github.msx80.doorsofdoom",
+   "released": "2026-08-21",
+   "version": "0.0.10",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/msx80/doorsofdoomomicron/releases/download/v0.0.10/doorsofdoom.apk",
+    "file": "doorsofdoom.apk",
+    "tag": "v0.0.10",
+    "size": 8639692,
+    "sha256": "be10aaf3224e10305e650ffab94c003cb43290ba3578b2be5c10a6622926ef93",
+    "version_code": 10,
+    "version_name": "0.0.10",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a"
+    ],
+    "signers": [
+     "a297b15de94d3d5459c1be74bf088020ffd26a5af7ecce0e964bb1a85d976ba6"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "fabularium",
+   "name": "Fabularium",
+   "group": "games",
+   "tags": [
+    "reading"
+   ],
+   "description": "Create and play interactive fiction",
+   "developer": "Tim Cadogan-Cowper",
+   "source": "https://github.com/davidar/fabularium",
+   "license": "GPL-2.0-or-later",
+   "package": "io.davidar.fabularium",
+   "released": "2025-01-13",
+   "version": "1.5.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "mentions gamepad / controller / D-pad / keyboard control",
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 16,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/io.davidar.fabularium/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "fairy-mahjong",
+   "name": "Fairy Mahjong",
+   "group": "games",
+   "tags": [],
+   "description": "Clear a layered garden board with a four-slot matching hand",
+   "developer": "FairyTrick",
+   "source": "https://github.com/fairytrick/fairymahjong",
+   "license": "Apache-2.0",
+   "package": "com.fairytrick.fairymahjong",
+   "released": "2026-09-22",
+   "version": "0.1.4",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 26,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/fairytrick/fairymahjong/releases/download/v0.1.4/FairyMahjong-0.1.4.apk",
+    "file": "FairyMahjong-0.1.4.apk",
+    "tag": "v0.1.4",
+    "size": 73009950,
+    "sha256": "88a4cbbea3e365c1d2a931c88e915d5e69b6b0ac45e742e0e1cb18e371f6bc2d",
+    "version_code": 5,
+    "version_name": "0.1.4",
+    "min_sdk": 26,
+    "abis": [],
+    "signers": [
+     "6e1d8030328c0ba9181da71709bc9d8fb37ffbb9c798c7a4dfe1994d8633321a"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "finalrozgamenew",
+   "name": "FinalRozGameNew",
+   "group": "games",
+   "tags": [],
+   "description": "A pixel art 2D speedrun platformer featuring 17 levels and isometric mechanics.",
+   "developer": "rozworld",
+   "source": "https://rozworld.itch.io",
+   "license": "MIT",
+   "package": "org.codeberg.rozworld.finalrozgamenew",
+   "released": "2026-03-15",
+   "version": "1.0.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "mentions gamepad / controller / D-pad / keyboard control",
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/org.codeberg.rozworld.finalrozgamenew/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "futoshiki",
+   "name": "Futoshiki",
+   "group": "games",
+   "tags": [],
+   "description": "A clean, modern Futoshiki logic puzzle game",
+   "developer": "Sayan",
+   "source": "https://github.com/samgrande/simple-futoshiki",
+   "license": "Apache-2.0",
+   "package": "com.hexcorp.futoshiki",
+   "released": "2026-08-10",
+   "version": "1.4",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/samgrande/simple-futoshiki/releases/download/v1.4/Futoshiki-release.apk",
+    "file": "Futoshiki-release.apk",
+    "tag": "v1.4",
+    "size": 10682048,
+    "sha256": "2e2b83058ca9f65b8ae6b5395404318b0085360a073c7b6c548f8b5b661a12ec",
+    "version_code": 5,
+    "version_name": "1.4",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "f67ce912eea1ae24d6b79309a6570860970b96a8592d52e070f331dd6d292566"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "i-keep-having-this-dream",
+   "name": "I Keep Having This Dream",
+   "group": "games",
+   "tags": [],
+   "description": "Build a path of tiles to escape each cycle of a dangerous recurring dream",
+   "developer": "Fuzion",
+   "source": "https://github.com/fuzioncd/dream-game-android",
+   "license": "GPL-3.0-or-later",
+   "package": "com.fireflame.dream",
+   "released": "2026-11-09",
+   "version": "1.0.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/fuzioncd/dream-game-android/releases/download/1.0.0/dream_1.0.0.apk",
+    "file": "dream_1.0.0.apk",
+    "tag": "1.0.0",
+    "size": 70242555,
+    "sha256": "6838a61f8e924cfb084492b1c82f0f76698aa0eb8d9d74b808d2c777c83ee47d",
+    "version_code": 1,
+    "version_name": "1.0.0",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "02a8aad4792bb15b78bdeee639475e96bcef0594d900b8d68811c9cbde36f10e"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "infra-arcana",
+   "name": "Infra Arcana",
+   "group": "games",
+   "tags": [],
+   "description": "Infra Arcana - a Lovecraftian horror roguelike",
+   "developer": "Werewolf Camp",
+   "source": "https://github.com/tyrannotorus/cpp-infra-arcana-android",
+   "license": "AGPL-3.0-or-later",
+   "package": "camp.werewolf.infraarcana",
+   "released": "2026-09-15",
+   "version": "23.0.0.9",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/tyrannotorus/cpp-infra-arcana-android/releases/download/v23.0.0.9/infra-arcana-v23.0.0.9.apk",
+    "file": "infra-arcana-v23.0.0.9.apk",
+    "tag": "v23.0.0.9",
+    "size": 61229872,
+    "sha256": "cb3e90b0acaae5ac14a4ae05bd05a09aeed2e264fcdd2f37111b627a3eef1c4a",
+    "version_code": 23000009,
+    "version_name": "23.0.0.9",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86_64"
+    ],
+    "signers": [
+     "5d79afbc171dd61dfbd60ddb2a4d6b58b154692a35d41e0fedaf01c7d4e4762d"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "king-pong",
+   "name": "King Pong",
+   "group": "games",
+   "tags": [],
+   "description": "Retro Pong campaign with multiplayer and a secret ending",
+   "developer": "King Alex Gilbert",
+   "source": "https://github.com/kingalexgilbert/king-pong",
+   "license": "GPL-3.0-only",
+   "package": "com.kingalex.kingpong",
+   "released": "2026-11-04",
+   "version": "2.0.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "mentions gamepad / controller / D-pad / keyboard control",
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 24,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/kingalexgilbert/king-pong/releases/download/v2.0.0/King-Pong-v2.0.0.apk",
+    "file": "King-Pong-v2.0.0.apk",
+    "tag": "v2.0.0",
+    "size": 619978,
+    "sha256": "826241f96eead099da3d901423e6d23f2dcf60155a703bef2dcf1661dbca27f9",
+    "version_code": 8,
+    "version_name": "2.0.0",
+    "min_sdk": 24,
+    "abis": [],
+    "signers": [
+     "0487071f91473ce70661bd38c315ca537b10b5249c39e84fe7ac310efed89faf"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "mill",
+   "name": "Mill",
+   "group": "games",
+   "tags": [],
+   "description": "A Mill Game which supports many rule variants, written in Flutter",
+   "developer": "Calcitem Studio and Sanmill Developers",
+   "source": "https://github.com/calcitem/sanmill",
+   "license": "GPL-3.0-only",
+   "package": "com.calcitem.sanmill",
+   "released": "2026-06-20",
+   "version": "7.4.6",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.calcitem.sanmill/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "pixel-wheels",
+   "name": "Pixel Wheels",
+   "group": "games",
+   "tags": [],
+   "description": "A top-down retro racing game",
+   "developer": "Aurélien Gâteau",
+   "source": "https://github.com/agateau/pixelwheels",
+   "license": "GPL-3.0-or-later",
+   "package": "com.agateau.tinywheels.android",
+   "released": "2025-12-22",
+   "version": "1.0.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 19,
+   "abis": [
+    "arm64-v8a",
+    "armeabi",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/agateau/pixelwheels/releases/download/1.0.1/pixelwheels-itchio-1.0.1.apk",
+    "file": "pixelwheels-itchio-1.0.1.apk",
+    "tag": "1.0.1",
+    "size": 29444553,
+    "sha256": "78fe17b60412358cb3b0b9e0052df3c9a8e2b42359bdca6d56a05982eb5a9a12",
+    "version_code": 33,
+    "version_name": "1.0.1",
+    "min_sdk": 19,
+    "abis": [
+     "arm64-v8a",
+     "armeabi",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "8a8ff484fdd780b3fbdb14183a5373dbe11b026edd3e6fec297e5f10aa3f32f1"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "square-chess",
+   "name": "Square Chess",
+   "group": "games",
+   "tags": [],
+   "description": "Chess built for square screens, compact devices, e-ink and physical keyboards.",
+   "developer": "Christopher Ottesen",
+   "source": "https://github.com/chriotte/square-chess",
+   "license": "GPL-3.0-or-later",
+   "package": "com.dataespresso.squarechess",
+   "released": "2026-11-09",
+   "version": "1.5.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "mentions gamepad / controller / D-pad / keyboard control"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/chriotte/square-chess/releases/download/v1.5.0/Square-Chess-v1.5.0.apk",
+    "file": "Square-Chess-v1.5.0.apk",
+    "tag": "v1.5.0",
+    "size": 5615541,
+    "sha256": "8bfb71b80315ae2877cff7fbb939e86e352caf0727c6bee55353ff93e108eb3a",
+    "version_code": 15,
+    "version_name": "1.5.0",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a"
+    ],
+    "signers": [
+     "e6302c95f0da65d8f27c80c82d4b82c979af75bbc1ea383547cd079ec178cf44"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "sudoku-you",
+   "name": "Sudoku You",
+   "group": "games",
+   "tags": [],
+   "description": "Offline Sudoku with logical hints, advanced notes and flexible import/export",
+   "developer": "Galaxy-rio",
+   "source": "https://github.com/galaxy-rio/sudokuyou",
+   "license": "GPL-3.0-or-later",
+   "package": "com.galaxyrio.sudokusolver",
+   "released": "2026-10-22",
+   "version": "3.0.2",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 30,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/galaxy-rio/sudokuyou/releases/download/v3.0.2/SudokuYou_3.0.2.apk",
+    "file": "SudokuYou_3.0.2.apk",
+    "tag": "v3.0.2",
+    "size": 4685050,
+    "sha256": "817486b0a4f6ecc32e1b9bd1ece793c8da7dc7bbd5b88441bded9eb458739ead",
+    "version_code": 10,
+    "version_name": "3.0.2",
+    "min_sdk": 30,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "2afeef946b759ec1ed620c9b98166a0dc0d2589a6ddc398cef0d745e04bbddaf"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "turns-of-war",
+   "name": "Turns of War",
+   "group": "games",
+   "tags": [],
+   "description": "A pixelart styled turn based strategy game",
+   "developer": "msx80",
+   "source": "https://github.com/msx80/turnsofwar",
+   "license": "Apache-2.0",
+   "package": "com.github.msx80.turnsofwar",
+   "released": "2026-05-27",
+   "version": "0.0.3",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "retro / arcade / classic game style"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/msx80/turnsofwar/releases/download/v0.0.3/turnsofwar.apk",
+    "file": "turnsofwar.apk",
+    "tag": "v0.0.3",
+    "size": 9491032,
+    "sha256": "60b6038422117f994a0ea60389ea0673025de0d5e37c2f6022da554a655e2d50",
+    "version_code": 3,
+    "version_name": "0.0.3",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a"
+    ],
+    "signers": [
+     "a297b15de94d3d5459c1be74bf088020ffd26a5af7ecce0e964bb1a85d976ba6"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "bilimiao",
+   "name": "bilimiao",
+   "group": "media",
+   "tags": [
+    "internet",
+    "multimedia"
+   ],
+   "description": "Original Bilibili Time Machine",
+   "developer": "10喵喵",
+   "source": "https://github.com/10miaomiao/bilimiao2",
+   "license": "GPL-3.0-only",
+   "package": "com.a10miaomiao.bilimiao",
+   "released": "2025-11-17",
+   "version": "2.5.2.2",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/10miaomiao/bilimiao2/releases/download/2.5.2.2/bilimiao-github-2.5.2.2.apk",
+    "file": "bilimiao-github-2.5.2.2.apk",
+    "tag": "2.5.2.2",
+    "size": 16879564,
+    "sha256": "05d79a75d4f6ed2f9aba63ed77f0689fa64e4bf74ed3a53d242ed8b8d2bec44d",
+    "version_code": 122,
+    "version_name": "2.5.2.2",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "d30ba38d50a8d2dc9a0ab2c5a6df8409163cc479d300cc64ba0e3857f0ab0ddf"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "castlab",
+   "name": "CastLab",
+   "group": "media",
+   "tags": [
+    "cast",
+    "gallery"
+   ],
+   "description": "Cast your media to DLNA/UPnP and FCast devices",
+   "developer": "Thomas",
+   "source": "https://fedilab.app/",
+   "license": "GPL-3.0-only",
+   "package": "app.fedilab.castlab",
+   "released": "2026-10-27",
+   "version": "1.7.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Local Media Player)"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/app.fedilab.castlab/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "classipod",
+   "name": "ClassiPod",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "🎵 iPod Classic player for local music and Subsonic/Navidrome streaming",
+   "developer": "Aditya R",
+   "source": "https://github.com/adeeteya/classipod",
+   "license": "BSD-4-Clause",
+   "package": "com.adeeteya.classipod",
+   "released": "2026-10-08",
+   "version": "2.1.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Local Media Player)"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/adeeteya/classipod/releases/download/2.1.0/Classipod-Android.apk",
+    "file": "Classipod-Android.apk",
+    "tag": "2.1.0",
+    "size": 69335518,
+    "sha256": "adaa79a5e607b96c0940bec9bbd4df91df2532d3505c58aea8631ca06e07bb26",
+    "version_code": 28,
+    "version_name": "2.1.0",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86_64"
+    ],
+    "signers": [
+     "f1050844ee6557cce25cc500229dcff2cea18dc140c8a0abdd8e5a894c96abbb"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "felicity-music-player-trial",
+   "name": "Felicity Music Player (Trial)",
+   "group": "media",
+   "tags": [],
+   "description": "Advance audiophile grade offline music player.",
+   "developer": "Hamza Rizwan",
+   "source": "https://github.com/hamza417/felicity",
+   "license": "AGPL-3.0-only",
+   "package": "app.simple.felicity",
+   "released": "2026-11-06",
+   "version": "0.0.33_alpha",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Local Media Player)"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/hamza417/felicity/releases/download/0.0.33_alpha/felicity-foss-arm64-v8a.apk",
+    "file": "felicity-foss-arm64-v8a.apk",
+    "tag": "0.0.33_alpha",
+    "size": 25279572,
+    "sha256": "fc290f86169b4cf0b9c60dc3f2c39b3cde01f499d3a8b660650475ddabed2581",
+    "version_code": 33,
+    "version_name": "0.0.33_alpha",
+    "min_sdk": 29,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "6e8ac882f40074a513ac14042425c31eb9c31cf253fc53e640fd06ec904469d9"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "findroid",
+   "name": "Findroid",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "Third-party native Jellyfin app",
+   "developer": "Jarne Demeulemeester",
+   "source": "https://github.com/jarnedemeulemeester/findroid",
+   "license": "GPL-3.0-only",
+   "package": "dev.jdtech.jellyfin",
+   "released": "2026-07-20",
+   "version": "1.2.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "game or media streaming client"
+   ],
+   "min_sdk": 28,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/jarnedemeulemeester/findroid/releases/download/v1.2.0/findroid-v1.2.0-libre-arm64-v8a.apk",
+    "file": "findroid-v1.2.0-libre-arm64-v8a.apk",
+    "tag": "v1.2.0",
+    "size": 38492766,
+    "sha256": "fd363d514ab7717029c7503623eff2cb0eb9ee69c9038f3d1a8b198ccb8b7342",
+    "version_code": 34,
+    "version_name": "1.2.0",
+    "min_sdk": 29,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "ecc12086dbddb5faa3e1b650d161fb623f5f24188992c1173339cd5a8b2f8689"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "gallery",
+   "name": "Gallery",
+   "group": "media",
+   "tags": [
+    "gallery"
+   ],
+   "description": "A private photo and video gallery with no ads, a basic photo editor and a recycle bin.",
+   "developer": "FossifyOrg",
+   "source": "https://github.com/FossifyOrg/Gallery",
+   "license": "GPL-3.0",
+   "package": "org.fossify.gallery",
+   "released": "2026-11-07",
+   "version": "1.14.2",
+   "recommended_by": [],
+   "sources": [
+    "inventory"
+   ],
+   "reasons": [
+    "one of the eight apps with hand-written descriptions"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/FossifyOrg/Gallery/releases/download/1.14.2/gallery-42-foss-arm64-v8a-release.apk",
+    "file": "gallery-42-foss-arm64-v8a-release.apk",
+    "tag": "1.14.2",
+    "size": 17483618,
+    "sha256": "dd1d87612745c17c469559e56043c7838a701035d33783999ee9bd2441fe92ee",
+    "version_code": 42,
+    "version_name": "1.14.2",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "affdb124d3f4720c2f98dbca9eacba0514fba4306e20a2786c861c3c0d6ff292"
+    ],
+    "sha256_inspected": "2026-11-09 (candidates/inventory-rg-rotate.json)"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "jellyfin",
+   "name": "Jellyfin",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "Mobile client for Jellyfin, the free software media system",
+   "developer": "Jellyfin",
+   "source": "https://github.com/jellyfin/jellyfin-android",
+   "license": "GPL-2.0-or-later",
+   "package": "org.jellyfin.mobile",
+   "released": "2026-09-16",
+   "version": "2.7.3",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy",
+    "obtainium"
+   ],
+   "reasons": [
+    "game or media streaming client",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/jellyfin/jellyfin-android/releases/download/v2.7.3/jellyfin-android-v2.7.3-libre-release.apk",
+    "file": "jellyfin-android-v2.7.3-libre-release.apk",
+    "tag": "v2.7.3",
+    "size": 8964986,
+    "sha256": "f9f4b3ab46cc9434df811194c2d4351417f4db83a4c1a0facd0a662d69533f7f",
+    "version_code": 2070399,
+    "version_name": "2.7.3",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "d881796ed2a67ff6ef9f676828723c6b1fa18e09388962cba4abc4a594a69131"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "jellyfin-for-android-tv",
+   "name": "Jellyfin for Android TV",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "Television client for Jellyfin, the free software media system",
+   "developer": "Jellyfin",
+   "source": "https://github.com/jellyfin/jellyfin-androidtv",
+   "license": "GPL-2.0-or-later",
+   "package": "org.jellyfin.androidtv",
+   "released": "2026-08-19",
+   "version": "0.19.10",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "obtainium"
+   ],
+   "reasons": [
+    "game or media streaming client",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/jellyfin/jellyfin-androidtv/releases/download/v0.19.10/jellyfin-androidtv-v0.19.10-release.apk",
+    "file": "jellyfin-androidtv-v0.19.10-release.apk",
+    "tag": "v0.19.10",
+    "size": 21950619,
+    "sha256": "8510a517c99927076082917f41bf306dd7a2546c59d492dd11bde18d6e2e4628",
+    "version_code": 191099,
+    "version_name": "0.19.10",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "d881796ed2a67ff6ef9f676828723c6b1fa18e09388962cba4abc4a594a69131"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "newpipe",
+   "name": "NewPipe",
+   "group": "media",
+   "tags": [
+    "internet",
+    "multimedia"
+   ],
+   "description": "Lightweight YouTube frontend",
+   "developer": "Team NewPipe",
+   "source": "https://github.com/teamnewpipe/newpipe",
+   "license": "GPL-3.0-or-later",
+   "package": "org.schabi.newpipe",
+   "released": "2026-08-21",
+   "version": "0.29.2",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/teamnewpipe/newpipe/releases/download/v0.29.2/NewPipe_v0.29.2.apk",
+    "file": "NewPipe_v0.29.2.apk",
+    "tag": "v0.29.2",
+    "size": 16980865,
+    "sha256": "318bd6a51f216027ba340f2934e59fa9c0d078d0f2f526a4af84354aee60651f",
+    "version_code": 1016,
+    "version_name": "0.29.2",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "cb84069bd68116bafae5ee4ee5b08a567aa6d898404e7cb12f9e756df5cf5cab"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "nicotind",
+   "name": "NicotinD",
+   "group": "media",
+   "tags": [],
+   "description": "Stream and organise your own self-hosted music library",
+   "developer": "Kevin Roberts",
+   "source": "https://github.com/kevinch3/nicotind",
+   "license": "AGPL-3.0-only",
+   "package": "ar.kevinroberts.nicotind",
+   "released": "2026-11-09",
+   "version": "0.8.126",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 26,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/kevinch3/nicotind/releases/download/v0.8.126/NicotinD-0.8.126.apk",
+    "file": "NicotinD-0.8.126.apk",
+    "tag": "v0.8.126",
+    "size": 2382555,
+    "sha256": "814ba34cb3d6feadf948ddb31a6dddb10f7e772e1f465dc0f5e14c7a2fc2f016",
+    "version_code": 8126,
+    "version_name": "0.8.126",
+    "min_sdk": 26,
+    "abis": [],
+    "signers": [
+     "5bf701a0ff9a2cd75f279404d2c8b4bf16ed2bb8591709ae2c8560bc557d6bea"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "omegaplayer",
+   "name": "OmegaPlayer",
+   "group": "media",
+   "tags": [],
+   "description": "Better and easier video playback\nMusic player\nPrivate Vault with biometric",
+   "developer": "arslandaim",
+   "source": "https://github.com/arslandaim-hub/omegaplayer",
+   "license": "GPL-3.0-or-later",
+   "package": "com.arslandaim.omegaplayer",
+   "released": "2026-09-16",
+   "version": "1.2.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Local Media Player)"
+   ],
+   "min_sdk": 25,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/arslandaim-hub/omegaplayer/releases/download/v1.2.1/app-release.apk",
+    "file": "app-release.apk",
+    "tag": "v1.2.1",
+    "size": 5111308,
+    "sha256": "06dcebd8f50329c98346cef0d902f8fc9ac9bba3c7e93df1879e60a7ffe18dd4",
+    "version_code": 6,
+    "version_name": "1.2.1",
+    "min_sdk": 25,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "ed164b0223d03b18eb98a7e73dc3c9ef32e8c405aa4564af8902f6772ec7b747"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "opentune",
+   "name": "OpenTune",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "A YouTube Music client with Material Design 3, for Android",
+   "developer": "Arturo254",
+   "source": "https://github.com/arturo254/opentune",
+   "license": "GPL-3.0-or-later",
+   "package": "com.Arturo254.opentune",
+   "released": "2026-07-16",
+   "version": "3.0.5",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.Arturo254.opentune/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "pipepipe",
+   "name": "PipePipe",
+   "group": "media",
+   "tags": [
+    "internet",
+    "multimedia"
+   ],
+   "description": "A FLOSS Android app to let you browse YouTube, NicoNico and BiliBili freely.",
+   "developer": "NullPointerException",
+   "source": "https://github.com/infinityloop1308/pipepipe",
+   "license": "GPL-3.0-or-later",
+   "package": "InfinityLoop1309.NewPipeEnhanced",
+   "released": "2026-10-25",
+   "version": "5.5.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/infinityloop1308/pipepipe/releases/download/v5.5.0/PipePipe_5.5.0-arm64-v8a-release.apk",
+    "file": "PipePipe_5.5.0-arm64-v8a-release.apk",
+    "tag": "v5.5.0",
+    "size": 32604824,
+    "sha256": "dfac608d4802b461252550a0485f779a12fd198f18dce77afa90cd441568f06f",
+    "version_code": 111004,
+    "version_name": "5.5.0",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "dec73429ce2563275f5ed19825e44652b32b363a46f38bdff9ad6dcde4842d88"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "polaris",
+   "name": "Polaris",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "Music player for usage with a Polaris streaming server",
+   "developer": "Antoine Gersant",
+   "source": "https://github.com/agersant/polaris-android",
+   "license": "MIT",
+   "package": "agersant.polaris",
+   "released": "2026-07-03",
+   "version": "0.10.4",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/agersant/polaris-android/releases/download/0.10.4/polaris.apk",
+    "file": "polaris.apk",
+    "tag": "0.10.4",
+    "size": 56366555,
+    "sha256": "442365992a723e316b51f499fbc75f31d3257f97e81219c13f8c14043ed5a853",
+    "version_code": 415293156,
+    "version_name": "0.10.4",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86_64"
+    ],
+    "signers": [
+     "de606a1927d49ff81880bae99b39113c361fbf9828513f0b29219437fbc77928"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "retro-music",
+   "name": "Retro Music",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "Material You Design Music player for Android",
+   "developer": "Hemanth Savarala",
+   "source": "https://github.com/retromusicplayer/retromusicplayer",
+   "license": "GPL-3.0-only",
+   "package": "code.name.monkey.retromusic",
+   "released": "2026-08-16",
+   "version": "7.0.3",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Local Media Player)"
+   ],
+   "min_sdk": 24,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/retromusicplayer/retromusicplayer/releases/download/v7.0.3/app-normal-release.apk",
+    "file": "app-normal-release.apk",
+    "tag": "v7.0.3",
+    "size": 9634464,
+    "sha256": "6511da4da829ee2ab5a63da15859c7b06ffa5df3c42e57c6ab750f8e8dfd8eec",
+    "version_code": 10703,
+    "version_name": "7.0.3",
+    "min_sdk": 24,
+    "abis": [],
+    "signers": [
+     "873f9e49f6eede2924fcee29174dfbac89804d27415d1601191ae7c6e4ed364f"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "rhythm",
+   "name": "Rhythm",
+   "group": "media",
+   "tags": [],
+   "description": "Your Music, Your Rhythm - Privacy-first player with Material 3 design.",
+   "developer": "Anjishnu Nandi",
+   "source": "https://github.com/cromaguy/rhythm",
+   "license": "GPL-3.0-only",
+   "package": "chromahub.rhythm.app",
+   "released": "2026-10-15",
+   "version": "5.5.499.1302-gh",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Local Media Player)"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/cromaguy/rhythm/releases/download/v5.5.499.1302-stable/Rhythm-5.5.499.1302-githubRelease-arm64-v8a.apk",
+    "file": "Rhythm-5.5.499.1302-githubRelease-arm64-v8a.apk",
+    "tag": "v5.5.499.1302-stable",
+    "size": 23572778,
+    "sha256": "7cbace0e46e9b9b1afaec7fcf3c2b413e3a0517fd1faceb9c4634db7bf623ffd",
+    "version_code": 554991302,
+    "version_name": "5.5.499.1302-gh",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "cb9045124f6f7066c70f3b85c2bcfb75cc2293bb1b4ba1c3ec40e223a5cc6a35"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "smarttube-f-droid",
+   "name": "SmartTube F-Droid",
+   "group": "media",
+   "tags": [],
+   "description": "Browse media content with your own rules on Android TV",
+   "developer": "yuliskov",
+   "source": "https://github.com/yuliskov/smarttube",
+   "license": "MIT",
+   "package": "org.smarttube.stable",
+   "released": "2026-11-09",
+   "version": "32.71",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [
+    "index lists app.smarttube.fdroid; the project's own release is org.smarttube.stable"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "apk": {
+    "url": "https://github.com/yuliskov/smarttube/releases/download/32.71s/SmartTube_stable_32.71_arm64-v8a.apk",
+    "file": "SmartTube_stable_32.71_arm64-v8a.apk",
+    "tag": "32.71s",
+    "size": 26731385,
+    "sha256": "6a799a129015e772d231440f4e3ad919f643164a0fdeb76ecb202bf3afb3db52",
+    "version_code": 2461,
+    "version_name": "32.71",
+    "min_sdk": 17,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "109735aa24fe85e2e1623ebb3b1ecc4bf4263f4c6374e4411d646bfa2eda482a"
+    ],
+    "sha256_inspected": "2026-11-09"
+   }
+  },
+  {
+   "id": "spotube",
+   "name": "Spotube",
+   "group": "media",
+   "tags": [
+    "internet",
+    "multimedia"
+   ],
+   "description": "Lightweight & resource friendly music client",
+   "developer": "Kingkor Roy Tirtho",
+   "source": "https://github.com/krtirtho/spotube",
+   "license": "BSD-4-Clause",
+   "package": "org.spotube.spotube",
+   "released": "2026-06-09",
+   "version": "6.0.0-beta.0",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "fdroid",
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "media player (Online Media Player)",
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [
+    "index lists oss.krtirtho.spotube; the project's own release is org.spotube.spotube"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/org.spotube.spotube/",
+    "reason": "The latest release is a beta / rolling build, not a pinned stable release. x",
+    "price": null
+   }
+  },
+  {
+   "id": "umihi-music",
+   "name": "Umihi Music",
+   "group": "media",
+   "tags": [
+    "multimedia"
+   ],
+   "description": "A simple Material YouTube Music player",
+   "developer": "ilianoKokoro",
+   "source": "https://github.com/ilianokokoro/umihi-music",
+   "license": "GPL-3.0-only",
+   "package": "ca.ilianokokoro.umihi.music",
+   "released": "2026-10-27",
+   "version": "1.16.2-store",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "media player (Online Media Player)"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/ilianokokoro/umihi-music/releases/download/v1.16.2/UmihiMusic-store.apk",
+    "file": "UmihiMusic-store.apk",
+    "tag": "v1.16.2",
+    "size": 5441053,
+    "sha256": "c7d00d873b98d3609845bb4ffe159ad7fd0bcbf976cbc0799244f255a8dafade",
+    "version_code": 11620,
+    "version_name": "1.16.2-store",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "f1f83fa5ebf5a43ee0f4abc8d0add89d9434380ea4e7f296ffe84e1a6610c5bb"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "anarch-re",
+   "name": "Anarch RE",
+   "group": "ports",
+   "tags": [],
+   "description": "Public domain from-scratch suckless Doom clone",
+   "developer": "Marcin Serwin",
+   "source": "https://git.sr.ht/~marcin-serwin/anarch-re",
+   "license": "CC0-1.0",
+   "package": "dev.serwin.AnarchRE",
+   "released": "2026-05-04",
+   "version": "4",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/dev.serwin.AnarchRE/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "arx-libertatis",
+   "name": "Arx Libertatis",
+   "group": "ports",
+   "tags": [],
+   "description": "Android port of Arx Libertatis",
+   "developer": "sandstranger",
+   "source": "https://github.com/sandstranger/arxlibertatis-android-port",
+   "license": "GPL-3.0-only",
+   "package": "com.arxlibertatis",
+   "released": "2025-02-03",
+   "version": "1.3.5.3",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.arxlibertatis/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "crash-bandicoot-recompiled",
+   "name": "Crash Bandicoot Recompiled",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "ps1"
+   ],
+   "description": "Native Android recomp of Crash Bandicoot. You supply your own original game files.",
+   "developer": "Matteo842",
+   "source": "https://github.com/matteo842/crashbandicoot-launcher",
+   "license": "MIT",
+   "package": "io.github.matteo842.crashlauncher.runtime",
+   "released": "2026-11-09",
+   "version": "2.5",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of Crash Bandicoot"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/Matteo842/CrashBandicoot-Launcher/releases/download/2.5/CrashBandicoot-2.5.apk",
+    "file": "CrashBandicoot-2.5.apk",
+    "tag": "2.5",
+    "size": 74028247,
+    "sha256": "bfeb5ed4a9f6a590147521f2f1de61a94b2d9592f0b8755ddddb346e18cf83af",
+    "version_code": 20,
+    "version_name": "2.5",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "x86_64"
+    ],
+    "signers": [
+     "4879193db383c0dace44aabb71486a9a197d6475633ebda6cc9073cd53df79e6"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "d2r-mobile",
+   "name": "D2R Mobile",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "pc"
+   ],
+   "description": "Native Android recomp of Diablo II: Resurrected. You supply your own original game files.",
+   "developer": "jhaizhou-ops",
+   "source": "https://github.com/jhaizhou-ops/d2r-mobile",
+   "license": "MIT",
+   "package": "com.xiaoboluo.d2r",
+   "released": "2026-11-04",
+   "version": "2.3.0",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of Diablo II: Resurrected"
+   ],
+   "min_sdk": 31,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/jhaizhou-ops/d2r-mobile/releases/download/v2.3.0/D2RMobile-android.apk",
+    "file": "D2RMobile-android.apk",
+    "tag": "v2.3.0",
+    "size": 35287534,
+    "sha256": "90d2266614ff18a3b11fc0954906da682c3dc1b10f627c979b29a471a25ddcb9",
+    "version_code": 20300,
+    "version_name": "2.3.0",
+    "min_sdk": 31,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "e2cd5964c1d5f1de31a0e915b048e4e70174f6e6b06cceb2291d1391c54c9245"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "donkey-kong-64-recompiled",
+   "name": "Donkey Kong 64: Recompiled",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "n64"
+   ],
+   "description": "Native Android recomp of Donkey Kong 64. You supply your own original game files.",
+   "developer": "deivid22srk",
+   "source": "https://github.com/deivid22srk/dk64-recomp-android",
+   "license": "GPL-3.0",
+   "package": "com.deivid22srk.dk64recomp",
+   "released": "2026-09-05",
+   "version": "1.0.3-android",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of Donkey Kong 64"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/deivid22srk/dk64-recomp-android/releases/download/v1.0.3-android-r7/dk64recomp-android-v1.0.3-android-r7.apk",
+    "file": "dk64recomp-android-v1.0.3-android-r7.apk",
+    "tag": "v1.0.3-android-r7",
+    "size": 10488083,
+    "sha256": "041a9e3794e5593ebdd75a2ce28c577f376ffb2477dc0cf876175e4c8072755d",
+    "version_code": 4,
+    "version_name": "1.0.3-android",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "c62dee7e55ed7e95d0d422d94e78f89eb6649b4f1b337f79dbdc568b00d91428"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "earthbound-companion",
+   "name": "EarthBound Companion",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "snes"
+   ],
+   "description": "Native Android recomp of EarthBound. You supply your own original game files.",
+   "developer": "rages4calm",
+   "source": "https://github.com/rages4calm/earthbound-companion",
+   "license": "limited-scope",
+   "package": "org.earthbound.companion.preview",
+   "released": "2026-11-09",
+   "version": "0.5.0-ports-preview.30",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of EarthBound"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/rages4calm/earthbound-companion/releases/download/v0.5.0-ports-preview.30/EarthBound-Companion-android-arm64-preview.apk",
+    "file": "EarthBound-Companion-android-arm64-preview.apk",
+    "tag": "v0.5.0-ports-preview.30",
+    "size": 66629076,
+    "sha256": "a54b3cfa93fc4f1dae1aa9206a5fff464d8af6467f715579d42c8a402c5c9f4f",
+    "version_code": 30,
+    "version_name": "0.5.0-ports-preview.30",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "0ff1807701821ca658c4dd2cbc5b0a5e7c3158a95b6085ba00a6fce0b4cc40ee"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "eidos",
+   "name": "Eidos",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "ds"
+   ],
+   "description": "Native Android recomp of Pokémon Black & White. You supply your own original game files.",
+   "developer": "Project-Holon",
+   "source": "https://github.com/project-holon/eidos",
+   "license": "MIT",
+   "package": "org.projectholon.eidos",
+   "released": "2026-11-08",
+   "version": "0.2.4",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of Pokémon Black & White"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/Project-Holon/eidos/releases/download/v0.2.4/eidos-android.apk",
+    "file": "eidos-android.apk",
+    "tag": "v0.2.4",
+    "size": 69618760,
+    "sha256": "df1719c9ac0a848e341e7dcb3fb7e23a9ca4cfec52dc3417f5d0b9a50b47afe9",
+    "version_code": 204,
+    "version_name": "0.2.4",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "d4203f83b4c63639624dae1ab0038898c5e312ff9c7134c1cb47fdfb8883bf36"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "endless-sky",
+   "name": "Endless Sky",
+   "group": "ports",
+   "tags": [],
+   "description": "Android port of endless-sky space trading game.",
+   "developer": "thewierdnut",
+   "source": "https://github.com/thewierdnut/endless-mobile",
+   "license": "GPL-3.0-only",
+   "package": "com.github.thewierdnut.endless_mobile",
+   "released": "2026-11-04",
+   "version": "0.11.4-63",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.github.thewierdnut.endless_mobile/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "flare",
+   "name": "FLARE",
+   "group": "ports",
+   "tags": [],
+   "description": "An action RPG with gameplay alike to the games in the Diablo series",
+   "developer": "Clint Bellanger",
+   "source": "https://github.com/flareteam/flare-engine",
+   "license": "GPL-3.0-or-later",
+   "package": "org.flare.app",
+   "released": "2026-05-27",
+   "version": "1.15",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 16,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/org.flare.app/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "freecell4",
+   "name": "FreeCell4",
+   "group": "ports",
+   "tags": [],
+   "description": "FreeCell4 is a patience / solitaire card game.",
+   "developer": "lufebe16",
+   "source": "https://github.com/lufebe16/freecell4maemo",
+   "license": "GPL-3.0-only",
+   "package": "org.lufebe16.freecell",
+   "released": "2025-03-23",
+   "version": "2.2",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/lufebe16/freecell4maemo/releases/download/v2.2/freecell-2.2-arm64-v8a_armeabi-v7a-release.apk",
+    "file": "freecell-2.2-arm64-v8a_armeabi-v7a-release.apk",
+    "tag": "v2.2",
+    "size": 37955032,
+    "sha256": "eb86d001a70c57729cd85fc9f9d3b7902d21ccb82434dce7a3f7d967a252a31b",
+    "version_code": 1021202,
+    "version_name": "2.2",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a"
+    ],
+    "signers": [
+     "81ed86494121e19175e91b095057c94cd67bfa01de5e23aba77a9e72e37afd62"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "god-of-war-chains-of-olympus",
+   "name": "God of War: Chains of Olympus",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "psp"
+   ],
+   "description": "Native Android recomp of God of War: Chains of Olympus. You supply your own original game files.",
+   "developer": "arnaldolima1",
+   "source": "https://github.com/arnaldolima1/gow-chains-of-olympus-pc",
+   "license": "MIT",
+   "package": "io.olympus",
+   "released": "2026-10-15",
+   "version": "0.1.0",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of God of War: Chains of Olympus"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/arnaldolima1/gow-chains-of-olympus-pc/releases/download/v0.1.0/olympus-0.1.0-android-arm64.apk",
+    "file": "olympus-0.1.0-android-arm64.apk",
+    "tag": "v0.1.0",
+    "size": 26775254,
+    "sha256": "90fb3bfaf1ffc528ff98a14c8cd896d64c96fa6930bf6f9dcd22f9b62087d685",
+    "version_code": 2,
+    "version_name": "0.1.0",
+    "min_sdk": 29,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "ecf5ae9b69b02e2435f711654727994eedf86a05b614b6de259c66877f811a37"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "godot-editor-3",
+   "name": "Godot Editor 3",
+   "group": "ports",
+   "tags": [
+    "development"
+   ],
+   "description": "All-in-one, cross-platform game engine",
+   "developer": "The Godot Foundation",
+   "source": "https://github.com/godotengine/godot",
+   "license": "MIT",
+   "package": "org.godotengine.editor.v3",
+   "released": "2026-09-16",
+   "version": "3.6.3.stable",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/org.godotengine.editor.v3/",
+    "reason": "Not installable here: inspect failed: over the size cap. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "minute-maze",
+   "name": "Minute Maze",
+   "group": "ports",
+   "tags": [],
+   "description": "Solve as many mazes as possible before the time runs out.",
+   "developer": "Yannick Gingras",
+   "source": "https://gitlab.com/ygingras/minute-maze/",
+   "license": "GPL-3.0-only",
+   "package": "net.ygingras.minutemaze",
+   "released": "2025-02-20",
+   "version": "0.2.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/net.ygingras.minutemaze/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "ocarina-retuned",
+   "name": "Ocarina ReTuned",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "other"
+   ],
+   "description": "Native Android recomp of The Legend of Zelda: Ocarina of Time 3D. You supply your own original game files.",
+   "developer": "WINDROID-EMU",
+   "source": "https://github.com/windroid-emu/recomp-zelda-3ds-android",
+   "license": "GPL-3.0",
+   "package": "org.triaevum.android",
+   "released": "2026-09-22",
+   "version": "0.1-intro-dev",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of The Legend of Zelda: Ocarina of Time 3D"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port",
+    "size differs from the lead (94737891 vs 94813327)"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/WINDROID-EMU/RECOMP-ZELDA-3DS-ANDROID/releases/download/v1.0.0-android/TriAevum-Oot3D-Android-arm64-v8a.apk",
+    "file": "TriAevum-Oot3D-Android-arm64-v8a.apk",
+    "tag": "v1.0.0-android",
+    "size": 94737891,
+    "sha256": "ca90a3f17976b77b73247bec7ae698d6e17366487e111e67b34ee6a01683b9a2",
+    "version_code": 1,
+    "version_name": "0.1-intro-dev",
+    "min_sdk": 29,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "30f0d90be95239d06470a2bb207d4f3c65392d23dce39d84961a1a146fcafb06"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "open-surge-retro-game-engine",
+   "name": "Open Surge: retro game engine",
+   "group": "ports",
+   "tags": [],
+   "description": "A retro game engine with a fun platformer inspired by 16-bit Sonic games.",
+   "developer": "alemart",
+   "source": "https://github.com/alemart/opensurge",
+   "license": "GPL-3.0-or-later",
+   "package": "org.opensurge2d.surgeengine.ale",
+   "released": "2026-01-29",
+   "version": "6.1.3.0-android",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [
+    "index lists org.opensurge2d.surgeengine; the project's own release is org.opensurge2d.surgeengine.ale"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "apk": {
+    "url": "https://github.com/alemart/opensurge/releases/download/v0.6.1.3/opensurge-0.6.1.3-android.apk",
+    "file": "opensurge-0.6.1.3-android.apk",
+    "tag": "v0.6.1.3",
+    "size": 45065524,
+    "sha256": "12fc7e11fc515412a0bd33e445708c7f620488a0b918a363b50f2dc9ad50efb0",
+    "version_code": 30650,
+    "version_name": "6.1.3.0-android",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a"
+    ],
+    "signers": [
+     "68e408fa6562e178113777ddde2e69a93244bd4d25a31902244027857f93f934"
+    ],
+    "sha256_inspected": "2026-11-09"
+   }
+  },
+  {
+   "id": "openmw",
+   "name": "OpenMW",
+   "group": "ports",
+   "tags": [
+    "source-port",
+    "pc"
+   ],
+   "description": "Native Android source-port of The Elder Scrolls III: Morrowind. You supply your own original game files.",
+   "developer": "Andiweli",
+   "source": "https://github.com/andiweli/openmw-android",
+   "license": "GPL-3.0",
+   "package": "com.ast.openmw",
+   "released": "2026-10-28",
+   "version": "0.51.0-14",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android source-port of The Elder Scrolls III: Morrowind"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/Andiweli/OpenMW-Android/releases/download/0.51.0-14/OpenMW.0.51-14.apk",
+    "file": "OpenMW.0.51-14.apk",
+    "tag": "0.51.0-14",
+    "size": 44225707,
+    "sha256": "db78a8b6076acb0cd3db59705539490292dc5c7a098cd76f7c9af1f773145540",
+    "version_code": 5114,
+    "version_name": "0.51.0-14",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "a3810c7ae720118333f68c55f49cd4145fd4a02ec01127f8cc6256d6a507f41a"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "revengate",
+   "name": "Revengate",
+   "group": "ports",
+   "tags": [],
+   "description": "A steampunk roguelike dungeon crawling game.",
+   "developer": "Yannick Gingras",
+   "source": "https://gitlab.com/ygingras/revengate",
+   "license": "GPL-3.0-or-later",
+   "package": "org.revengate.revengate",
+   "released": "2024-11-21",
+   "version": "0.13.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/org.revengate.revengate/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "simon-tatham-s-puzzles",
+   "name": "Simon Tatham's Puzzles",
+   "group": "ports",
+   "tags": [],
+   "description": "40 single-player logic games",
+   "developer": "Chris Boyle",
+   "source": "https://github.com/chrisboyle/sgtpuzzles",
+   "license": "MIT",
+   "package": "name.boyle.chris.sgtpuzzles",
+   "released": "2025-09-20",
+   "version": "2025-09-12-1919-23762278",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/chrisboyle/sgtpuzzles/releases/download/2025-09-12-1919-23762278/SGTPuzzles-2025-09-12-1919-23762278.apk",
+    "file": "SGTPuzzles-2025-09-12-1919-23762278.apk",
+    "tag": "2025-09-12-1919-23762278",
+    "size": 10811960,
+    "sha256": "f37590d8ef6cc4953ac5133b4649b3fa6a58a82ed0d85ecea888acef0b4b478c",
+    "version_code": 149,
+    "version_name": "2025-09-12-1919-23762278",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "f71581ec7d704153bac34ab148d925683db9207122a2933b28c04ca2e4f28453"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "space-trader-classic",
+   "name": "Space Trader Classic",
+   "group": "ports",
+   "tags": [],
+   "description": "Trade, fight and explore the galaxy in the classic Space Trader, fully offline",
+   "developer": "lunchwine",
+   "source": "https://github.com/lunchwine/space-trader-classic",
+   "license": "GPL-3.0-or-later",
+   "package": "io.github.lunchwine.spacetraderclassic",
+   "released": "2026-10-31",
+   "version": "0.9.5",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 24,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/lunchwine/space-trader-classic/releases/download/v0.9.5/space-trader-classic-0.9.5.apk",
+    "file": "space-trader-classic-0.9.5.apk",
+    "tag": "v0.9.5",
+    "size": 1262670,
+    "sha256": "87cbbb0a085e035b4d0f2883683541738a0ac484c088d4987ba4e6679a742ac6",
+    "version_code": 905,
+    "version_name": "0.9.5",
+    "min_sdk": 24,
+    "abis": [],
+    "signers": [
+     "4019b1d23f26e0d37060dc9d245fe404dc5247913ad0fc4e2e4f17d9b78b7b26"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "starfox-enhanced",
+   "name": "Starfox Enhanced",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "snes"
+   ],
+   "description": "Native Android recomp of Star Fox. You supply your own original game files.",
+   "developer": "kandowontu2",
+   "source": "https://github.com/kandowontu2/starfox-enhanced",
+   "license": "GPL-3.0",
+   "package": "com.starfox.enhanced",
+   "released": "2026-11-01",
+   "version": "0.0.8.8.3",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of Star Fox"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/kandowontu2/starfox-enhanced/releases/download/v0.0.8.8.3/StarFoxEnhanced-0.0.8.8.3-android-arm64.apk",
+    "file": "StarFoxEnhanced-0.0.8.8.3-android-arm64.apk",
+    "tag": "v0.0.8.8.3",
+    "size": 69322056,
+    "sha256": "f126f22398896ee7b4b3a2582be305a8c9843577a6e7d74c7d04a97f18916e95",
+    "version_code": 21,
+    "version_name": "0.0.8.8.3",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "50bcb41f7a02c2e9bb0f68a74b1f6e14f7317fedc69d2c6fd70a165f87800fc0"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "the-legend-of-zelda-majora-s-mask",
+   "name": "The Legend of Zelda: Majora's Mask",
+   "group": "ports",
+   "tags": [
+    "decomp",
+    "n64"
+   ],
+   "description": "Native Android decomp of The Legend of Zelda: Majora's Mask. You supply your own original game files.",
+   "developer": "linkzenic",
+   "source": "https://github.com/linkzenic/2ship2harkinian-android",
+   "license": "CC0-1.0",
+   "package": "com.twoshipfork.mm",
+   "released": "2026-10-23",
+   "version": "5.0.1-android.3",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android decomp of The Legend of Zelda: Majora's Mask"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/linkzenic/2ship2harkinian-Android/releases/download/v5.0.1-android.3/2Ship-Android-v5.0.1-android.3.apk",
+    "file": "2Ship-Android-v5.0.1-android.3.apk",
+    "tag": "v5.0.1-android.3",
+    "size": 36675891,
+    "sha256": "23121c8645e6baf1f27c2f55518aa2a77e69ef108c2538317ef3fc46a26da98d",
+    "version_code": 5001035,
+    "version_name": "5.0.1-android.3",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "f608b8ed8a09fd6c8890dee105f3268ad5577638ec3aa2544ff4618f399efd3e"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "thextech",
+   "name": "TheXTech",
+   "group": "ports",
+   "tags": [],
+   "description": "2D-platformer game engine",
+   "developer": "Vitaly Novichkov",
+   "source": "https://github.com/wohlstand/thextech",
+   "license": "GPL-3.0-or-later",
+   "package": "ru.wohlsoft.thextech",
+   "released": "2026-10-22",
+   "version": "1.7.4.1 #5181deb",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 16,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [
+    "index lists ru.wohlsoft.thextech.fdroid; the project's own release is ru.wohlsoft.thextech"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "apk": {
+    "url": "https://github.com/wohlstand/thextech/releases/download/v1.7.4.1/thextech-android-v1.7.4.1.apk",
+    "file": "thextech-android-v1.7.4.1.apk",
+    "tag": "v1.7.4.1",
+    "size": 28032503,
+    "sha256": "ef7add3f32de450a5ca1115f9adb4e9eae7fd2d4a821a2f6659c5b0f1a02a064",
+    "version_code": 1070401,
+    "version_name": "1.7.4.1 #5181deb",
+    "min_sdk": 16,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "167471bd111c86b015a6e19ff7a8526841ee48750fe5ab14e3945c6f69e45a3a"
+    ],
+    "sha256_inspected": "2026-11-09"
+   }
+  },
+  {
+   "id": "unciv",
+   "name": "Unciv",
+   "group": "ports",
+   "tags": [],
+   "description": "Open source 4X civilization-building game",
+   "developer": "Yair Morgenstern",
+   "source": "https://github.com/yairm210/unciv",
+   "license": "MPL-2.0",
+   "package": "com.unciv.app",
+   "released": "2026-11-06",
+   "version": "4.22.18-patch1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/yairm210/unciv/releases/download/4.22.18-patch1/Unciv-signed.apk",
+    "file": "Unciv-signed.apk",
+    "tag": "4.22.18-patch1",
+    "size": 27601185,
+    "sha256": "2ec496a63f9c16baec3a8e6d2c0cf4571ee5140d5d948f3c1500a3c27c02b66d",
+    "version_code": 1283,
+    "version_name": "4.22.18-patch1",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "7d6e6bea768161c3d8da8b3fb00def5377effe65dc7268482f8f779bb4fc6e2e"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "warsmash",
+   "name": "Warsmash",
+   "group": "ports",
+   "tags": [],
+   "description": "Warsmash Android port",
+   "developer": "sandstranger",
+   "source": "https://github.com/sandstranger/warsmashmodengine",
+   "license": "AGPL-3.0-only",
+   "package": "net.warsmash.phone",
+   "released": "2025-03-03",
+   "version": "1.0.4",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "engine / source port / reimplementation of an existing game"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/net.warsmash.phone/",
+    "reason": "Not installable here: no APK in the project's own latest GitHub release. GitHub repo but the listed APK is not a release of it (resolved at inspect time)",
+    "price": null
+   }
+  },
+  {
+   "id": "xenogears",
+   "name": "Xenogears",
+   "group": "ports",
+   "tags": [
+    "decomp",
+    "ps1"
+   ],
+   "description": "Native Android decomp of Xenogears. You supply your own original game files.",
+   "developer": "brianblakely",
+   "source": "https://github.com/brianblakely/xenogears-ex-machina",
+   "license": "MIT",
+   "package": "dev.xem.app",
+   "released": "2026-11-04",
+   "version": "1.0.6",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android decomp of Xenogears"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a",
+    "x86_64"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/brianblakely/xenogears-ex-machina/releases/download/v1.0.6/xenogears-ex-machina-v1.0.6-android-horizon.apk",
+    "file": "xenogears-ex-machina-v1.0.6-android-horizon.apk",
+    "tag": "v1.0.6",
+    "size": 78112581,
+    "sha256": "d6b45ce912ad5480922312fb90552d7394b846f967230321db5f4b207acf1e0e",
+    "version_code": 1000006,
+    "version_name": "1.0.6",
+    "min_sdk": 29,
+    "abis": [
+     "arm64-v8a",
+     "x86_64"
+    ],
+    "signers": [
+     "656da4c8364f09452ddb1642638d21aafb600281987a842eda8360f78fd3170c"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "yakumo",
+   "name": "Yakumo",
+   "group": "ports",
+   "tags": [
+    "recomp",
+    "psp"
+   ],
+   "description": "Native Android recomp of Monster Hunter Portable 3rd. You supply your own original game files.",
+   "developer": "TeamGDB",
+   "source": "https://github.com/teamgdb/yakumo",
+   "license": "MIT",
+   "package": "io.github.teamgdb.yakumo",
+   "released": "2026-10-13",
+   "version": "v0.7.5",
+   "recommended_by": [],
+   "sources": [
+    "recompa"
+   ],
+   "reasons": [
+    "Recompa lists a native Android recomp of Monster Hunter Portable 3rd"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "yes",
+   "flags": [
+    "fork-or-community-port"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://github.com/TeamGDB/Yakumo",
+    "reason": "The APK is larger than RetroHatch downloads (200 MB).",
+    "price": null
+   },
+   "needs": [
+    "direct APK source",
+    "device testing"
+   ]
+  },
+  {
+   "id": "alembicons",
+   "name": "Alembicons",
+   "group": "themes-launchers",
+   "tags": [
+    "theming"
+   ],
+   "description": "Icon pack creator and Arcticons companion",
+   "developer": "kaanelloed",
+   "source": "https://codeberg.org/kaanelloed/Alembicons",
+   "license": "GPL-3.0-only",
+   "package": "com.kaanelloed.iconeration",
+   "released": "2025-02-11",
+   "version": "2025.02.00",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/com.kaanelloed.iconeration/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "arcticons",
+   "name": "Arcticons",
+   "group": "themes-launchers",
+   "tags": [],
+   "description": "A monotone line-based icon pack for dark themed setups.",
+   "developer": "Arcticons Team",
+   "source": "https://github.com/arcticons-team/arcticons",
+   "license": "GPL-3.0-only",
+   "package": "com.donnnno.arcticons.light",
+   "released": "2026-09-21",
+   "version": "15.4.7",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "obtainium"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 21,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [
+    "index lists com.donnnno.arcticons; the project's own release is com.donnnno.arcticons.light"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "apk": {
+    "url": "https://github.com/arcticons-team/arcticons/releases/download/15.4.7/Arcticons-15.4.7-black-release.apk",
+    "file": "Arcticons-15.4.7-black-release.apk",
+    "tag": "15.4.7",
+    "size": 70192836,
+    "sha256": "3cf9c829848a531a5d69ab5449e16b6c4be6caa7cc4e11b1744cc12a79c8b512",
+    "version_code": 1580,
+    "version_name": "15.4.7",
+    "min_sdk": 21,
+    "abis": [],
+    "signers": [
+     "299bb9312e39130d0d33ed42bf98567f726ab11a04dc950c5b6c162e28c869c5"
+    ],
+    "sha256_inspected": "2026-11-09"
+   }
+  },
+  {
+   "id": "argosy-launcher",
+   "name": "Argosy Launcher",
+   "group": "themes-launchers",
+   "tags": [],
+   "description": "A native Android client for RomM  for syncing, installing, and launching games on any of your mobile devices - rommapp/argosy-launcher",
+   "developer": "rommapp",
+   "source": "https://github.com/rommapp/argosy-launcher",
+   "license": "GPL-3.0",
+   "package": "com.nendo.argosy",
+   "released": "",
+   "version": "2.29.2",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/rommapp/argosy-launcher/releases/download/v2.29.2/argosy-v2.29.2-arm64.apk",
+    "file": "argosy-v2.29.2-arm64.apk",
+    "tag": "v2.29.2",
+    "size": 24595263,
+    "sha256": "945932eca5d1f7301deefdb321482980c15fa0b05cbc92009ef252eeab566499",
+    "version_code": 2000373,
+    "version_name": "2.29.2",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "3033353026d56a8f808bca5112a576f944a17aef25e2d0ed39b805f535f22e6d"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "cclauncher",
+   "name": "CClauncher",
+   "group": "themes-launchers",
+   "tags": [
+    "launcher",
+    "system",
+    "navigation",
+    "theming"
+   ],
+   "description": "Minimal home launcher that hides apps by default to reduce distractions",
+   "developer": "MLM Games",
+   "source": "https://github.com/mlm-games/cclauncher",
+   "license": "GPL-3.0-only",
+   "package": "app.cclauncher",
+   "released": "2026-11-06",
+   "version": "v10.7.20",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/mlm-games/cclauncher/releases/download/v10.7.20/cclauncher-v10.7.20-arm64-v8a.apk",
+    "file": "cclauncher-v10.7.20-arm64-v8a.apk",
+    "tag": "v10.7.20",
+    "size": 3955112,
+    "sha256": "26c02047aaaaa84ab51882244d6d0fe28b4869999db781f18ddca9182bf5986d",
+    "version_code": 1450,
+    "version_name": "v10.7.20",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "57f73d58f4049f378ba988eae6edd1cc8cd245e0647e0f83dd669c450f4d056e"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "clauncher",
+   "name": "Clauncher",
+   "group": "themes-launchers",
+   "tags": [
+    "launcher",
+    "navigation",
+    "system",
+    "theming"
+   ],
+   "description": "Yet Another Olauncher Fork, But With All Apps Hidden",
+   "developer": "MLM Games",
+   "source": "https://github.com/mlm-games/clauncher",
+   "license": "GPL-3.0-only",
+   "package": "app.clauncher",
+   "released": "2026-09-16",
+   "version": "v5.3.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 24,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/mlm-games/clauncher/releases/download/v5.3.0/clauncher-v5.3.0-arm64-v8a.apk",
+    "file": "clauncher-v5.3.0-arm64-v8a.apk",
+    "tag": "v5.3.0",
+    "size": 2073428,
+    "sha256": "aedb78216822d5c8924eb125529f2dfa9140e4841b87ed309eca8f12f38956eb",
+    "version_code": 480,
+    "version_name": "v5.3.0",
+    "min_sdk": 24,
+    "abis": [],
+    "signers": [
+     "4aed2f691df64a7b0fea25a6b8c80183c6dc520e049dac0178defa1d6472228f"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "daijisho",
+   "name": "Daijishō",
+   "group": "themes-launchers",
+   "tags": [],
+   "description": "Frontend and launcher for your game library.",
+   "developer": "tapiocafox",
+   "source": "https://github.com/tapiocafox/daijishou",
+   "license": "MIT",
+   "package": "com.magneticchen.daijishou",
+   "released": "2026-01-15",
+   "version": "1.5.0",
+   "recommended_by": [
+    "rgc-guide",
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)",
+    "recommended in the Retro Game Corps Android emulation guide"
+   ],
+   "min_sdk": 26,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "Project page",
+    "url": "https://github.com/tapiocafox/daijishou",
+    "reason": "On hold for review: signing certificate looks like an AOSP key: investigate who holds it first. RetroHatch does not install it until that is resolved.",
+    "price": null
+   }
+  },
+  {
+   "id": "easy-launcher-minimal-launcher",
+   "name": "Easy Launcher - Minimal launcher",
+   "group": "themes-launchers",
+   "tags": [
+    "launcher",
+    "system",
+    "theming"
+   ],
+   "description": "EasyLauncher - Minimal and Clutter Free Android launcher",
+   "developer": "DroidWorksStudio",
+   "source": "https://github.com/droidworksstudio/easylauncher",
+   "license": "GPL-3.0-only",
+   "package": "app.easy.launcher",
+   "released": "2025-07-24",
+   "version": "0.3.3",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/droidworksstudio/easylauncher/releases/download/0.3.3/EasyLauncher-0.3.3-Signed.apk",
+    "file": "EasyLauncher-0.3.3-Signed.apk",
+    "tag": "0.3.3",
+    "size": 19364553,
+    "sha256": "d5d50652fcc96229e5fdc855419716d6e68ba50445937673f7dd3712a3d8731b",
+    "version_code": 33,
+    "version_name": "0.3.3",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "88585139eac6d8d5922ce7af80a0f2acd9280371676014a114d5e3bf34904ae0"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "es-de",
+   "name": "ES-DE",
+   "group": "themes-launchers",
+   "tags": [],
+   "description": "Frontend and launcher for your game library.",
+   "developer": "es-de",
+   "source": "https://www.patreon.com/es_de",
+   "license": "MIT (desktop); Android partly closed source",
+   "package": "org.es_de.frontend",
+   "released": "",
+   "version": "",
+   "recommended_by": [
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)"
+   ],
+   "min_sdk": null,
+   "abis": null,
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://www.patreon.com/es_de",
+    "reason": "es-de.org: \"The Android release is a paid app, and it's partially closed source.\" ANDROID.md: sold through Patreon, the Samsung Galaxy Store and Huawei AppGallery; not on Google Play.",
+    "price": "Android: paid"
+   },
+   "needs": [
+    "direct APK source",
+    "device testing"
+   ]
+  },
+  {
+   "id": "lawnicons",
+   "name": "Lawnicons",
+   "group": "themes-launchers",
+   "tags": [
+    "theming"
+   ],
+   "description": "Monochrome outlined brand icons for Android launchers.",
+   "developer": "Lawnchair",
+   "source": "https://github.com/lawnchairlauncher/lawnicons",
+   "license": "Apache-2.0",
+   "package": "app.lawnchair.lawnicons",
+   "released": "2026-10-17",
+   "version": "2.19.0",
+   "recommended_by": [],
+   "sources": [
+    "izzy",
+    "obtainium"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/lawnchairlauncher/lawnicons/releases/download/v2.19.0/Lawnicons.2.19.0.apk",
+    "file": "Lawnicons.2.19.0.apk",
+    "tag": "v2.19.0",
+    "size": 18700742,
+    "sha256": "5ed67a0338c207bd0f8c44392dedbae8d0449fef5c8d773a202451d42bbd8cdd",
+    "version_code": 27,
+    "version_name": "2.19.0",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "747c3645b357258b2e23e851e53c96747fe0add007e5ba2cd97e8c85572e4dc5"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "multi-launcher-home-screen",
+   "name": "Multi Launcher ‧ Home Screen",
+   "group": "themes-launchers",
+   "tags": [
+    "launcher",
+    "system",
+    "theming"
+   ],
+   "description": "Multi Launcher ‧ Home Screen",
+   "developer": "DroidWorksStudio",
+   "source": "https://github.com/droidworksstudio/mlauncher",
+   "license": "GPL-3.0-only",
+   "package": "app.mlauncher",
+   "released": "2026-10-04",
+   "version": "1.12.2 Build 0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 28,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/droidworksstudio/mlauncher/releases/download/1.12.2.0/MultiLauncher-1.12.2.0-Signed.apk",
+    "file": "MultiLauncher-1.12.2.0-Signed.apk",
+    "tag": "1.12.2.0",
+    "size": 7103946,
+    "sha256": "437740f419b6565e88f3947ad5c62bfe25d2396341b1517507d45ef11d8e8356",
+    "version_code": 1120200,
+    "version_name": "1.12.2 Build 0",
+    "min_sdk": 28,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "431361eebc9d055ed708125def85423c70f05c10f04cc6c25e2e1018700eafd7"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "murine-launcher",
+   "name": "Murine Launcher",
+   "group": "themes-launchers",
+   "tags": [
+    "launcher",
+    "theming"
+   ],
+   "description": "A modern, lightweight Launcher3 fork for an enhanced stock++ Android experience.",
+   "developer": "Alex Sim",
+   "source": "https://github.com/alesimula/murine-launcher",
+   "license": "Apache-2.0",
+   "package": "app.murinelauncher",
+   "released": "2026-11-06",
+   "version": "1.3.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 26,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/alesimula/murine-launcher/releases/download/v1.3.0/Murine-launcher.apk",
+    "file": "Murine-launcher.apk",
+    "tag": "v1.3.0",
+    "size": 4613734,
+    "sha256": "55ed2d9551bdeede1be91de55111dfb99318a6d096f06c289dba64912dd3903a",
+    "version_code": 10300,
+    "version_name": "1.3.0",
+    "min_sdk": 26,
+    "abis": [],
+    "signers": [
+     "4ee045489a40c3072dca4ad7c50e30961c6256182511368c53a56a5acc07e2e5"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "olauncher",
+   "name": "Olauncher",
+   "group": "themes-launchers",
+   "tags": [
+    "launcher",
+    "system",
+    "theming"
+   ],
+   "description": "Minimal launcher app with daily new wallpaper",
+   "developer": "Tanuj M.",
+   "source": "https://github.com/tanujnotes/olauncher",
+   "license": "GPL-3.0-only",
+   "package": "app.olauncher",
+   "released": "2026-10-31",
+   "version": "v6.9.17",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 24,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/tanujnotes/olauncher/releases/download/v6.9.17/Olauncher-v6.9.17.apk",
+    "file": "Olauncher-v6.9.17.apk",
+    "tag": "v6.9.17",
+    "size": 2401356,
+    "sha256": "bc72df3b8162f68a7bfed886fa21eb62ee1d53eadb9526498606b8f0aae5aa19",
+    "version_code": 113,
+    "version_name": "v6.9.17",
+    "min_sdk": 24,
+    "abis": [],
+    "signers": [
+     "a2bd5f2443fd4b43a039b73ebe254febbc7eb57a2993dff541de52c52e588149"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "pegasus-frontend",
+   "name": "Pegasus Frontend",
+   "group": "themes-launchers",
+   "tags": [],
+   "description": "Frontend and launcher for your game library.",
+   "developer": "mmatyas",
+   "source": "https://github.com/mmatyas/pegasus-frontend",
+   "license": "GPL-3.0",
+   "package": "org.pegasus_frontend.android",
+   "released": "2024-10-05",
+   "version": "alpha16-82-gc3462e68",
+   "recommended_by": [
+    "mainstream-seed"
+   ],
+   "sources": [
+    "mainstream-seed"
+   ],
+   "reasons": [
+    "mainstream emulator/frontend seed (requested by name)"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "external": {
+    "label": "Project page",
+    "url": "https://github.com/mmatyas/pegasus-frontend",
+    "reason": "On hold for review: licence not detected: resolve it first. RetroHatch does not install it until that is resolved.",
+    "price": null
+   }
+  },
+  {
+   "id": "yagni-launcher",
+   "name": "Yagni Launcher",
+   "group": "themes-launchers",
+   "tags": [
+    "launcher",
+    "system",
+    "theming"
+   ],
+   "description": "Stock Android Launcher From Scratch",
+   "developer": "T31n",
+   "source": "https://github.com/t31n/yagnilauncher",
+   "license": "GPL-3.0-only",
+   "package": "com.eblan.launcher",
+   "released": "2026-11-09",
+   "version": "1.1.0-alpha",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "launcher / frontend / icon pack"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/t31n/yagnilauncher/releases/download/v1.1.0-alpha/YagniLauncher-v1.1.0-alpha.apk",
+    "file": "YagniLauncher-v1.1.0-alpha.apk",
+    "tag": "v1.1.0-alpha",
+    "size": 2916296,
+    "sha256": "1a381dce6880c1b767a9f13252a7c47683801d266decc07675a1015f993b7347",
+    "version_code": 110,
+    "version_name": "1.1.0-alpha",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "1eaea35caae68379f7d4617f283a33805afecec36ab484174562731f756d5d49"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "aegis",
+   "name": "Aegis",
+   "group": "utilities",
+   "tags": [
+    "2fa",
+    "authenticator",
+    "encryption",
+    "fingerprint",
+    "hotp",
+    "otp"
+   ],
+   "description": "A free, open-source two-factor authentication (2FA) app with an encrypted vault.",
+   "developer": "beemdevelopment",
+   "source": "https://github.com/beemdevelopment/Aegis",
+   "license": "GPL-3.0",
+   "package": "com.beemdevelopment.aegis",
+   "released": "2026-09-06",
+   "version": "3.4.3",
+   "recommended_by": [],
+   "sources": [
+    "inventory"
+   ],
+   "reasons": [
+    "one of the eight apps with hand-written descriptions"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/beemdevelopment/Aegis/releases/download/v3.4.3/aegis-v3.4.3.apk",
+    "file": "aegis-v3.4.3.apk",
+    "tag": "v3.4.3",
+    "size": 6881897,
+    "sha256": "fa091c91912c0d56ec3553394fac4158f9a9d178e93bcbb35419601d788cb528",
+    "version_code": 82,
+    "version_name": "3.4.3",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "c6db80a8e14e5230c1de8415ef820d13dc901d8fe33cf3acb57b6862d858a823"
+    ],
+    "sha256_inspected": "2026-11-09 (candidates/inventory-rg-rotate.json)"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "amaze-file-manager",
+   "name": "Amaze File Manager",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "An open-source file manager following the Material Design guidelines",
+   "developer": "Team Amaze",
+   "source": "https://github.com/teamamaze/amazefilemanager",
+   "license": "GPL-3.0-or-later",
+   "package": "com.amaze.filemanager",
+   "released": "2026-10-18",
+   "version": "3.11.4",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "utility category App Manager",
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/teamamaze/amazefilemanager/releases/download/v3.11.4/app-fdroid-release.apk",
+    "file": "app-fdroid-release.apk",
+    "tag": "v3.11.4",
+    "size": 11996072,
+    "sha256": "2462dc19c75db5eae0629ac40a5f11baecb84afde1565602de5712f6260577e5",
+    "version_code": 126,
+    "version_name": "3.11.4",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "aff656d7ca84d71254d272c55fb420edf172b2549de14f5ccefd5a82528df554"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "anemo",
+   "name": "Anemo",
+   "group": "utilities",
+   "tags": [
+    "system",
+    "writing"
+   ],
+   "description": "A private local storage utility application for android.",
+   "developer": "2bllw8",
+   "source": "https://github.com/2bllw8/anemo",
+   "license": "GPL-3.0-only",
+   "package": "exe.bbllw8.anemo",
+   "released": "2026-03-16",
+   "version": "2.7.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 26,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/2bllw8/anemo/releases/download/v2.7.1/app-release.apk",
+    "file": "app-release.apk",
+    "tag": "v2.7.1",
+    "size": 73574,
+    "sha256": "e3f58fc12632bb961d1a303de76a1d8cbccdc8eb32fe1db43fe6559edded0835",
+    "version_code": 18,
+    "version_name": "2.7.1",
+    "min_sdk": 26,
+    "abis": [],
+    "signers": [
+     "0b264e1331f9554899f2c3ff8dbd1b64b793f12c886ad7e9545cc82bc192bad2"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "ashell",
+   "name": "aShell",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "aShell: A local ADB shell for Shizuku powered android devices",
+   "developer": "sunilpaulmathew",
+   "source": "https://gitlab.com/sunilpaulmathew/ashell",
+   "license": "GPL-3.0-or-later",
+   "package": "in.sunilpaulmathew.ashell",
+   "released": "2026-08-01",
+   "version": "v0.28",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 24,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "F-Droid",
+    "url": "https://f-droid.org/packages/in.sunilpaulmathew.ashell/",
+    "reason": "Distributed from a package repository (f-droid.org) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds.",
+    "price": null
+   },
+   "needs": [
+    "source approval",
+    "device testing"
+   ]
+  },
+  {
+   "id": "ashell-you",
+   "name": "aShell You",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "A material you designed app for your ADB needs",
+   "developer": "DP Hridayan",
+   "source": "https://github.com/dp-hridayan/ashellyou",
+   "license": "GPL-3.0-or-later",
+   "package": "in.hridayan.ashell",
+   "released": "2026-05-24",
+   "version": "v7.4.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 28,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/dp-hridayan/ashellyou/releases/download/v7.4.0/aShellYou-v7.4.0-github-release.apk",
+    "file": "aShellYou-v7.4.0-github-release.apk",
+    "tag": "v7.4.0",
+    "size": 13156722,
+    "sha256": "820d6a78f62b0d4b7e10ae253765ad387b3ad4bc448444dd8599ad4780c2a669",
+    "version_code": 62,
+    "version_name": "v7.4.0",
+    "min_sdk": 28,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "dc4217203a7284bd159d7b863b7990620069c7929d6f5a51f59a321e77f18d4c"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "cannoli",
+   "name": "cannoli",
+   "group": "utilities",
+   "tags": [],
+   "description": "A frontend with just the right amount of filling!",
+   "developer": "cannolihq",
+   "source": "https://github.com/cannolihq/cannoli",
+   "license": "GPL-3.0",
+   "package": "dev.cannoli.scorza",
+   "released": "",
+   "version": "v1.9.1",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 28,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://github.com/CannoliHQ/cannoli",
+    "reason": "The APK is larger than RetroHatch downloads (200 MB).",
+    "price": null
+   },
+   "needs": [
+    "direct APK source",
+    "device testing"
+   ]
+  },
+  {
+   "id": "databackup",
+   "name": "DataBackup",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "Back up/Restore your data.",
+   "developer": "XayahSuSuSu",
+   "source": "https://github.com/xayahsususu/android-databackup",
+   "license": "GPL-3.0-only",
+   "package": "com.xayah.databackup.premium",
+   "released": "2025-09-25",
+   "version": "2.0.12",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [
+    "index lists com.xayah.databackup.foss; the project's own release is com.xayah.databackup.premium"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "apk": {
+    "url": "https://github.com/xayahsususu/android-databackup/releases/download/2.0.12/DataBackup-2.0.12-arm64-v8a-premium-release.apk",
+    "file": "DataBackup-2.0.12-arm64-v8a-premium-release.apk",
+    "tag": "2.0.12",
+    "size": 15181547,
+    "sha256": "606b5cb2824918d093bf731bbf9604efa77a52359851dc1f44a6910b3b334311",
+    "version_code": 3501194,
+    "version_name": "2.0.12",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "7fb9ec207705a0fbb9ca61253e596364c72762868a83815239e7ca1923acb39f"
+    ],
+    "sha256_inspected": "2026-11-09"
+   }
+  },
+  {
+   "id": "droidify",
+   "name": "Droid-ify",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "Clutterfree F-Droid client",
+   "developer": "Iamlooker",
+   "source": "https://github.com/droid-ify/client",
+   "license": "GPL-3.0-or-later",
+   "package": "com.looker.droidify",
+   "released": "2026-10-12",
+   "version": "0.7.8",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "utility category App Store & Updater"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/droid-ify/client/releases/download/v0.7.8/app-release.apk",
+    "file": "app-release.apk",
+    "tag": "v0.7.8",
+    "size": 5997579,
+    "sha256": "3e7934ff9b811c2f77794793381241095a02bac2d163bf922cb5a5a0ed25ca82",
+    "version_code": 780,
+    "version_name": "0.7.8",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "ed8859c55af311162658b94af982b9f091dcd27628d4de3486d1217ebf3c9935"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "es-de-android-apps",
+   "name": "ES-DE Android Apps",
+   "group": "utilities",
+   "tags": [],
+   "description": "Tool to import android apps into the ES-DE launcher - BinaryQuantumSoul/esde_android_apps",
+   "developer": "binaryquantumsoul",
+   "source": "https://github.com/binaryquantumsoul/esde_android_apps",
+   "license": "AGPL-3.0",
+   "package": "com.quantumsoul.esde_android",
+   "released": "",
+   "version": "1.3.3",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 21,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/binaryquantumsoul/esde_android_apps/releases/download/v1.3.3/esde_android_apps_v1.3.3.apk",
+    "file": "esde_android_apps_v1.3.3.apk",
+    "tag": "v1.3.3",
+    "size": 22811252,
+    "sha256": "c2572dc842e13d6b6939d6aceb0e8d54abac68565a64b00552ba834e7513e380",
+    "version_code": 1,
+    "version_name": "1.3.3",
+    "min_sdk": 21,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "e4de67a8e7c75cc1d426077097bbe3afcc3d4491cc7fd26b59a13e167ab57775"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "fluffy",
+   "name": "Fluffy",
+   "group": "utilities",
+   "tags": [
+    "multimedia",
+    "system"
+   ],
+   "description": "A TV friendly file manager and archive viewer",
+   "developer": "MLM Games",
+   "source": "https://github.com/mlm-games/fluffy",
+   "license": "GPL-3.0-or-later",
+   "package": "app.fluffy",
+   "released": "2026-10-22",
+   "version": "4.5.1",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "utility category File Manager",
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/mlm-games/fluffy/releases/download/4.5.1/fluffy-4.5.1-arm64-v8a.apk",
+    "file": "fluffy-4.5.1-arm64-v8a.apk",
+    "tag": "4.5.1",
+    "size": 7636079,
+    "sha256": "526f06ed0a001ecbf565bc6005b33cad963bf572400b8aa2d6e230d31ef0cdc0",
+    "version_code": 930,
+    "version_name": "4.5.1",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "4aed2f691df64a7b0fea25a6b8c80183c6dc520e049dac0178defa1d6472228f"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "fossify-file-manager",
+   "name": "Fossify File Manager",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "Handy, lightweight, open-source file explorer with essential features.",
+   "developer": "Fossify",
+   "source": "https://github.com/fossifyorg/file-manager",
+   "license": "GPL-3.0-only",
+   "package": "org.fossify.filemanager",
+   "released": "2026-10-27",
+   "version": "1.6.4",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "utility category File Manager",
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/fossifyorg/file-manager/releases/download/1.6.4/file-manager-16-foss-release.apk",
+    "file": "file-manager-16-foss-release.apk",
+    "tag": "1.6.4",
+    "size": 10033882,
+    "sha256": "6e4656b8947966a2853681691bb0005e802ee89983fb141ec0f7186497dcd5f4",
+    "version_code": 16,
+    "version_name": "1.6.4",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "affdb124d3f4720c2f98dbca9eacba0514fba4306e20a2786c861c3c0d6ff292"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "little-file-explorer",
+   "name": "Little File Explorer",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "Android 1.0+ mini simple file manager/explorer",
+   "developer": "MGGames",
+   "source": "https://github.com/martinmimigames/little-file-explorer",
+   "license": "GPL-3.0-only",
+   "package": "com.martinmimigames.simplefileexplorer",
+   "released": "2025-04-22",
+   "version": "4.18",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "utility category File Manager",
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 1,
+   "abis": [],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/martinmimigames/little-file-explorer/releases/download/v4.18/little.file.explorer.4.18.apk",
+    "file": "little.file.explorer.4.18.apk",
+    "tag": "v4.18",
+    "size": 36759,
+    "sha256": "83e9ff3d7895658b30ebddaa01b200415febd101b169de5271b559a3ce21ca76",
+    "version_code": 20,
+    "version_name": "4.18",
+    "min_sdk": 1,
+    "abis": [],
+    "signers": [
+     "e7de6a6e56d431b54d6e7452a3c9b69f4f0d89115685b1e46c73dfb251c38806"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "logfox",
+   "name": "LogFox",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "LogCat readers are allowed to be beautiful and useful!",
+   "developer": "F0x1d",
+   "source": "https://github.com/f0x1d/logfox",
+   "license": "GPL-3.0-only",
+   "package": "com.f0x1d.logfox",
+   "released": "2026-03-02",
+   "version": "2.1.10",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/f0x1d/logfox/releases/download/v2.1.10-79/LogFox-2.1.10-release.apk",
+    "file": "LogFox-2.1.10-release.apk",
+    "tag": "v2.1.10-79",
+    "size": 3981447,
+    "sha256": "34bd7ff3e367f16cf36a299adb1872da34a5ed8934514d3c73687bf8633ccdc4",
+    "version_code": 79,
+    "version_name": "2.1.10",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "741f819a4c213ba438053134890b40e258774fce55a778846ec5c67a1c92709f"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "materialfiles",
+   "name": "Material Files",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "Open source Material Design file manager",
+   "developer": "Hai Zhang",
+   "source": "https://github.com/zhanghai/materialfiles",
+   "license": "GPL-3.0-or-later",
+   "package": "me.zhanghai.android.files",
+   "released": "2026-09-22",
+   "version": "1.7.5",
+   "recommended_by": [],
+   "sources": [
+    "fdroid"
+   ],
+   "reasons": [
+    "utility category Cloud Storage & File Sync"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/zhanghai/materialfiles/releases/download/v1.7.5/app-release-universal.apk",
+    "file": "app-release-universal.apk",
+    "tag": "v1.7.5",
+    "size": 13747821,
+    "sha256": "f2e7f028fbddf51d7ee90ace27a1ae4b247511e12514d1def6c9e52435feac40",
+    "version_code": 40,
+    "version_name": "1.7.5",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "873b9b60c77cf7f3cd5fae66d0fe112c4a86973e118ee8a29c346c4c673c97f0"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "neo-backup",
+   "name": "Neo Backup",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "The open-source tool to backup your apps and data",
+   "developer": "Antonios Hazim",
+   "source": "https://github.com/neoapplications/neo-backup",
+   "license": "AGPL-3.0-only",
+   "package": "com.machiav3lli.backup",
+   "released": "2026-05-04",
+   "version": "8.3.18",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/neoapplications/neo-backup/releases/download/8.3.18/Neo_Backup_8.3.18_release.apk",
+    "file": "Neo_Backup_8.3.18_release.apk",
+    "tag": "8.3.18",
+    "size": 11430871,
+    "sha256": "d2bd2fbd57bf1e99d12a40ba4418e66543a2983742f16b0f3509262f36f7b4f7",
+    "version_code": 8331,
+    "version_name": "8.3.18",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "c94f10243c14d57dd69dede61c234bb5e8bb0704d61b45dafe496728ac32f378"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "obtainium",
+   "name": "Obtainium",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "Get Android app updates directly from the source",
+   "developer": "Imran",
+   "source": "https://github.com/imranr98/obtainium",
+   "license": "GPL-3.0-only",
+   "package": "dev.imranr.obtainium",
+   "released": "2026-11-04",
+   "version": "1.7.4",
+   "recommended_by": [
+    "rgc-guide",
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "fdroid",
+    "retrohandhelds-rotate",
+    "rgc-guide"
+   ],
+   "reasons": [
+    "utility category App Store & Updater",
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [
+    "index lists dev.imranr.obtainium.fdroid; the project's own release is dev.imranr.obtainium"
+   ],
+   "added": "2026-11-09",
+   "mode": "install",
+   "needs": [
+    "source approval",
+    "device testing"
+   ],
+   "apk": {
+    "url": "https://github.com/imranr98/obtainium/releases/download/v1.7.4/app-arm64-v8a-release.apk",
+    "file": "app-arm64-v8a-release.apk",
+    "tag": "v1.7.4",
+    "size": 34609838,
+    "sha256": "f9216f721a7713b75929e0806bc18586f8fcf7328fbbff99b6aef1debb9eef80",
+    "version_code": 23623,
+    "version_name": "1.7.4",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "b353601f6a1d5fd6603ae2f50be80cf301367b86b6ab8b1f66243da96cd57362"
+    ],
+    "sha256_inspected": "2026-11-09"
+   }
+  },
+  {
+   "id": "pico8-android",
+   "name": "Pico8 Android",
+   "group": "utilities",
+   "tags": [],
+   "description": "A wrapper for PICO-8 to run on Android.",
+   "developer": "macs75",
+   "source": "https://github.com/macs75/pico8-android",
+   "license": "unknown",
+   "package": "io.wip.pico8",
+   "released": "",
+   "version": "1.6.6",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [
+    "fork"
+   ],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://github.com/Macs75/pico8-android",
+    "reason": "No licence was found; RetroHatch does not install unlicensed software.",
+    "price": null
+   },
+   "needs": [
+    "legal/licence review",
+    "device testing"
+   ]
+  },
+  {
+   "id": "pixelplayer",
+   "name": "PixelPlayer",
+   "group": "utilities",
+   "tags": [],
+   "description": "privacy-first Android music player built with Material 3 Expressive. Play offline, sync lyrics, fine-tune with equalizer presets, and cast to your devices. - PixelPlayerHQ/PixelPlayer",
+   "developer": "theovilardo",
+   "source": "https://github.com/theovilardo/pixelplayer",
+   "license": "unknown",
+   "package": "com.theveloper.pixelplay",
+   "released": "",
+   "version": "0.7.5-beta",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 30,
+   "abis": [
+    "arm64-v8a"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "external",
+   "external": {
+    "label": "Official page",
+    "url": "https://github.com/theovilardo/PixelPlayer",
+    "reason": "No licence was found; RetroHatch does not install unlicensed software.",
+    "price": null
+   },
+   "needs": [
+    "legal/licence review",
+    "device testing"
+   ]
+  },
+  {
+   "id": "reterminal",
+   "name": "ReTerminal",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "Terminal Emulator",
+   "developer": "Rohit Kushvaha",
+   "source": "https://github.com/rohitkushvaha01/reterminal",
+   "license": "MIT",
+   "package": "com.rk.terminal",
+   "released": "2025-04-13",
+   "version": "1.2.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 26,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/rohitkushvaha01/reterminal/releases/download/v1.2.0/reterminal-v1.2.0.apk",
+    "file": "reterminal-v1.2.0.apk",
+    "tag": "v1.2.0",
+    "size": 11004122,
+    "sha256": "c2710da3927585a0ba291940333e0775a1e2c72af8034a5596205ef4dd9fe1ed",
+    "version_code": 7,
+    "version_name": "1.2.0",
+    "min_sdk": 26,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "8ad6b593b0772c96f9d05e923b610f16aed2792c664f0cd91f0dfd627098346f"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "shizuku",
+   "name": "Shizuku",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "using system APIs directly with adb/root privileges from normal apps",
+   "developer": "Rikka apps",
+   "source": "https://github.com/rikkaapps/shizuku",
+   "license": "Apache-2.0",
+   "package": "moe.shizuku.privileged.api",
+   "released": "2025-05-29",
+   "version": "13.6.0.r1086.2650830c",
+   "recommended_by": [],
+   "sources": [
+    "izzy",
+    "obtainium"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility",
+    "listed in the Obtainium community configurations"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/rikkaapps/shizuku/releases/download/v13.6.0/shizuku-v13.6.0.r1086.2650830c-release.apk",
+    "file": "shizuku-v13.6.0.r1086.2650830c-release.apk",
+    "tag": "v13.6.0",
+    "size": 2571773,
+    "sha256": "6e273ab0e991c4e79bc8b1bbb9b9dd739ccac1a8712a541a214078886b7b790f",
+    "version_code": 1086,
+    "version_name": "13.6.0.r1086.2650830c",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "268b5590e868fb08bae7e0ac413564cd1ff88f5ccff74af9dbd0dc918e30db30"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "syncthing-fork",
+   "name": "Syncthing-Fork",
+   "group": "utilities",
+   "tags": [
+    "internet"
+   ],
+   "description": "Wrapper for Syncthing - Open and decentralized file synchronization",
+   "developer": "researchxxl",
+   "source": "https://github.com/researchxxl/syncthing-android",
+   "license": "MPL-2.0",
+   "package": "com.github.catfriend1.syncthingfork",
+   "released": "2026-10-25",
+   "version": "2.1.7.0",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "fdroid",
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "utility category Cloud Storage & File Sync",
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 23,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/researchxxl/syncthing-android/releases/download/v2.1.7.0/com.github.catfriend1.syncthingfork_release_v2.1.7.0_arm64-v8a.apk",
+    "file": "com.github.catfriend1.syncthingfork_release_v2.1.7.0_arm64-v8a.apk",
+    "tag": "v2.1.7.0",
+    "size": 19011956,
+    "sha256": "222a7860f2ad21f2bbf4782fcf16c2150b0c1dea60a1aae33f44e2f4d07371c1",
+    "version_code": 2010700,
+    "version_name": "2.1.7.0",
+    "min_sdk": 23,
+    "abis": [
+     "arm64-v8a"
+    ],
+    "signers": [
+     "d374b8de5057013143c7d1515a015598c2df403be8160cae01a58c227e6e86aa"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "unipatcher",
+   "name": "UniPatcher",
+   "group": "utilities",
+   "tags": [],
+   "description": "A game console ROM patcher for Android.",
+   "developer": "btimofeev",
+   "source": "https://github.com/btimofeev/unipatcher",
+   "license": "GPL-3.0",
+   "package": "org.emunix.unipatcher",
+   "released": "",
+   "version": "0.19",
+   "recommended_by": [
+    "retrohandhelds-rotate"
+   ],
+   "sources": [
+    "retrohandhelds-rotate"
+   ],
+   "reasons": [
+    "curated by Retro Handhelds in their RG Rotate Obtainium collection"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/btimofeev/unipatcher/releases/download/v0.19/UniPatcher-0.19.apk",
+    "file": "UniPatcher-0.19.apk",
+    "tag": "v0.19",
+    "size": 8268255,
+    "sha256": "d1b00f8713071b161d0c27dc4b1df8732018768659f00b4979c492e1274d2556",
+    "version_code": 190000,
+    "version_name": "0.19",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86_64"
+    ],
+    "signers": [
+     "d7fd9058ef94176c4bf2219a10618eae572cb79b3269b5a6dec2c376d0481e1b"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "universal-installer",
+   "name": "Universal Installer",
+   "group": "utilities",
+   "tags": [
+    "system"
+   ],
+   "description": "APK/XAPK installer with silent installs via Shizuku, Root or Dhizuku.",
+   "developer": "Nguyen Quang Minh (NQM)",
+   "source": "https://github.com/pass-with-high-score/universal-installer",
+   "license": "GPL-3.0-only",
+   "package": "app.pwhs.universalinstaller",
+   "released": "2026-11-04",
+   "version": "1.21.0",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "utility category App Manager",
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 24,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/pass-with-high-score/universal-installer/releases/download/v1.21.0/app-release.apk",
+    "file": "app-release.apk",
+    "tag": "v1.21.0",
+    "size": 7279841,
+    "sha256": "172ae8d1d84fee46cb0993257a950657c5ddadb2e9a8a2e0410aabf349c42a07",
+    "version_code": 45,
+    "version_name": "1.21.0",
+    "min_sdk": 24,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "40e1d86c6228809e07857a62edcf72952fea664e715317920150b937ef75f5de"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  },
+  {
+   "id": "wifi-password-manager",
+   "name": "WiFi Password Manager",
+   "group": "utilities",
+   "tags": [
+    "security",
+    "system"
+   ],
+   "description": "Simple app using Shizuku or root access to manage WiFi passwords",
+   "developer": "Khh-vu",
+   "source": "https://github.com/khh-vu/wifi-password-manager",
+   "license": "MIT",
+   "package": "io.github.wifi_password_manager",
+   "released": "2026-11-09",
+   "version": "1.22",
+   "recommended_by": [],
+   "sources": [
+    "fdroid",
+    "izzy"
+   ],
+   "reasons": [
+    "file / archive / backup / sync / terminal utility"
+   ],
+   "min_sdk": 29,
+   "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+   ],
+   "needs_game_files": "unknown",
+   "flags": [],
+   "added": "2026-11-09",
+   "mode": "install",
+   "apk": {
+    "url": "https://github.com/khh-vu/wifi-password-manager/releases/download/v1.22/app-release.apk",
+    "file": "app-release.apk",
+    "tag": "v1.22",
+    "size": 5958773,
+    "sha256": "b1643f536d6b06fcc3d5fdfa7ce360597dd49afebb1ecc00cb29f5d60b53bc95",
+    "version_code": 23,
+    "version_name": "1.22",
+    "min_sdk": 29,
+    "abis": [
+     "arm64-v8a",
+     "armeabi-v7a",
+     "x86",
+     "x86_64"
+    ],
+    "signers": [
+     "34ffa2ee658fe036b6c5d292aeb25145de6957ed52edd99f4beb8d6b3631c1ff"
+    ],
+    "sha256_inspected": "2026-11-09"
+   },
+   "needs": [
+    "device testing"
+   ]
+  }
+ ]
+}

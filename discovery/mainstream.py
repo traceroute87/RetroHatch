@@ -149,7 +149,9 @@ def inspect_apk(app_id, url, outdir):
     except (Exception, SystemExit) as e:
         return {"error": str(e)[:120]}
     finally:
-        f.unlink(missing_ok=True)
+        for _ in range(8):                      # Windows may still hold the file for a moment after aapt2/apksigner exit
+            try: f.unlink(missing_ok=True); break
+            except PermissionError: __import__("time").sleep(0.7)
 
 
 def verify(a):

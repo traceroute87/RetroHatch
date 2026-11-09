@@ -38,6 +38,21 @@ class ExperimentalTest {
     private fun signed(d: Map<String, Any?>, key: TestKey = dev): Pair<ByteArray, ByteArray> { val b = StrictJson.canonical(d); return b to key.sign(b) }
     private fun devKid() = Trust.keyId(unhex(dev.pubHex))
 
+    @Test fun externalListingsAreDevOnlyAndNeverCarryADownload() {
+        val ext = mapOf("id" to "paid-emu", "name" to "Paid Emu", "description" to "Store only.", "developer" to "acme", "source" to "https://example.org/emu", "license" to "proprietary",
+            "label" to "Google Play", "url" to "https://play.google.com/store/apps/details?id=x", "reason" to "Paid, store-only.", "group" to "emulators", "tags" to listOf("ps2"))
+        fun withExt(e: Map<String, Any?>) = doc(app()) + ("external" to listOf(e))
+        assertNull(CatalogPolicy.check(withExt(ext), allowExperimental = true))
+        assertTrue("production keys never accept an external list", CatalogPolicy.check(withExt(ext), allowExperimental = false)!!.contains("unexpected"))
+        for ((bad, why) in listOf(ext + ("sha256" to "ab".repeat(32)) to "carries no download", ext + ("artifacts" to emptyList<Any?>()) to "carries no download", ext + ("url" to "http://x") to "bad url",
+                                  ext + ("id" to "tool") to "duplicate id", ext + ("group" to "movies") to "bad group", ext - "reason" to "wrong fields", ext + ("extra" to "x") to "wrong fields"))
+            assertTrue("$why: " + CatalogPolicy.check(withExt(bad), allowExperimental = true), CatalogPolicy.check(withExt(bad), allowExperimental = true)!!.contains(why))
+        val mapped = CatalogMapper.fromDoc(withExt(ext)).external.single()
+        assertEquals("Google Play", mapped.external!!.label); assertTrue(mapped.artifacts.isEmpty())
+        val l = DeviceFilter.forDevice(CatalogMapper.fromDoc(withExt(ext)), Targets.RG_ROTATE).single { it.app.id == "paid-emu" }
+        assertFalse(l.installable); assertNull(l.artifact.url); assertNull(l.artifact.sha256)
+    }
+
     @Test fun acceptedOnlyFromADevKey() {
         val (i, s) = signed(doc(app()))
         Trust.verify(i, s, listOf(dev.pubHex), experimentalKeyIds = setOf(devKid()))
@@ -73,32 +88,28 @@ class ExperimentalTest {
         assertTrue(rel.source is CatalogSource.Preview)
     }
 
-    /** The committed debug-build snapshot (android/app/src/debug/assets/dev/catalog) is what the app lists: 8 real apps, matching the inventory byte for byte. */
-    @Test fun bundledDevCatalogMatchesTheInventoryAndExcludesHeldApps() {
+    /** The committed debug-build snapshot (android/app/src/debug/assets/dev/catalog) verifies with the DEV key only and matches candidates/android-curated.json fact for fact. */
+    @Test fun bundledDevCatalogMatchesTheCuratedFile() {
         val dir = "android/app/src/debug/assets/dev"
         val key = repo("$dir/dev_keys.txt").readLines().first { it.isNotBlank() && !it.startsWith("#") }.trim()
         val v = Trust.verify(repo("$dir/catalog/index.json").readBytes(), repo("$dir/catalog/index.json.sig").readBytes(), listOf(key), experimentalKeyIds = setOf(Trust.keyId(unhex(key))))
         val cat = CatalogMapper.fromDoc(v.doc)
-        val inv = StrictJson.parseObject(repo("candidates/inventory-rg-rotate.json").readBytes())
-        @Suppress("UNCHECKED_CAST") val entries = (inv["applications"] as List<Map<String, Any?>>)
-        val held = entries.filter { it["hold"] != null }
-        assertEquals("exactly two entries are on hold (licence, signer)", 2, held.size)
-        assertEquals(8, cat.apps.size)
+        @Suppress("UNCHECKED_CAST") val cur = (StrictJson.parseObject(repo("candidates/android-curated.json").readBytes())["apps"] as List<Map<String, Any?>>)
+        val inst = cur.filter { it["mode"] == "install" }; val ext = cur.filter { it["mode"] == "external" }
+        assertEquals(inst.size, cat.apps.size); assertEquals(ext.size, cat.external.size)
         val shown = DeviceFilter.forDevice(cat, Targets.RG_ROTATE)
-        assertEquals("every entry is for RG Rotate", 8, shown.size)
-        for (l in shown) {
-            val a = l.artifact
-            assertEquals("experimental", a.level); assertTrue("the EXPERIMENTAL label comes from the artifact level (the UI), not from the text", l.app.description.isNotBlank())
-            @Suppress("UNCHECKED_CAST") val e = entries.single { ((it["packages"] as List<Map<String, Any?>>)[0]["android"] as Map<String, Any?>)["package"] == a.android!!.packageName }
-            assertNull("held entries must not be in the catalog", e["hold"])
-            @Suppress("UNCHECKED_CAST") val p = (e["packages"] as List<Map<String, Any?>>)[0]
-            assertEquals(p["sha256"], a.sha256); assertEquals(p["url"], a.url); assertEquals((p["size"] as Long), a.size)
-            @Suppress("UNCHECKED_CAST") val an = p["android"] as Map<String, Any?>
-            assertEquals(an["version_code"], a.android!!.versionCode); assertEquals(an["signer_sha256"], a.android!!.signerSha256)
-            assertEquals(e["license"], l.app.license)
-            assertTrue(a.url!!.startsWith(l.app.source + "/releases/download/"))
+        assertEquals("every entry is for RG Rotate", cur.size, shown.size)
+        for (e in inst) {
+            @Suppress("UNCHECKED_CAST") val ap = e["apk"] as Map<String, Any?>
+            val l = shown.single { it.app.id == e["id"] }; val a = l.artifact
+            assertEquals("experimental", a.level); assertTrue(l.installable)
+            assertEquals(ap["sha256"], a.sha256); assertEquals(ap["url"], a.url); assertEquals(ap["size"], a.size)
+            assertEquals(ap["version_code"], a.android!!.versionCode); assertEquals(ap["signers"], a.android!!.signerSha256); assertEquals(e["package"], a.android!!.packageName)
+            assertTrue(a.url!!.startsWith(l.app.source + "/releases/download/") || a.url!!.lowercase().startsWith((l.app.source + "/releases/download/").lowercase()))
         }
-        assertFalse(shown.any { it.app.name.contains("Pegasus", true) || it.artifact.android!!.packageName.contains("daijishou") })
+        for (e in ext) { val l = shown.single { it.app.id == e["id"] }; assertTrue(l.app.external != null && !l.installable && l.artifact.url == null) }
+        // a held entry is never installable
+        assertTrue(shown.none { it.app.id in setOf("daijisho", "pegasus-frontend") && it.installable })
         // production trust refuses the very same files
         try { Trust.verify(repo("$dir/catalog/index.json").readBytes(), repo("$dir/catalog/index.json.sig").readBytes(), Trust.PRODUCTION_KEYS); fail() } catch (e: TrustException) { /* unknown signing key */ }
     }

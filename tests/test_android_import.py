@@ -24,7 +24,8 @@ assert A.classify("Moonlight", "Open source game streaming client", ["Multimedia
 # installability comes from the manifest only
 r = A.new(min_sdk=23, abis=["arm64-v8a", "x86"]); assert A.installable(r)[0] is True
 assert A.installable(A.new(min_sdk=33, abis=[]))[0] is False                                              # Android 12 is API 31
-assert A.installable(A.new(min_sdk=21, abis=["armeabi-v7a"]))[0] is False                                 # no arm64 library
+assert A.installable(A.new(min_sdk=21, abis=["armeabi-v7a"]))[0] is True                                  # the Rotate lists armeabi-v7a (32-bit) in its abilist
+assert A.installable(A.new(min_sdk=21, abis=["x86", "x86_64"]))[0] is False                               # x86 only: no usable ABI
 assert A.installable(A.new(min_sdk=21, abis=[]))[0] is True                                                # pure Java
 assert A.installable(A.new())[0] is None                                                                   # unknown stays unknown
 

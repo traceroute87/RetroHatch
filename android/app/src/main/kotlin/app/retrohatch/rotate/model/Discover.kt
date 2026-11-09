@@ -4,7 +4,7 @@ package app.retrohatch.rotate.model
 enum class Sort(val label: String) { NAME("A to Z"), UPDATED("Recently updated"), ADDED("Newly added") }
 
 enum class Filter(val label: String) {
-    ALL("All apps"), INSTALLED("Installed"), NOT_INSTALLED("Not installed"), UPDATES("Updates available"), VERIFIED("Verified only"),
+    ALL("All apps"), INSTALLABLE("Installable here"), EXTERNAL("External listings"), INSTALLED("Installed"), NOT_INSTALLED("Not installed"), UPDATES("Updates available"), VERIFIED("Verified only"),
 }
 
 /** [group] null = every category. */
@@ -44,8 +44,10 @@ object Discover {
         val kept = listings.filter { l ->
             (q.group == null || Groups.of(l.app) == q.group) && matches(l, q.text) && when (q.filter) {
                 Filter.ALL -> true
+                Filter.INSTALLABLE -> l.app.external == null && l.installable
+                Filter.EXTERNAL -> l.app.external != null
                 Filter.INSTALLED -> presence(l) != Presence.NOT_INSTALLED
-                Filter.NOT_INSTALLED -> presence(l) == Presence.NOT_INSTALLED
+                Filter.NOT_INSTALLED -> presence(l) == Presence.NOT_INSTALLED && l.app.external == null
                 Filter.UPDATES -> presence(l) == Presence.UPDATE
                 Filter.VERIFIED -> l.artifact.level == "verified"
             }

@@ -14,6 +14,9 @@ data class Artifact(
     val version: String?, val url: String?, val sha256: String?, val size: Long?, val level: String, val android: AndroidPackage? = null,
 )
 
+/** A legitimate app RetroHatch must NOT install: store-only, paid, or from a source the trust policy does not accept. Shown as an external listing with a link, never an install button. */
+data class ExternalListing(val label: String, val url: String, val reason: String, val price: String? = null)
+
 data class AppEntry(
     val id: String, val name: String, val description: String, val developer: String, val source: String,
     val website: String?, val license: String, val category: String, val artifacts: List<Artifact>,
@@ -21,9 +24,10 @@ data class AppEntry(
     val longDescription: String? = null, val features: List<String> = emptyList(),
     /** Android-only display metadata: one primary group (games, emulators, ports, utilities, media, themes-launchers), search tags, release date, date added (YYYY-MM-DD). */
     val group: String? = null, val tags: List<String> = emptyList(), val released: String? = null, val added: String? = null,
+    val external: ExternalListing? = null, val externalVersion: String? = null,
 )
 
-data class Catalog(val devices: List<DeviceProfile>, val apps: List<AppEntry>, val serial: Long? = null, val generated: String? = null) {
+data class Catalog(val devices: List<DeviceProfile>, val apps: List<AppEntry>, val serial: Long? = null, val generated: String? = null, val external: List<AppEntry> = emptyList()) {
     companion object { val EMPTY = Catalog(emptyList(), emptyList()) }
 }
 
@@ -66,7 +70,13 @@ object CatalogMapper {
                 s(a, "license") ?: "unknown", s(a, "category") ?: "other", arts, s(a, "long_description"),
                 (a["features"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(), s(a, "group"), (a["tags"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(), s(a, "released"), s(a, "added"))
         }
-        return Catalog(devices, apps, doc["serial"] as? Long, s(doc, "generated"))
+        val ext = objs(doc["external"]).mapNotNull { e ->
+            val id = s(e, "id") ?: return@mapNotNull null
+            AppEntry(id, s(e, "name") ?: id, s(e, "description") ?: "", s(e, "developer") ?: "", s(e, "source") ?: "", s(e, "website"), s(e, "license") ?: "unknown", "application", emptyList(), null, emptyList(),
+                s(e, "group"), (e["tags"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(), s(e, "released"), s(e, "added"),
+                ExternalListing(s(e, "label") ?: "Website", s(e, "url") ?: return@mapNotNull null, s(e, "reason") ?: "", s(e, "price")), s(e, "version"))
+        }
+        return Catalog(devices, apps, doc["serial"] as? Long, s(doc, "generated"), ext)
     }
 }
 
@@ -86,16 +96,22 @@ object Targets {
  */
 object DeviceFilter {
     fun forDevice(cat: Catalog, target: DeviceProfile): List<Listing> =
-        cat.apps.mapNotNull { app ->
-            val art = app.artifacts.firstOrNull { matches(it, target) } ?: return@mapNotNull null
-            Listing(app, art)
-        }.sortedBy { it.app.name.lowercase() }
+        (installable(cat, target) + cat.external.map { e -> Listing(e, externalArtifact(e, target)) }).sortedBy { it.app.name.lowercase() }
+
+    private fun installable(cat: Catalog, target: DeviceProfile): List<Listing> = cat.apps.mapNotNull { app ->
+        val art = app.artifacts.firstOrNull { matches(it, target) } ?: return@mapNotNull null
+        Listing(app, art)
+    }
+
+    /** Never installable: no url, no hash, available = false. The UI shows the listing and a link, not an install button. */
+    private fun externalArtifact(e: AppEntry, target: DeviceProfile) = Artifact(target.id, target.firmware.firstOrNull() ?: "", target.packageFormat, false,
+        "External listing: " + (e.external?.reason ?: ""), e.externalVersion, null, null, null, "external", null)
 
     fun matches(a: Artifact, target: DeviceProfile): Boolean =
         a.device == target.id && a.firmware in target.firmware && a.format == target.packageFormat && a.format == "apk"
 
     /** Entries in the catalog that have no artifact for this device (other handhelds). Shown in Catalog Status, never in the app list. */
-    fun hiddenCount(cat: Catalog, target: DeviceProfile): Int = cat.apps.size - forDevice(cat, target).size
+    fun hiddenCount(cat: Catalog, target: DeviceProfile): Int = cat.apps.size - installable(cat, target).size
 }
 
 sealed class CatalogSource {

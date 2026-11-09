@@ -55,11 +55,14 @@ class DetailsCatalogTest {
     @Test fun theBundledDevCatalogCarriesProfessionalText() {
         val f = File("src/debug/assets/dev/catalog/index.json")
         val apps = CatalogMapper.fromDoc(StrictJson.parseObject(f.readBytes())).apps
-        assertEquals(8, apps.size)
+        val hand = setOf("aegis", "droidify", "gallery", "lemuroid", "materialfiles", "melonds", "newpipe", "obtainium")
+        assertTrue("the eight hand-written apps stay", apps.map { it.id }.containsAll(hand))
         for (a in apps) {
-            assertTrue("${a.id} short description", a.description.length in 20..140 && !a.description.contains("EXPERIMENTAL") && !a.description.contains("not approved"))
-            assertTrue("${a.id} long description", (a.longDescription ?: "").length in 200..2000)
-            assertTrue("${a.id} features", a.features.size in 3..8)
+            assertTrue("${a.id} short description", a.description.length in 15..300 && !a.description.contains("EXPERIMENTAL") && !a.description.contains("not approved"))
+            if (a.id in hand) {
+                assertTrue("${a.id} long description", (a.longDescription ?: "").length in 200..2000)
+                assertTrue("${a.id} features", a.features.size in 3..8)
+            }
         }
     }
 }

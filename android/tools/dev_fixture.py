@@ -289,6 +289,59 @@ def real(ids=None, tested_file=None):
     print(f"signed DEV catalog (EXPERIMENTAL, serial {doc['serial']}) with {len(want)} real app(s): {', '.join(want)}\n  -> {out}\n  -> {bundled} (bundled into the debug APK)")
 
 
+def curated():
+    """DEV catalog from candidates/android-curated.json (discovery/curate.py): install entries are signed artifacts (GitHub release of the app's own repository, APK identity read from the
+    file); external entries go into the DEV-only top-level `external` list with a link and a reason and NO download. Hand-written text for the first eight apps comes from
+    candidates/descriptions-rg-rotate.json. Signed with the DEV key only: tools/trust.py and release builds reject this index (experimental level, `external`)."""
+    need_crypto()
+    import trust as T, validate
+    from cryptography.hazmat.primitives.serialization import load_pem_private_key
+    if not (KEYS / "catalog-dev.key").exists():
+        init()
+    cur = json.loads((ROOT / "candidates" / "android-curated.json").read_text(encoding="utf-8"))
+    hand = json.loads((ROOT / "candidates" / "descriptions-rg-rotate.json").read_text(encoding="utf-8"))["apps"]
+    d = OUT / "cats" / "curated"
+    if d.exists():
+        shutil.rmtree(d)
+    for sub in ("apps", "devices"):
+        (d / sub).mkdir(parents=True)
+    shutil.copy(ROOT / "catalog" / "devices" / "rg-rotate.json", d / "devices")
+    cat_of = {"themes-launchers": "launcher", "ports": "port", "utilities": "utility"}
+    external, n_install = [], 0
+    for x in cur["apps"]:
+        h = hand.get(x["id"], {})
+        base = {"id": x["id"], "name": x["name"], "description": (h.get("description") or x["description"])[:300], "developer": x["developer"] or "unknown", "source": x["source"], "license": x["license"] or "unknown",
+                "group": x["group"], **({"tags": (h.get("tags") or x["tags"])[:8]} if (h.get("tags") or x["tags"]) else {}), **({"released": x["released"]} if x.get("released") else {}),
+                "added": h.get("added") or x["added"]}
+        if x["mode"] == "install":
+            ap = x["apk"]
+            app = {"schema": 1, **base, **({"long_description": h["long_description"]} if h.get("long_description") else {}), **({"features": h["features"]} if h.get("features") else {}),
+                   "category": cat_of.get(x["group"], "application"),
+                   "artifacts": [{"device": "rg-rotate", "firmware": "android-12", "format": "apk", "status": "available", "version": ap.get("version_name") or x["version"] or ap["tag"], "url": ap["url"],
+                                  "sha256": ap["sha256"], "size": ap["size"], "android": {"package": x["package"], "version_code": ap["version_code"], "signer_sha256": ap["signers"]},
+                                  "compatibility": {"level": "experimental"}}]}
+            (d / "apps" / f"{x['id']}.json").write_text(json.dumps(app, indent=2) + "\n")
+            n_install += 1
+        else:
+            e = x["external"]
+            external.append({**base, "label": e["label"], "url": e["url"], "reason": e["reason"], **({"price": e["price"]} if e.get("price") else {}), **({"version": x["version"]} if x.get("version") else {})})
+    errs = validate.check(d, validate.ROOT / "schema")                  # the shared schema and cross-file rules for every installable app
+    if errs:
+        raise SystemExit("catalog invalid: " + "; ".join(errs[:3]))
+    doc = {"format": 1, "serial": (datetime.date.today() - datetime.date(2026, 1, 1)).days * 1440 + datetime.datetime.now().hour * 60 + datetime.datetime.now().minute, "generated": time.strftime("%Y-%m-%d"),
+           "devices": [json.loads((d / "devices" / "rg-rotate.json").read_text())], "apps": [json.loads(p.read_text()) for p in sorted((d / "apps").glob("*.json"))], "approvals": [], "revoked": [], "external": external}
+    errs = T.strict_patterns(doc)
+    idx = T.canonical(doc)
+    if errs or T.shape(doc)[0] > T.MAX_TOKENS or len(idx) > T.MAX_INDEX:   # the same 8192-token / 256 KB budget as production
+        raise SystemExit(f"index format: {errs[:3]} tokens={T.shape(doc)[0]} bytes={len(idx)}")
+    key = load_pem_private_key((KEYS / "catalog-dev.key").read_bytes(), None)
+    sig = T.canonical({"v": 1, "alg": "ed25519", "key_id": T.key_id(T.raw_pub(key)), "sig": base64.b64encode(key.sign(idx)).decode()})
+    bundled = DEBUG_SRC / "assets" / "dev" / "catalog"
+    bundled.mkdir(parents=True, exist_ok=True)
+    (bundled / "index.json").write_bytes(idx); (bundled / "index.json.sig").write_bytes(sig)
+    print(f"signed DEV catalog (EXPERIMENTAL, serial {doc['serial']}): {n_install} installable + {len(external)} external listings, {len(idx)} bytes, {T.shape(doc)[0]} tokens\n  -> {bundled} (bundled into the debug APK)")
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=str(OUT / "serve"), **k)
@@ -319,4 +372,5 @@ def serve():
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "build"
-    real(*(sys.argv[2:4] if sys.argv[2:3] != ["-"] else [None] + sys.argv[3:4])) if cmd == "real" else {"init": init, "build": build, "serve": serve}[cmd]()
+    if cmd == "curated": curated()
+    else: real(*(sys.argv[2:4] if sys.argv[2:3] != ["-"] else [None] + sys.argv[3:4])) if cmd == "real" else {"init": init, "build": build, "serve": serve}[cmd]()

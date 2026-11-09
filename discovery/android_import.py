@@ -24,6 +24,7 @@ from apk_inspect import pick_asset
 
 CACHE = ROOT / "build" / "discovery" / "cache"
 API_LEVEL = 31
+ROTATE_ABIS = {"arm64-v8a", "armeabi-v7a", "armeabi"}      # ro.product.cpu.abilist of the RG Rotate (read over adb 2026-11-09); 32-bit apps run, so they are NOT rejected
 T0 = time.time()
 LABEL = CAT.LABEL
 SRC_URL = {"fdroid": "https://f-droid.org/repo/index-v2.json", "izzy": "https://apt.izzysoft.de/fdroid/repo/index-v2.json", "recompa": "https://recompa.app/index.json"}
@@ -102,7 +103,7 @@ def repo_id(url):
 def new(**k):
     base = {"package": "", "name": "", "group": "utilities", "tags": [], "official_url": "", "download_source": "", "apk_url": "", "apk_file": "", "apk_size": None, "apk_sha256": "",
             "version": "", "released": "", "license": "", "restrictions": [], "min_sdk": None, "abis": None, "signer_sha256": [], "rotate_confidence": "unknown", "needs_game_files": "unknown",
-            "status": "needs_verification", "verification": [], "flags": [], "sources": [], "reasons": [], "summary": "", "repo": "", "price": "free", "notes": "", "reports": None, "project": ""}
+            "status": "needs_verification", "verification": [], "flags": [], "sources": [], "reasons": [], "summary": "", "repo": "", "price": "free", "notes": "", "reports": None, "project": "", "developer": ""}
     base.update(k); return base
 
 
@@ -118,7 +119,7 @@ def from_fdroid_like(key, base_url, label):
         if not g or not p.get("versions"): continue
         v = max(p["versions"].values(), key=lambda x: x["manifest"].get("versionCode", 0))
         mf = v["manifest"]; sdk = (mf.get("usesSdk") or {}); mn = sdk.get("minSdkVersion", 1); nc = mf.get("nativecode") or []
-        r = new(package=pkg, name=name, group=g[0], reasons=g[1], summary=summ[:160], official_url=m.get("webSite") or m.get("sourceCode") or "", repo=m.get("sourceCode") or "",
+        r = new(package=pkg, name=name, group=g[0], reasons=g[1], summary=summ[:160], developer=(m.get("authorName") or "").strip(), official_url=m.get("webSite") or m.get("sourceCode") or "", repo=m.get("sourceCode") or "",
                 download_source=f"{label} package repository", apk_url=base_url + v["file"]["name"], apk_file=v["file"]["name"].lstrip("/"), apk_size=v["file"].get("size"), apk_sha256=v["file"].get("sha256", ""),
                 version=mf.get("versionName", ""), released=ms(v.get("added") or m.get("lastUpdated")), license=m.get("license", ""), min_sdk=mn, abis=nc, signer_sha256=(mf.get("signer") or {}).get("sha256", []),
                 sources=[key], verification=[f"{label} index lists the file, its SHA-256, size, manifest and signer"], tags=CAT.make_tags(m.get("categories", [])),
@@ -137,7 +138,7 @@ def from_recompa():
             rep = f.get("reports") or []
             tot = {k: sum(x.get(k, 0) for x in rep) for k in ("great", "playable", "broken")}
             typ = p.get("type", "")
-            r = new(package=f["package"], name=p["name"], group="ports", reasons=[f"Recompa lists a native Android {typ or 'port'} of {p.get('game') or p['name']}"],
+            r = new(package=f["package"], name=p["name"], developer=f["repo"].split("/")[0], group="ports", reasons=[f"Recompa lists a native Android {typ or 'port'} of {p.get('game') or p['name']}"],
                     official_url=f"https://github.com/{f['repo']}", repo=f"https://github.com/{f['repo']}", download_source="GitHub release of the fork repository (listed by Recompa)", apk_url=a["url"],
                     apk_file=a["name"], apk_size=a.get("size"), apk_sha256=a.get("sha256", ""), version=rel.get("tag", ""), released=(rel.get("published_at") or "")[:10], signer_sha256=[f["signer_sha256"]] if f.get("signer_sha256") else [],
                     project=f"game:{p.get('game') or p['id']}", sources=["recompa"], verification=["Recompa index (third-party lead): file, size and SHA-256 re-checked independently"], needs_game_files="yes" if typ in ("recomp", "decomp", "source-port") else "unknown",
@@ -385,7 +386,7 @@ def installable(r):
     """Manifest facts only. -> (ok | None unknown, reason)."""
     if r["min_sdk"] is None: return None, "minSdk unknown"
     if r["min_sdk"] > API_LEVEL: return False, f"needs Android API {r['min_sdk']}+ (RG Rotate is API {API_LEVEL})"
-    if r["abis"] and "arm64-v8a" not in r["abis"]: return False, "native code without arm64-v8a"
+    if r["abis"] and not (set(r["abis"]) & ROTATE_ABIS): return False, "native code for none of the device's ABIs (" + ", ".join(sorted(ROTATE_ABIS)) + ")"
     return True, ""
 
 
@@ -426,7 +427,7 @@ def rank(r):
 
 def merge(a, b):
     """Fold b into a: prefer index-verified facts, union sources/flags/reasons."""
-    for k in ("apk_url", "apk_file", "apk_size", "apk_sha256", "version", "released", "license", "min_sdk", "abis", "official_url", "repo", "summary", "download_source"):
+    for k in ("developer", "apk_url", "apk_file", "apk_size", "apk_sha256", "version", "released", "license", "min_sdk", "abis", "official_url", "repo", "summary", "download_source"):
         if (a[k] in ("", None, []) or (k in ("min_sdk", "abis") and a[k] is None)) and b[k] not in ("", None, []): a[k] = b[k]
     if not a["signer_sha256"]: a["signer_sha256"] = b["signer_sha256"]
     if not a["package"]: a["package"] = b["package"]
@@ -515,11 +516,11 @@ def main():
     print("after dedupe", len(uniq), "duplicates folded", dups, flush=True)
     # installable by manifest (index data) BEFORE spending requests; the not-installable are dropped, not counted
     pre = []
-    dropped = {"needs Android above API 31": 0, "no arm64 library": 0}
+    dropped = {"needs Android above API 31": 0, "no usable ABI": 0}
     for r in uniq:
         ok, why = installable(r)
         if ok is False:
-            dropped["needs Android above API 31" if "API" in why else "no arm64 library"] += 1; continue
+            dropped["needs Android above API 31" if "API" in why else "no usable ABI"] += 1; continue
         pre.append(r)
     # resolve leads (upstream release, licence, manifest) and spot-check index records with real range reads
     prio = {"retrohandhelds-rotate": 0, "mainstream-seed": 0, "rgc-guide": 1, "obtainium": 2, "recompa": 3}
@@ -586,7 +587,7 @@ def report(out, final, doc):
           f"- **Distinct upstream projects: {len(projects)}** (community forks of one Recompa game, and the same repository under two package ids, count once). This is the conservative headline number.",
           f"- Core retro categories (Emulators, Games, Ports, Themes & Launchers): **{len(core)}** packages / **{len({proj(r) for r in core})}** projects. General handheld utilities and media players: **{n - len(core)}** packages (a defensible but broader selection: file managers, backup/sync, app managers, music/video players, game streaming).",
           f"- Duplicates folded: **{doc['duplicates_folded']}** (by package id, then upstream repository + name)",
-          f"- Dropped as not installable on RG Rotate (manifest): needs Android above API 31 **{doc['dropped_not_installable']['needs Android above API 31']}**, no arm64 library **{doc['dropped_not_installable']['no arm64 library']}**",
+          f"- Dropped as not installable on RG Rotate (manifest): needs Android above API 31 **{doc['dropped_not_installable']['needs Android above API 31']}**, no usable ABI **{doc['dropped_not_installable']['no usable ABI']}**",
           f"- New versus the current RetroHatch inventory/catalog: **{new_}** new, **{ex}** already known\n",
           "## By category\n", "| Category | Candidates | Verified | Needs verification | External |", "|---|---|---|---|---|"]
     for gid in CAT.GROUP_IDS:
@@ -596,7 +597,7 @@ def report(out, final, doc):
     for k, v in doc["stats"]["scanned"].items(): md.append(f"| {k} | {v} | {doc['stats']['relevant'][k]} | {src[k]} | {only[k]} |")
     conf = C.Counter(r["rotate_confidence"] for r in final)
     md += ["", "## RG Rotate compatibility confidence (never a device test)\n", "| Level | Meaning | Count |", "|---|---|---|",
-           f"| curated-for-rotate | listed in Retro Handhelds' RG Rotate collection | {conf['curated-for-rotate']} |", f"| manifest-installable | minSdk <= 31 and arm64 (or pure Java) per the APK's manifest | {conf['manifest-installable']} |", f"| unknown | manifest not read | {conf['unknown']} |", ""]
+           f"| curated-for-rotate | listed in Retro Handhelds' RG Rotate collection | {conf['curated-for-rotate']} |", f"| manifest-installable | minSdk <= 31 and an ABI the device supports (arm64-v8a, armeabi-v7a, armeabi) or pure Java, per the APK's manifest | {conf['manifest-installable']} |", f"| unknown | manifest not read | {conf['unknown']} |", ""]
     md += ["## Top 75 recommended for RG Rotate\n", "Ranked by: named in the mainstream seed list or Retro Handhelds' Rotate collection, verified file, category value for a handheld, community reports (Recompa), recency, FOSS licence. Per-category caps keep it balanced.\n",
            "| # | App | Category | Status | Min Android | Version | Licence | Why | Source |", "|---|---|---|---|---|---|---|---|---|"]
     caps = {"emulators": 25, "games": 12, "ports": 12, "utilities": 10, "media": 8, "themes-launchers": 8}; used = C.Counter(); top = []

@@ -70,7 +70,8 @@ def inspect(path):
             "label": label.group(1) if label else "", "min_sdk": int(min_sdk.group(1)) if min_sdk else 1, "target_sdk": int(tgt.group(1)) if tgt else None,
             "abis": abis, "signers_sha256": signers, "signer_dn": dns, "signature_schemes": schemes, "signature_ok": rc == 0 and bool(signers), "debuggable": debuggable, "launchable": launcher}
     sdk_ok = info["min_sdk"] <= API_LEVEL
-    info["fits"] = {"rg_rotate_android12_arm64": bool(sdk_ok and (not abis or "arm64-v8a" in abis) and info["signature_ok"]),
+    # the RG Rotate's ro.product.cpu.abilist is arm64-v8a,armeabi-v7a,armeabi: 32-bit apps run there too (key name kept for existing consumers)
+    info["fits"] = {"rg_rotate_android12_arm64": bool(sdk_ok and (not abis or {"arm64-v8a", "armeabi-v7a", "armeabi"} & set(abis)) and info["signature_ok"]),
                     "emulator_x86_64": bool(sdk_ok and (not abis or "x86_64" in abis) and info["signature_ok"])}
     return info
 

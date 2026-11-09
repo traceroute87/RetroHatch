@@ -237,7 +237,7 @@ internal fun appRow(ui: Ui, l: Listing, onOpen: () -> Unit): View {
     val c = ui.ctx; val m = ui.m
     val inst = ui.installed(l)
     val status = when {
-        inst == null -> null
+        inst == null -> if (l.app.external != null) "External" to Pal.TXT2 else null
         ui.managed(l, inst) && ui.updateAvailable(l, inst) -> "Update" to Pal.ACC
         ui.managed(l, inst) -> "Installed" to Pal.GREEN
         else -> "Installed" to Pal.TXT2
@@ -387,8 +387,8 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
                     orientation = LinearLayout.HORIZONTAL
                     fun chip(t: String, color: Int) = addView(W.chip(c, m, t, color), W.lp(W.WRAP, W.WRAP).apply { rightMargin = m.px(3) })
                     a.version?.let { chip("v$it", Pal.TXT2) }
-                    chip(size(a.size), Pal.TXT2)
-                    if (a.level != "verified") chip("EXPERIMENTAL", Pal.ACC)
+                    if (a.size != null) chip(size(a.size), Pal.TXT2)
+                    if (l.app.external != null) chip("EXTERNAL LISTING", Pal.ACC) else if (a.level != "verified") chip("EXPERIMENTAL", Pal.ACC)
                 })
             }, W.lp(0, W.WRAP, 1f))
         })
@@ -419,11 +419,12 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
 
         col.addView(W.section(c, m, "Compatibility"))
         val exp = a.level != "verified"
+        val ext = l.app.external
         col.addView(W.table(c, m, listOf(
             "Device" to "${ui.target.name}, ${a.firmware.replace("android-", "Android ")}",
-            "Status" to if (exp) "Experimental: not approved or tested on ${ui.target.name}" else "Verified for ${ui.target.name}",
-            "Checks" to "SHA-256, package and signer are verified before install"),
-            listOf("smartphone", if (exp) "triangle-alert" else "shield-check", "shield-check")))
+            "Status" to if (ext != null) "External listing: RetroHatch does not install this app" else if (exp) "Experimental: not approved or tested on ${ui.target.name}" else "Verified for ${ui.target.name}",
+            "Checks" to if (ext != null) "Nothing is downloaded or verified by RetroHatch. Check the listing's licence and requirements yourself." else "SHA-256, package and signer are verified before install"),
+            listOf("smartphone", if (ext != null) "external-link" else if (exp) "triangle-alert" else "shield-check", "shield-check")))
 
         root = frame(W.scroll(c, col).also { scroller = it })
         flow.autoInstall = true
@@ -454,7 +455,8 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
         val ver = inst?.let { versionText(it.versionName, it.versionCode) } ?: "-"
         // (icon, title, detail, colour)
         val st: List<Any> = when (s) {
-            is InstState.Unavailable -> listOf(if (ui.preview) "triangle-alert" else "info", if (ui.preview) "Preview only" else "Not available", s.reason, if (ui.preview) Pal.ERR else Pal.TXT)
+            is InstState.Unavailable -> if (l.app.external != null) listOf("external-link", "External listing", l.app.external!!.reason + (l.app.external!!.price?.let { "  Price: $it." } ?: ""), Pal.TXT)
+                else listOf(if (ui.preview) "triangle-alert" else "info", if (ui.preview) "Preview only" else "Not available", s.reason, if (ui.preview) Pal.ERR else Pal.TXT)
             is InstState.Ready ->
                 if (s.installed != null) listOf("circle-arrow-up", "Update available", "Installed $ver (code ${s.installed}), the catalog has ${versionText(l.artifact.version, l.artifact.android?.versionCode)} (code ${l.artifact.android?.versionCode}). ${size(l.artifact.size)}.", Pal.ACC)
                 else listOf("download", "Ready to install", "Checked against the signed SHA-256, package name and signing certificate before Android is asked to install.", Pal.TXT)
@@ -490,7 +492,11 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
         val busy = s is InstState.Downloading || s === InstState.Verifying || s === InstState.Installing
         val updating = inst != null && (s is InstState.Ready || s === InstState.Downloaded || s === InstState.NeedsPermission || s === InstState.InstallCancelled)
         when (s) {
-            is InstState.Unavailable -> acts.add(W.button(c, m, "Not available", false, iconName = "circle-x", weight = 1f) {})
+            is InstState.Unavailable -> l.app.external?.let { x ->
+                acts.add(W.button(c, m, "Open ${x.label}".take(26), true, iconName = "external-link", weight = 1f) {
+                    try { ui.host.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(x.url))) } catch (e: Exception) { Toast.makeText(ui.ctx, "No browser available", Toast.LENGTH_SHORT).show() }
+                })
+            } ?: acts.add(W.button(c, m, "Not available", false, iconName = "circle-x", weight = 1f) {})
             is InstState.Ready -> acts.add(W.button(c, m, if (s.installed != null) "Update" else "Install", true, iconName = if (s.installed != null) "circle-arrow-up" else "download", weight = 1f) { flow.primary() })
             is InstState.Downloading -> acts.add(W.button(c, m, "Cancel download", true, W.Kind.SECONDARY, "x", weight = 1f) { flow.cancelDownload() })
             InstState.Verifying -> acts.add(W.button(c, m, "Verifying...", false, iconName = "shield-check", weight = 1f) {})

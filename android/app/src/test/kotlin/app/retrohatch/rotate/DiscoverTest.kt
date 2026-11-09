@@ -11,6 +11,9 @@ import app.retrohatch.rotate.model.Groups
 import app.retrohatch.rotate.model.Listing
 import app.retrohatch.rotate.model.Presence
 import app.retrohatch.rotate.model.Sort
+import app.retrohatch.rotate.model.DeviceFilter
+import app.retrohatch.rotate.model.Targets
+import app.retrohatch.rotate.model.ExternalListing
 import app.retrohatch.rotate.model.StrictJson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -75,6 +78,18 @@ class DiscoverTest {
         assertEquals(listOf("Lemuroid"), names(DiscoverQuery(text = "retro", group = "emulators", filter = Filter.INSTALLED), p))      // they combine
     }
 
+    @Test fun externalListingsAndTheInstallableFilter() {
+        val ext = Listing(AppEntry("paid", "Paid Emu", "Store only", "dev", "https://example.org", null, "proprietary", "application", emptyList(), null, emptyList(), "emulators", emptyList(), null, "2026-11-09",
+            ExternalListing("Google Play", "https://play.google.com/x", "Paid.")), Artifact("rg-rotate", "android-12", "apk", false, "External listing: Paid.", null, null, null, null, "external", null))
+        val mix = all + ext
+        fun n(q: DiscoverQuery) = Discover.apply(mix, q, none).map { it.app.name }
+        assertEquals(listOf("Paid Emu"), n(DiscoverQuery(filter = Filter.EXTERNAL)))
+        assertEquals(false, n(DiscoverQuery(filter = Filter.NOT_INSTALLED)).contains("Paid Emu"))               // "not installed" means installable but not installed yet
+        assertEquals(false, ext.installable)
+        assertEquals(listOf("Paid Emu"), n(DiscoverQuery(text = "paid")))
+        assertEquals(setOf("emulators", "media", "utilities", "games"), Discover.groups(mix).map { it.first }.toSet())
+    }
+
     @Test fun summaryAndActive() {
         assertFalse(DiscoverQuery().active); assertTrue(DiscoverQuery(text = "a").active); assertTrue(DiscoverQuery(group = "media").active)
         assertFalse(DiscoverQuery(sort = Sort.ADDED).active)                                                  // a sort alone is not a filter
@@ -83,10 +98,16 @@ class DiscoverTest {
     }
 
     @Test fun bundledDevCatalogIsOrganised() {
-        val apps = CatalogMapper.fromDoc(StrictJson.parseObject(File("src/debug/assets/dev/catalog/index.json").readBytes())).apps
-        assertTrue(apps.all { it.group != null && it.added != null && it.released != null && it.tags.isNotEmpty() })
-        val groups = Discover.groups(apps.map { Listing(it, it.artifacts.first()) })
-        assertEquals(listOf("emulators", "utilities", "media"), groups.map { it.first })                    // only the categories that hold apps
+        val cat = CatalogMapper.fromDoc(StrictJson.parseObject(File("src/debug/assets/dev/catalog/index.json").readBytes()))
+        val all = DeviceFilter.forDevice(cat, Targets.RG_ROTATE)
+        assertTrue("a curated catalog of 100+ apps", all.size >= 100)
+        assertTrue(all.all { it.app.group != null && it.app.added != null && it.app.description.isNotBlank() })
+        assertEquals("every group holds apps", Groups.ORDER.map { it.first }, Discover.groups(all).map { it.first })
+        val ext = all.filter { it.app.external != null }; val inst = all.filter { it.app.external == null }
+        assertTrue(ext.isNotEmpty() && inst.size >= 60)
+        assertTrue("an external listing can never be installed", ext.none { it.installable || it.artifact.url != null || it.artifact.sha256 != null || it.artifact.available })
+        assertTrue("every installable entry has the full identity", inst.all { it.installable && it.artifact.android != null && it.artifact.android!!.signerSha256.isNotEmpty() })
+        assertTrue(ext.all { it.app.external!!.url.startsWith("https://") && it.app.external!!.reason.isNotBlank() })
         // schema-level checks of the new fields
         val base = mapOf("schema" to 1L, "id" to "t", "name" to "T", "description" to "d", "developer" to "x", "source" to "https://github.com/x/t", "license" to "MIT", "category" to "application")
         fun problem(extra: Map<String, Any?>): String? = CatalogPolicy.check(mapOf("format" to 1L, "serial" to 1L, "generated" to "2026-11-09", "devices" to emptyList<Any?>(),
