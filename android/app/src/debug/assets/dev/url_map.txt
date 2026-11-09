@@ -1,2 +1,3 @@
-# debug builds only: fixture release URLs -> local HTTPS test server (10.0.2.2 = the PC, seen from the emulator)
+# debug builds only: fixture URLs -> local HTTPS test server (10.0.2.2 = the PC, seen from the emulator)
 https://github.com/retrohatch-fixture/=https://10.0.2.2:8443/
+https://traceroute87.github.io/RetroHatch/catalog/=https://10.0.2.2:8443/catalog/

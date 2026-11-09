@@ -15,13 +15,20 @@ import android.widget.Toast
 import android.widget.ProgressBar
 import android.widget.TextView
 import java.io.File
+import java.text.DateFormat
+import java.util.Date
 import java.util.concurrent.Executors
 import app.retrohatch.rotate.DevHooks
 import app.retrohatch.rotate.android.InstallEvents
 import app.retrohatch.rotate.android.PmApkInspector
 import app.retrohatch.rotate.android.PmPackageState
 import app.retrohatch.rotate.android.SessionInstaller
+import app.retrohatch.rotate.model.CatalogConfig
 import app.retrohatch.rotate.model.CatalogSource
+import app.retrohatch.rotate.model.CatalogStore
+import app.retrohatch.rotate.model.CatalogUpdater
+import app.retrohatch.rotate.model.RefreshResult
+import app.retrohatch.rotate.model.RefreshStatus
 import app.retrohatch.rotate.model.Downloader
 import app.retrohatch.rotate.model.InstState
 import app.retrohatch.rotate.model.InstallFlow
@@ -32,8 +39,11 @@ import app.retrohatch.rotate.model.LoadedCatalog
 import app.retrohatch.rotate.model.Trust
 
 /** Everything a screen needs. */
-class Ui(val host: MainActivity, val m: Metrics, val width: Int, val loaded: LoadedCatalog, val target: DeviceProfile) {
-    val listings: List<Listing> = DeviceFilter.forDevice(loaded.catalog, target)
+class Ui(val host: MainActivity, val m: Metrics, val width: Int, initial: LoadedCatalog, val target: DeviceProfile, val store: CatalogStore) {
+    var loaded: LoadedCatalog = initial
+        private set
+    /** Entries for THIS device only (device id, firmware and apk format must all match): Nano OPKs and other devices never appear. */
+    val listings: List<Listing> get() = DeviceFilter.forDevice(loaded.catalog, target)
     val source get() = loaded.source
     /** Not production-signed data: the bundled offline sample. */
     val preview: Boolean get() = source is CatalogSource.Preview
@@ -45,10 +55,34 @@ class Ui(val host: MainActivity, val m: Metrics, val width: Int, val loaded: Loa
     fun push(s: Screen) = host.push(s)
     fun back() = host.back()
 
-    private val worker = Executors.newSingleThreadExecutor()
+    private val worker = Executors.newSingleThreadExecutor()          // downloads
+    private val netWorker = Executors.newSingleThreadExecutor()       // catalog refresh: never waits behind a download
     private val uiHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private val flows = HashMap<String, InstallFlow>()
     private val packages = PmPackageState(host)
+    private val updater = CatalogUpdater({ u, max -> Downloader(mapUrl = DevHooks::mapUrl).fetch(u, max) }, store, Trust.PRODUCTION_KEYS, DevHooks.devKeys(host))
+
+    @Volatile var refreshing = false
+        private set
+
+    /** A new verified catalog is in place: idle install flows are rebuilt from the new entries; one that is downloading keeps going. */
+    fun setCatalog(l: LoadedCatalog) { loaded = l; flows.entries.removeAll { !it.value.busy } }
+
+    /** Fetch, verify and cache the online catalog in the background. Screens are rebuilt when it ends. A rejected or failed refresh changes nothing but the status. */
+    fun refresh() {
+        if (refreshing) return
+        refreshing = true
+        host.rebuildAll()
+        netWorker.execute {
+            val r = updater.refresh()
+            uiHandler.post {
+                refreshing = false
+                if (r is RefreshResult.Updated) host.reloadCatalog() else host.rebuildAll()
+            }
+        }
+    }
+
+    fun refreshStatus(): RefreshStatus? = store.status()
 
     /** One install flow per catalog entry, kept alive while the app runs so a download continues when the screen is left. */
     fun flow(l: Listing): InstallFlow = flows.getOrPut(l.app.id) {
@@ -310,12 +344,18 @@ class InstalledScreen(ui: Ui, private val updatesOnly: Boolean = false) : Screen
 
 class SettingsScreen(ui: Ui) : Screen(ui) {
     override val title = "Settings"
+
+    private fun when_(st: RefreshStatus) = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(st.atMs))
+
     override fun build(): View {
         val c = ui.ctx; val m = ui.m
         val col = W.column(c, m, 8)
-        col.addView(W.row(c, m, "ic_phone_20", "Device Information", null, 28, { ui.push(InfoScreen(ui, "Device Information", deviceRows(), null)) }))
-        col.addView(W.row(c, m, "ic_database_20", "Catalog Status", null, 28, { ui.push(InfoScreen(ui, "Catalog Status", catalogRows(), trustNote())) }))
-        col.addView(W.row(c, m, "ic_info_20", "About RetroHatch", null, 28, { ui.push(InfoScreen(ui, "About", aboutRows(), null)) }))
+        val st = ui.refreshStatus()
+        val sub = if (ui.refreshing) "Refreshing..." else st?.text ?: "Not refreshed yet"
+        col.addView(W.row(c, m, "ic_refresh_20", "Refresh Catalog", sub, 28, { ui.refresh() }, enabled = !ui.refreshing))
+        col.addView(W.row(c, m, "ic_database_20", "Catalog Status", null, 28, { ui.push(InfoScreen(ui, "Catalog Status", { catalogRows() }, { trustNote() })) }))
+        col.addView(W.row(c, m, "ic_phone_20", "Device Information", null, 28, { ui.push(InfoScreen(ui, "Device Information", { deviceRows() }, { null })) }))
+        col.addView(W.row(c, m, "ic_info_20", "About RetroHatch", null, 28, { ui.push(InfoScreen(ui, "About", { aboutRows() }, { null })) }))
         return frame(W.scroll(c, col), showPreview = false)
     }
 
@@ -338,10 +378,16 @@ class SettingsScreen(ui: Ui) : Screen(ui) {
     private fun catalogRows(): List<Pair<String, String>> {
         val src = ui.loaded.source
         val total = ui.loaded.catalog.apps.size
+        val st = ui.refreshStatus()
         return listOf(
-            "Source" to when (src) { is CatalogSource.Signed -> if (src.dev) "DEV fixture catalog (test key)" else "Signed catalog"; is CatalogSource.Preview -> "PREVIEW sample (unsigned)" },
+            "Source" to when (src) {
+                is CatalogSource.Signed -> (if (src.dev) "DEV fixture catalog" else "Signed catalog") + if (src.cached) " (cached)" else " (bundled)"
+                is CatalogSource.Preview -> "PREVIEW sample (unsigned)"
+            },
             "Trust" to when (src) { is CatalogSource.Signed -> "serial ${src.serial}, key ${src.keyId}"; is CatalogSource.Preview -> src.reason },
-            "Pinned key id" to Trust.keyId(Trust.PRODUCTION_KEY_HEX.chunked(2).map { it.toInt(16).toByte() }.toByteArray()),
+            "Refresh" to (if (ui.refreshing) "in progress..." else st?.let { "${when_(it)}: ${it.text}" } ?: "never"),
+            "Online" to DevHooks.mapUrl(CatalogConfig.BASE).removePrefix("https://"),
+            "Pinned key" to Trust.keyId(Trust.PRODUCTION_KEY_HEX.chunked(2).map { it.toInt(16).toByte() }.toByteArray()),
             "Entries" to "$total in catalog",
             "For ${ui.target.name}" to "${ui.listings.size}",
             "Hidden" to "${DeviceFilter.hiddenCount(ui.loaded.catalog, ui.target)} for other devices",
@@ -349,20 +395,21 @@ class SettingsScreen(ui: Ui) : Screen(ui) {
     }
 
     private fun trustNote() = if (ui.preview) "Only a catalog signed by the pinned production key is shown as real. Until one is published, apps shown here are labelled PREVIEW and cannot be installed."
-    else if (ui.dev) "DEBUG build: catalogs signed with the DEV fixture key are accepted and shown as DEV. Release builds trust only the production key." else null
+    else if (ui.dev) "DEBUG build: catalogs signed with the DEV fixture key are accepted and shown as DEV; their cache and rollback state are kept apart from production. Release builds trust only the production key." else null
 
     private fun aboutRows() = listOf(
-        "App" to "RetroHatch for ${ui.target.name}", "Version" to "0.2.0-m2", "Install" to "Download, verify, then the Android installer",
+        "App" to "RetroHatch for ${ui.target.name}", "Version" to "0.3.0-m3", "Catalog" to "Online, signed, cached for offline use",
+        "Install" to "Download, verify, then the Android installer",
         "Trust" to "Same Ed25519 signing key and catalog format as RetroHatch for RG Nano",
     )
 }
 
-class InfoScreen(ui: Ui, override val title: String, private val rows: List<Pair<String, String>>, private val note: String?) : Screen(ui) {
+class InfoScreen(ui: Ui, override val title: String, private val rows: () -> List<Pair<String, String>>, private val note: () -> String?) : Screen(ui) {
     override fun build(): View {
         val c = ui.ctx; val m = ui.m
         val col = W.column(c, m, 8)
-        col.addView(W.table(c, m, rows))
-        if (note != null) col.addView(text(c, note, m.small, Pal.TXT2).apply { setPadding(m.px(2), m.px(2), m.px(2), 0) }, W.lp(W.MATCH, W.WRAP))
+        col.addView(W.table(c, m, rows()))
+        note()?.let { n -> col.addView(text(c, n, m.small, Pal.TXT2).apply { setPadding(m.px(2), m.px(2), m.px(2), 0) }, W.lp(W.MATCH, W.WRAP)) }
         return frame(W.scroll(c, col), showPreview = false)
     }
 }

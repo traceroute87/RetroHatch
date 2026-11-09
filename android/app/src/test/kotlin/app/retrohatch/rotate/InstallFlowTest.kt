@@ -97,6 +97,16 @@ class DownloaderTest {
         assertFalse(File(tmp.root, "a.apk").exists()); assertFalse(File(tmp.root, "a.apk.part").exists())
     }
 
+    @Test fun fetchIsBoundedAndHttpsOnly() {
+        val doc = "{\"a\":1}".toByteArray()
+        assertEquals(String(doc), String(dl(listOf { u -> FakeConn(u, 200, mapOf("Content-Length" to doc.size.toString()), doc) }).fetch("https://x.example/index.json", 100)))
+        refuses("larger than allowed") { dl(listOf { u -> FakeConn(u, 200, mapOf("Content-Length" to "999"), ByteArray(0)) }).fetch("https://x.example/i", 100) }
+        refuses("larger than allowed") { dl(listOf { u -> FakeConn(u, 200, emptyMap(), ByteArray(500)) }).fetch("https://x.example/i", 100) }
+        refuses("non-https") { dl(listOf { u -> FakeConn(u, 301, mapOf("Location" to "http://x.example/i"), ByteArray(0)) }).fetch("https://x.example/i", 100) }
+        refuses("404") { dl(listOf { u -> FakeConn(u, 404, emptyMap(), ByteArray(0)) }).fetch("https://x.example/i", 100) }
+        refuses("Only https") { dl(emptyList()).fetch("http://x.example/i", 100) }
+    }
+
     @Test fun fixtureHostMappingKeepsTheCatalogUrlSeparate() {
         var seen: URL? = null
         val d = Downloader(open = { u -> seen = u; FakeConn(u, 200, mapOf("Content-Length" to "5000"), body) }, mapUrl = { it.replace("https://github.com/retrohatch-fixture/", "https://10.0.2.2:8443/") })

@@ -5,8 +5,17 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- standard PackageInstaller sessions: the user still confirms every install in Android's own screen, and must allow RetroHatch under "Install unknown apps" -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <!-- tell which catalog apps are installed (their package names come from the catalog, so they cannot be listed in <queries>) -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <!--
+      Package visibility without QUERY_ALL_PACKAGES. Tested on Android 12 (API 31): an installer is NOT automatically allowed to see the app it installed, so
+      "Installed" / "Open" need an explicit rule. Catalog package names are not known at build time, so <package> entries are impossible; the narrowest
+      declaration that works is: packages that have a launcher activity (what a user sees as an app). Non-launchable packages stay invisible.
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
 
     <application
         android:allowBackup="false"

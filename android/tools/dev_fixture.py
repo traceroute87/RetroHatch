@@ -29,6 +29,7 @@ APPS = [  # id, name, what it exercises
     ("e2e-wrongsigner", "E2E Wrong Signer", "Right hash, but signed by another key than the catalog says: the identity check must reject it."),
     ("e2e-wrongpackage", "E2E Wrong Package", "The catalog names another package than the APK contains: the identity check must reject it."),
     ("e2e-slow", "E2E Slow Download", "Throttled server: lets the test cancel a download in progress."),
+    ("e2e-added", "E2E Added Later", "Only in the newer catalog (serial 3): proves a refresh brings in new entries."),
 ]
 
 
@@ -74,7 +75,7 @@ def init():
     (DEBUG_SRC / "assets" / "dev").mkdir(parents=True, exist_ok=True)
     shutil.copy(KEYS / "ca.pem", DEBUG_SRC / "res" / "raw" / "dev_ca.pem")
     (DEBUG_SRC / "assets" / "dev" / "dev_keys.txt").write_text("# DEV fixture catalog signing key, PUBLIC half (test only, debug builds)\n" + (KEYS / "catalog-dev.pub").read_text())
-    (DEBUG_SRC / "assets" / "dev" / "url_map.txt").write_text(f"# debug builds only: fixture release URLs -> local HTTPS test server (10.0.2.2 = the PC, seen from the emulator)\nhttps://github.com/retrohatch-fixture/=https://10.0.2.2:{PORT}/\n")
+    (DEBUG_SRC / "assets" / "dev" / "url_map.txt").write_text(f"# debug builds only: fixture URLs -> local HTTPS test server (10.0.2.2 = the PC, seen from the emulator)\nhttps://github.com/retrohatch-fixture/=https://10.0.2.2:{PORT}/\nhttps://traceroute87.github.io/RetroHatch/catalog/=https://10.0.2.2:{PORT}/catalog/\n")
     print("public parts written under", DEBUG_SRC)
 
 
@@ -132,6 +133,7 @@ def build():
         "e2e-wrongsigner": (wrong_apk.read_bytes(), wrong_apk.read_bytes(), pkg, signers),
         "e2e-wrongpackage": (good, good, "app.retrohatch.notthis", signers),
         "e2e-slow": (good, good, pkg, signers),
+        "e2e-added": (good, good, pkg, signers),
     }
     srv = OUT / "serve"
     cat = OUT / "catalog"
@@ -160,9 +162,27 @@ def build():
     from cryptography.hazmat.primitives.serialization import load_pem_private_key
     key = load_pem_private_key((KEYS / "catalog-dev.key").read_bytes(), None)
     other = ed25519.Ed25519PrivateKey.generate()
+    all_approvals = {a["app"]: a for a in approvals}
+    nano_src = ROOT / "tests" / "trust_fixture" / "catalog"
 
-    def write(name, serial, signer=key, mutate=None):
-        doc = T.build(cat, serial, "2026-11-09")
+    def catalog_dir(name, ids, nano=False):
+        d = OUT / "cats" / name
+        for sub in ("apps", "devices"):
+            (d / sub).mkdir(parents=True)
+        shutil.copy(ROOT / "catalog" / "devices" / "rg-rotate.json", d / "devices")
+        appr = []
+        for i in ids:
+            shutil.copy(cat / "apps" / f"{i}.json", d / "apps"); appr.append(all_approvals[i])
+        if nano:   # a valid catalog that has NO app for RG Rotate: one synthetic Nano OPK app (tests/trust_fixture)
+            shutil.copy(nano_src / "devices" / "rg-nano.json", d / "devices"); shutil.copy(nano_src / "apps" / "examplepad.json", d / "apps")
+            appr += json.loads((nano_src / "approvals.json").read_text())["approvals"]
+        (d / "approvals.json").write_text(json.dumps({"schema": 1, "approvals": appr, "revoked": []}, indent=2) + "\n")
+        return d
+
+    base_ids = [a[0] for a in APPS if a[0] != "e2e-added"]
+
+    def write(name, serial, ids, signer=key, mutate=None, nano=False):
+        doc = T.build(catalog_dir(name, ids, nano), serial, "2026-11-09")
         idx = T.canonical(doc)
         sig = T.sign(idx, signer)
         d = OUT / "catalogs" / name
@@ -171,17 +191,23 @@ def build():
         if not (d / "index.json").exists():
             (d / "index.json").write_bytes(idx); (d / "index.json.sig").write_bytes(sig)
 
-    write("good", 2)
-    write("rollback", 1)                                                          # valid, but older than the serial the app accepted from 'good'
-    write("unknownkey", 3, signer=other)                                         # genuine signature, key not trusted
+    write("good", 2, base_ids)                                                  # first catalog the app fetches
+    write("v3", 3, base_ids + ["e2e-added"])                                    # a newer valid catalog with one more entry
+    write("rollback", 1, base_ids)                                              # valid and signed, but older than anything accepted so far
+    write("unknownkey", 4, base_ids, signer=other)                              # genuine signature, key not trusted
     def badsig(d, idx, sig):
         s = json.loads(sig); raw = bytearray(base64.b64decode(s["sig"])); raw[5] ^= 1; s["sig"] = base64.b64encode(bytes(raw)).decode()
         (d / "index.json").write_bytes(idx); (d / "index.json.sig").write_bytes(T.canonical(s))
-    write("badsig", 3, mutate=badsig)
+    write("badsig", 4, base_ids, mutate=badsig)
     def tamper(d, idx, sig):
         t = bytearray(idx); t[len(t) // 2] ^= 1
         (d / "index.json").write_bytes(bytes(t)); (d / "index.json.sig").write_bytes(sig)
-    write("tampered", 3, mutate=tamper)
+    write("tampered", 4, base_ids, mutate=tamper)
+    write("nomatch", 2, [], nano=True)                                          # valid, but nothing for RG Rotate
+    live = srv / "catalog"                                                      # what the app fetches (https://traceroute87.github.io/RetroHatch/catalog/ in debug builds maps here)
+    live.mkdir(parents=True)
+    for f in ("index.json", "index.json.sig"):
+        shutil.copy(OUT / "catalogs" / "good" / f, live / f)
     meta = {"package": pkg, "version_code": vc, "signer_sha256": signers, "wrong_signer_sha256": wrong_signers, "apk_size": len(good), "apk_sha256": hashlib.sha256(good).hexdigest(),
             "apps": [a[0] for a in APPS], "dev_key_id": T.key_id(bytes.fromhex((KEYS / "catalog-dev.pub").read_text().strip()))}
     (OUT / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")

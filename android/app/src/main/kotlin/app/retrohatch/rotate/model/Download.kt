@@ -32,40 +32,64 @@ class Downloader(
         return URL(s)
     }
 
+    /** Open `url` (after the fixture mapping), follow https->https redirects, return the connection of the final 200 reply. */
+    private fun open200(url: String): HttpURLConnection {
+        var cur = httpsUrl(url)
+        var hop = 0
+        while (true) {
+            if (hop++ > MAX_REDIRECTS) throw DownloadException("Too many redirects")
+            val c = open(httpsUrl(mapUrl(cur.toString())))
+            c.instanceFollowRedirects = false
+            c.connectTimeout = connectMs; c.readTimeout = readMs
+            c.setRequestProperty("User-Agent", "RetroHatch-Android/1")
+            c.setRequestProperty("Accept-Encoding", "identity")
+            val code = try { c.responseCode } catch (e: IOException) { throw DownloadException(netMessage(e)) }
+            if (code in 300..399 && code != 304 && code != 300) {
+                val loc = c.getHeaderField("Location") ?: throw DownloadException("Bad redirect")
+                c.disconnect()
+                val next = try { cur.toURI().resolve(loc).toString() } catch (e: Exception) { throw DownloadException("Bad redirect") }
+                if (!next.startsWith("https://")) throw DownloadException("Redirect to a non-https link refused")
+                cur = httpsUrl(next)
+                continue
+            }
+            if (code != 200) { c.disconnect(); throw DownloadException(if (code == 404) "Not found on the server (404)" else "Server error (HTTP $code)") }
+            val enc = c.getHeaderField("Content-Encoding")
+            if (enc != null && !enc.equals("identity", true)) { c.disconnect(); throw DownloadException("Unsupported encoding") }
+            return c
+        }
+    }
+
+    /** A small document (the signed catalog and its signature) into memory. Same https/redirect rules; more than [maxBytes] is refused. */
+    fun fetch(url: String, maxBytes: Int): ByteArray {
+        val c = open200(url)
+        try {
+            val len = c.getHeaderField("Content-Length")?.toLongOrNull()
+            if (len != null && len > maxBytes) throw DownloadException("Reply is larger than allowed")
+            val out = java.io.ByteArrayOutputStream()
+            val buf = ByteArray(8192)
+            val deadline = System.nanoTime() + totalMs * 1_000_000L
+            c.inputStream.use { ins ->
+                while (true) {
+                    if (System.nanoTime() > deadline) throw DownloadException("Download took too long")
+                    val n = try { ins.read(buf) } catch (e: IOException) { throw DownloadException(netMessage(e)) }
+                    if (n < 0) break
+                    if (out.size() + n > maxBytes) throw DownloadException("Reply is larger than allowed")
+                    out.write(buf, 0, n)
+                }
+            }
+            return out.toByteArray()
+        } finally { c.disconnect() }
+    }
+
     fun download(url: String, dest: File, expectedSize: Long, expectedSha256: String, cancelled: () -> Boolean, progress: (Long, Long) -> Unit): File {
         if (expectedSize < 1 || expectedSha256.length != 64) throw DownloadException("Bad request")
         val part = File(dest.path + ".part")
         dest.parentFile?.mkdirs()
         val deadline = System.nanoTime() + totalMs * 1_000_000L
         try {
-            var cur = httpsUrl(url)
-            var conn: HttpURLConnection? = null
-            var hop = 0
-            while (true) {
-                if (hop++ > MAX_REDIRECTS) throw DownloadException("Too many redirects")
-                val c = open(httpsUrl(mapUrl(cur.toString())))
-                conn = c
-                c.instanceFollowRedirects = false
-                c.connectTimeout = connectMs; c.readTimeout = readMs
-                c.setRequestProperty("User-Agent", "RetroHatch-Android/1")
-                c.setRequestProperty("Accept-Encoding", "identity")
-                val code = try { c.responseCode } catch (e: IOException) { throw DownloadException(netMessage(e)) }
-                if (code in 300..399 && code != 304 && code != 300) {
-                    val loc = c.getHeaderField("Location") ?: throw DownloadException("Bad redirect")
-                    c.disconnect()
-                    val next = try { cur.toURI().resolve(loc).toString() } catch (e: Exception) { throw DownloadException("Bad redirect") }
-                    if (!next.startsWith("https://")) throw DownloadException("Redirect to a non-https link refused")
-                    cur = httpsUrl(next)
-                    continue
-                }
-                if (code != 200) { c.disconnect(); throw DownloadException(if (code == 404) "Not found on the server (404)" else "Server error (HTTP $code)") }
-                break
-            }
-            val c = conn!!
-            val enc = c.getHeaderField("Content-Encoding")
-            if (enc != null && !enc.equals("identity", true)) throw DownloadException("Unsupported encoding")
+            val c = open200(url)
             val len = c.getHeaderField("Content-Length")?.toLongOrNull()
-            if (len != null && len != expectedSize) throw DownloadException("Size differs from the catalog")
+            if (len != null && len != expectedSize) { c.disconnect(); throw DownloadException("Size differs from the catalog") }
             val md = MessageDigest.getInstance("SHA-256")
             var got = 0L
             try {

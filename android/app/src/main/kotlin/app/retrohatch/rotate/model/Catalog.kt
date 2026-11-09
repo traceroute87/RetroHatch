@@ -95,7 +95,7 @@ object DeviceFilter {
 
 sealed class CatalogSource {
     /** Signature, rollback state and every publish gate verified against a pinned key. */
-    data class Signed(val serial: Long, val keyId: String, val generated: String?, val dev: Boolean = false) : CatalogSource()
+    data class Signed(val serial: Long, val keyId: String, val generated: String?, val dev: Boolean = false, val cached: Boolean = false) : CatalogSource()
 
     /** Offline sample data. Not signed, not approved, not installable. The UI must label it as such everywhere it shows apps. */
     data class Preview(val reason: String) : CatalogSource()

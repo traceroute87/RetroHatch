@@ -30,7 +30,7 @@ class PmApkInspector(private val ctx: Context) : ApkInspector {
     }
 }
 
-/** Installed versions. Needs QUERY_ALL_PACKAGES (declared in the manifest) because the catalog's package names are not known at build time. */
+/** Installed versions. Android 11+ hides other packages; the manifest's <queries> (launchable apps) is what makes catalog apps visible. No QUERY_ALL_PACKAGES. */
 class PmPackageState(private val ctx: Context) : PackageState {
     override fun installedVersion(pkg: String): Long? = try { ctx.packageManager.getPackageInfo(pkg, 0).longVersionCode } catch (e: PackageManager.NameNotFoundException) { null }
 }

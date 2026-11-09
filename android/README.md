@@ -3,10 +3,16 @@
 Kotlin Android app for the RG Rotate (Android 12 / API 31, 720x720 touchscreen, D-pad and buttons). Separate from the Nano code
 (`platforms/nano`, `ui/`, `core/`); it shares only the **catalog format, the signing key and the trust rules** (`catalog/`, `tools/trust.py`).
 
-**M2 status: download, verify, install (standard Android confirmation).** Home, Discover, App Details with Download / Install / Installed / Error states,
+**M3 status: online signed catalog + download, verify, install (standard Android confirmation).** Home, Discover, App Details with Download / Install / Installed / Error states,
 Installed and Updates lists, Settings. Until a signed Android catalog exists, the bundled offline sample is shown and labelled **PREVIEW ONLY** everywhere and nothing
 can be installed from it. No silent installs: the last step is Android's own "Do you want to install this app?" screen (PackageInstaller session), and the user
 must allow RetroHatch under "Install unknown apps".
+
+Online catalog (`model/CatalogUpdate.kt`, `android/FileCatalogStore.kt`): at start (and from Settings > Refresh Catalog) the app fetches
+`https://traceroute87.github.io/RetroHatch/catalog/index.json` and `.sig` (the same signed index the Nano uses; not published yet, so today the fetch reports a 404 and the app
+stays on the PREVIEW sample). Nothing is shown or stored before the Ed25519 signature, canonical form, every publish gate and the rollback rule pass. The last valid catalog is cached
+(one atomically-replaced file per trust class) and re-verified on every start, so it works offline; a rejected, invalid or failed refresh changes only the status line.
+Production and DEV trust are separate classes: separate keys, cache file and rollback state; DEV keys exist only in debug builds. Only entries for `rg-rotate` / `android-12` / `apk` are listed.
 
 Install pipeline (`model/Download.kt`, `model/Install.kt`, `android/AndroidDeps.kt`): signed catalog entry -> HTTPS download (https only, also across redirects, size
 and SHA-256 from the signed entry, `.part` file, progress, cancel) -> the platform reads package name, versionCode and signing certificate(s) from the APK and they must
@@ -38,11 +44,13 @@ APK artifacts carry `android: {package, version_code, signer_sha256[1..8]}`; the
 accepts a shared index) and `model/CatalogPolicy.kt`. `tests/trust_fixture_android/` is a synthetic mixed index signed by the Python tools; Python, C and Kotlin all verify it.
 
 ## Testing
-- JVM unit tests (44): trust, policy, device filter, downloader (fake connections), identity check, the whole install flow with fakes.
-- `python android/tools/dev_fixture.py init|build` then `python android/tools/e2e.py`: end-to-end on the `rotate720` emulator (720x720, API 31) against a local HTTPS server.
+- JVM unit tests (56): trust, policy, device filter, downloader and fetch (fake connections), identity check, the whole install flow, catalog refresh/cache/rollback/offline/DEV-vs-production with fakes.
+- `python android/tools/dev_fixture.py init|build` then `python -u android/tools/e2e.py`: 11 end-to-end scenarios on the `rotate720` emulator (720x720, API 31) against a local HTTPS server that stands in for the online catalog.
   The DEV fixture (clearly labelled test APK `:fixtureapp`, DEV signing key and DEV CA, private parts in `~/.retrohatch-dev-android`) exists only in DEBUG builds
   (`src/debug`: DevHooks, network-security-config debug-overrides). The release build trusts only the production key and the system CAs.
 
 ## Not done
-Catalog download/refresh (the app reads `files/catalog/index.json[.sig]` or the bundled one), uninstall, background downloads, a signed production Android catalog.
+Uninstall, background downloads, scheduled refresh, a signed production Android catalog (nothing is published yet).
+
+**Package visibility:** no `QUERY_ALL_PACKAGES`. Tested on API 31: an installer is not automatically allowed to see what it installed, so the manifest has a `<queries>` entry for launchable apps (catalog package names are unknown at build time). Apps without a launcher activity are not detected as installed.
 Nothing here publishes a catalog or touches the production signing key.

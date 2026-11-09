@@ -1,7 +1,6 @@
 package app.retrohatch.rotate.ui
 
 import android.app.Activity
-import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -9,10 +8,11 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.widget.FrameLayout
 import app.retrohatch.rotate.DevHooks
-import app.retrohatch.rotate.model.CatalogLoader
+import app.retrohatch.rotate.android.FileCatalogStore
+import app.retrohatch.rotate.model.CatalogRepository
+import app.retrohatch.rotate.model.Trust
 import app.retrohatch.rotate.model.LoadedCatalog
 import app.retrohatch.rotate.model.Targets
-import app.retrohatch.rotate.model.TrustState
 import java.io.File
 
 /**
@@ -25,7 +25,7 @@ import java.io.File
 class MainActivity : Activity() {
     private lateinit var root: FrameLayout
     private lateinit var ui: Ui
-    private class Entry(val screen: Screen, val view: View, var focus: View? = null)
+    private class Entry(val screen: Screen, var view: View, var focus: View? = null)
     private val stack = ArrayList<Entry>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,21 +36,37 @@ class MainActivity : Activity() {
         setContentView(root)
         window.insetsController?.let { it.hide(WindowInsets.Type.systemBars()); it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE }
         DevHooks.init(this)
-        ui = Ui(this, Metrics(side / 240f), b.width(), loadCatalog(), Targets.RG_ROTATE)
+        ui = Ui(this, Metrics(side / 240f), b.width(), loadCatalog(), Targets.RG_ROTATE, store)
         push(HomeScreen(ui))
+        if (savedInstanceState == null) ui.refresh()   // once per start: fetch, verify, cache; on any failure the cached catalog stays
     }
 
-    /** A signed catalog (app files first, then the bundled one) is used only if it verifies against the pinned key; otherwise the PREVIEW sample. */
+    private val store by lazy { FileCatalogStore(this) }
+
+    /**
+     * The best catalog we can VERIFY: the last valid online one from the cache (production or, in debug builds, DEV), else a bundled signed snapshot,
+     * else the PREVIEW sample. Everything is verified again against the pinned keys and the rollback state on every start.
+     */
     private fun loadCatalog(): LoadedCatalog {
-        fun read(f: File) = if (f.isFile) f.readBytes() else null
         fun asset(p: String) = try { assets.open(p).use { it.readBytes() } } catch (e: java.io.IOException) { null }
-        val fi = read(File(filesDir, "catalog/index.json")); val fs = read(File(filesDir, "catalog/index.json.sig"))
-        val index = fi ?: asset("catalog/index.json"); val sig = if (fi != null) fs else asset("catalog/index.json.sig")
-        val prefs = getSharedPreferences("trust", Context.MODE_PRIVATE)
-        val st = if (prefs.contains("serial")) TrustState(prefs.getLong("serial", 0), prefs.getString("sha256", "") ?: "") else null
-        val r = CatalogLoader.load(index, sig, asset("preview/index.json"), state = st, devKeys = DevHooks.devKeys(this))
-        r.newState?.let { prefs.edit().putLong("serial", it.serial).putString("sha256", it.sha256).apply() }
-        return r
+        val bi = asset("catalog/index.json"); val bs = asset("catalog/index.json.sig")
+        return CatalogRepository.load(store, Trust.PRODUCTION_KEYS, DevHooks.devKeys(this), if (bi != null && bs != null) Pair(bi, bs) else null, asset("preview/index.json"))
+    }
+
+    /** A refresh stored a new verified catalog. */
+    fun reloadCatalog() { ui.setCatalog(loadCatalog()); rebuildAll() }
+
+    /** Rebuild every screen on the stack from the current state (catalog, refresh status) and put the highlight back where it was. */
+    fun rebuildAll() {
+        if (stack.isEmpty()) return
+        val top = stack.last()
+        val idx = focusables().indexOf(currentFocus)
+        stack.forEach { e ->
+            val v = e.screen.build()
+            if (e === top) { root.removeView(e.view); root.addView(v, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)) }
+            e.view = v; e.focus = null
+        }
+        top.view.post { if (!top.view.isInTouchMode) (focusables().getOrNull(maxOf(idx, 0)) ?: focusables().firstOrNull())?.requestFocus() }
     }
 
     fun push(s: Screen) {

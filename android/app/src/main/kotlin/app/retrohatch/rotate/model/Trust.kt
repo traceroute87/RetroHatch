@@ -40,7 +40,8 @@ object Trust {
         return v.verifySignature(sig)
     }
 
-    fun verify(index: ByteArray, sigDoc: ByteArray, trusted: List<String> = PRODUCTION_KEYS, state: TrustState? = null): Verified {
+    /** [stateFor] (keyId -> newest accepted state for THAT key's trust class) replaces [state] when given: production and DEV rollback state never mix. */
+    fun verify(index: ByteArray, sigDoc: ByteArray, trusted: List<String> = PRODUCTION_KEYS, state: TrustState? = null, stateFor: ((String) -> TrustState?)? = null): Verified {
         if (trusted.isEmpty()) throw TrustException("no trusted key configured")
         if (index.isEmpty() || sigDoc.isEmpty()) throw TrustException("missing index or signature")
         if (index.size > MAX_INDEX || sigDoc.size > MAX_SIG) throw TrustException("index or signature too large")
@@ -66,9 +67,10 @@ object Trust {
         CatalogPolicy.check(doc)?.let { throw TrustException("signed index violates policy: $it") }
         val h = sha256Hex(index)
         val serial = doc["serial"] as Long
-        if (state != null) {
-            if (serial < state.serial) throw TrustException("rollback: serial $serial < ${state.serial}")
-            if (serial == state.serial && h != state.sha256) throw TrustException("same serial, different content")
+        val st = if (stateFor != null) stateFor(kid) else state
+        if (st != null) {
+            if (serial < st.serial) throw TrustException("rollback: serial $serial < ${st.serial}")
+            if (serial == st.serial && h != st.sha256) throw TrustException("same serial, different content")
         }
         return Verified(doc, TrustState(serial, h), kid, emptyList())
     }

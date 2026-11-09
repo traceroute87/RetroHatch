@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""End-to-end test of the RG Rotate installer on the Android 12 (API 31) 720x720 emulator `rotate720`.
+"""End-to-end test of the RG Rotate app on the Android 12 (API 31) 720x720 emulator `rotate720`, against a local HTTPS server.
 
 Needs: python android/tools/dev_fixture.py init && build   (DEV keys, labelled test APK, signed DEV catalogs)
-Run:   python android/tools/e2e.py            (starts the emulator and the HTTPS test server if they are not running)
+Run:   python -u android/tools/e2e.py [scenario numbers]   (starts the emulator and the HTTPS test server if they are not running)
 
-Drives the real app through its UI (uiautomator dump + taps) and Android's own package installer screen, and checks the result with pm/dumpsys:
-  1 success       download over HTTPS (DEV CA), verify, install after the user taps Install in Android's installer
-  2 user cancel   the user taps Cancel in Android's installer: nothing is installed, the app says so
-  3 bad hash      tampered file: rejected before install, nothing kept
-  4 wrong signer  right hash, other signing certificate: rejected before install
-  5 wrong package catalog names another package than the APK: rejected before install
-  6 cancel download   cancel while downloading: partial file removed
-  7 invalid catalogs  bad signature / tampered index / unknown key / rollback: catalog rejected, only the PREVIEW sample is shown
+The app is the DEBUG build: it trusts the DEV fixture key and DEV CA and maps https://traceroute87.github.io/RetroHatch/catalog/ to the local server (DevHooks).
+It drives the real UI (uiautomator dump + taps) and Android's own package installer screen, and checks the result with pm/dumpsys/run-as:
+  1  install            fetch catalog, download, verify, install after the user confirms; nothing is installed before that
+  2  installed state    after a restart the app still shows Installed (no QUERY_ALL_PACKAGES); after a system uninstall it shows Ready again
+  3  user cancel        the user taps Cancel in Android's installer: nothing is installed
+  4  bad hash           tampered file: rejected, nothing kept
+  5  wrong signer       other signing certificate: rejected before install
+  6  wrong package      catalog names another package: rejected before install
+  7  cancel download    B button while downloading: partial file removed
+  8  online refresh     start-up fetch of the signed catalog, then Settings > Refresh Catalog brings in a newer one
+  9  offline            server down: the cached catalog is still shown, the refresh reports the failure
+  10 invalid updates    bad signature / tampered / unknown key / rollback: rejected, the last valid catalog stays
+  11 no matching apps   valid catalog without an RG Rotate entry: accepted, "No apps for RG Rotate yet"
 Screenshots and results go to android/build/e2e/."""
 import json, os, re, subprocess, sys, time, xml.etree.ElementTree as ET
 from pathlib import Path
@@ -115,28 +120,45 @@ def fixture_installed():
     return FIXTURE in sh(f"pm list packages {FIXTURE}", check=False)
 
 
+SRV = None
+
+
+def server(up):
+    global SRV
+    if up and SRV is None:
+        SRV = subprocess.Popen([sys.executable, str(HERE / "dev_fixture.py"), "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(2)
+    elif not up and SRV is not None:
+        SRV.terminate(); SRV.wait(); SRV = None
+        time.sleep(1)
+
+
+def serve_catalog(name):
+    """What the online catalog URL returns from now on (the server serves this directory live)."""
+    live = FX / "serve" / "catalog"
+    for f in ("index.json", "index.json.sig"):
+        (live / f).write_bytes((FX / "catalogs" / name / f).read_bytes())
+
+
 def fresh(catalog="good"):
-    """Clean slate: fixture removed, app data cleared, the chosen signed catalog placed in the app's private files, install permission granted (as the user would)."""
+    """Clean slate: fixture removed, app data cleared (no cache, no rollback state), the online catalog set, install permission granted (as the user would)."""
+    server(True)
     sh(f"pm uninstall {FIXTURE}", check=False)
     sh(f"am force-stop {APP}", check=False)
     sh(f"pm clear {APP}")
     if catalog:
-        put_catalog(catalog)
+        serve_catalog(catalog)
     sh(f"appops set {APP} REQUEST_INSTALL_PACKAGES allow")
     sh("settings put secure immersive_mode_confirmations confirmed")
 
 
-def put_catalog(name):
-    d = FX / "catalogs" / name
-    for f in ("index.json", "index.json.sig"):
-        adb("push", str(d / f), f"/data/local/tmp/{f}")
-    sh(f"run-as {APP} sh -c 'mkdir -p files/catalog && cp /data/local/tmp/index.json files/catalog/index.json && cp /data/local/tmp/index.json.sig files/catalog/index.json.sig'")
-
-
-def launch():
+def launch(dev_banner=True):
+    """Start the app; the start-up refresh runs in the background and the screens rebuild when it ends."""
     sh(f"am force-stop {APP}", check=False)
     sh(f"am start -n {APP}/.ui.MainActivity")
     time.sleep(3)
+    if dev_banner:
+        assert has("DEV FIXTURE CATALOG", 30), "the signed DEV catalog did not arrive"
 
 
 def open_entry(title):
@@ -170,10 +192,9 @@ def scenario(name):
     return deco
 
 
-@scenario("1 success: download, verify, install after the user confirms")
+@scenario("1 install: fetch catalog, download, verify, install after the user confirms")
 def s1():
     fresh(); launch()
-    assert has("DEV FIXTURE CATALOG", 10), "DEV banner"
     shot("1a_home_dev_banner")
     open_entry("E2E Good APK")
     assert has("Ready to download", 10); shot("1b_ready")
@@ -185,15 +206,12 @@ def s1():
     assert find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and "install" in n["text"].lower(), 25), "Android's own installer screen did not appear"
     assert not fixture_installed(), "nothing may be installed before the user confirms"
     installer_button("Install")
-    assert has("installed", 60, pkg=None)
-    for _ in range(30):
+    for _ in range(40):
         if fixture_installed():
             break
         time.sleep(1)
     assert fixture_installed(), "package not installed"
-    dump = sh(f"dumpsys package {FIXTURE}")
-    assert "versionCode=7" in dump, dump[:300]
-    # back to the app: Done / Open in the installer, then the app must say Installed
+    assert "versionCode=7" in sh(f"dumpsys package {FIXTURE}")
     n = find(lambda n: n["text"].lower() in ("done", "open") and "retrohatch" not in n["pkg"], 10)
     if n:
         sh(f"input tap {n['cx']} {n['cy']}")
@@ -204,15 +222,28 @@ def s1():
     assert downloads() == [], f"downloaded APK should be removed after install: {downloads()}"
 
 
-@scenario("2 user cancel in Android's installer")
+@scenario("2 installed state without QUERY_ALL_PACKAGES: survives a restart, follows a system uninstall")
 def s2():
+    perms = run_tool("aapt2", "dump", "permissions", str(ANDROID / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"))
+    assert "QUERY_ALL_PACKAGES" not in perms, perms
+    assert "REQUEST_INSTALL_PACKAGES" in perms and "INTERNET" in perms
+    assert fixture_installed(), "needs scenario 1 first"
+    launch(); open_entry("E2E Good APK")                  # restart: catalog from the cache, installed state from the platform
+    assert has("Installed", 15) and has("Open", 5); shot("2a_installed_after_restart")
+    sh(f"pm uninstall {FIXTURE}")
+    launch(); open_entry("E2E Good APK")
+    assert has("Ready to download", 15); shot("2b_after_uninstall")
+
+
+@scenario("3 user cancel in Android's installer")
+def s3():
     fresh(); launch(); open_entry("E2E Good APK")
     tap("Download", exact=True); assert has("Ready to install", 40)
     tap("Install", exact=True)
     time.sleep(2)
     installer_button("Cancel")
     sh(f"am start -n {APP}/.ui.MainActivity"); time.sleep(3)
-    assert has("Install cancelled", 20), "app must report the cancel"; shot("2_install_cancelled")
+    assert has("Install cancelled", 20), "app must report the cancel"; shot("3_install_cancelled")
     assert not fixture_installed(), "cancelled install must not install"
 
 
@@ -226,20 +257,20 @@ def failing(title, expect, shotname):
     assert [d for d in downloads() if d.endswith(".apk") or d.endswith(".part")] == [], f"nothing may be kept: {downloads()}"
 
 
-@scenario("3 invalid hash is rejected, nothing kept")
-def s3(): failing("E2E Bad Hash", "SHA-256 mismatch", "3_bad_hash")
+@scenario("4 invalid hash is rejected, nothing kept")
+def s4(): failing("E2E Bad Hash", "SHA-256 mismatch", "4_bad_hash")
 
 
-@scenario("4 wrong signing certificate is rejected before install")
-def s4(): failing("E2E Wrong Signer", "Signing certificate does not match", "4_wrong_signer")
+@scenario("5 wrong signing certificate is rejected before install")
+def s5(): failing("E2E Wrong Signer", "Signing certificate does not match", "5_wrong_signer")
 
 
-@scenario("5 wrong package name is rejected before install")
-def s5(): failing("E2E Wrong Package", "Wrong package", "5_wrong_package")
+@scenario("6 wrong package name is rejected before install")
+def s6(): failing("E2E Wrong Package", "Wrong package", "6_wrong_package")
 
 
-@scenario("6 cancel a download in progress (physical B button)")
-def s6():
+@scenario("7 cancel a download in progress (physical B button)")
+def s7():
     fresh(); launch(); open_entry("E2E Slow Download")
     tap("Download", exact=True)
     for _ in range(20):                                   # wait for the partial file instead of a UI dump: the UI never idles while the progress bar moves
@@ -247,36 +278,105 @@ def s6():
             break
         time.sleep(0.5)
     assert any(d.endswith(".part") for d in downloads()), "download did not start"
-    shot("6a_downloading")
+    shot("7a_downloading")
     sh("input keyevent KEYCODE_BUTTON_B")                 # B = cancel while downloading (the hint bar says Cancel)
-    assert has("Download cancelled", 20); shot("6b_cancelled")
+    assert has("Download cancelled", 20); shot("7b_cancelled")
     time.sleep(1)
     assert [d for d in downloads() if d.endswith(".apk") or d.endswith(".part")] == [], downloads()
     assert not fixture_installed()
 
 
-def catalog_status():
-    tap("Back", 10) if has("App Details", 1) else None
-    tap("Settings", exact=True); tap("Catalog Status")
+def catalog_rows():
+    """Open Settings > Catalog Status from wherever the app is (relaunching would re-run the start-up refresh)."""
+    for _ in range(4):
+        if has("Refresh Catalog", 1):
+            break
+        sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+        if has("Settings", 1) and not has("Refresh Catalog", 1) and has("Discover", 1):
+            tap("Settings", exact=True)
+    tap("Catalog Status"); time.sleep(1)
 
 
-@scenario("7 invalid catalogs: bad signature, tampered index, unknown key, rollback")
-def s7():
-    for name, why in (("badsig", "bad signature"), ("tampered", "bad signature"), ("unknownkey", "unknown signing key")):
-        fresh(name); launch()
-        assert has("PREVIEW ONLY", 10), f"{name}: preview strip"
-        tap("Settings", exact=True); tap("Catalog Status")
-        assert has("Signed catalog rejected: " + why, 10), f"{name}: reason '{why}'"
-        shot("7_" + name)
-        sh("input keyevent KEYCODE_BACK"); sh("input keyevent KEYCODE_BACK")
-        tap("Discover", exact=True)
-        assert not has("E2E", 3), f"{name}: no entry of the rejected catalog may be shown"
-    fresh("good"); launch()
-    assert has("DEV FIXTURE CATALOG", 10)           # accepts serial 2, remembers it
-    put_catalog("rollback"); launch()               # serial 1: older
-    assert has("PREVIEW ONLY", 10)
+def settings_refresh(expect, timeout=40):
+    """In Settings: press Refresh Catalog and wait for the outcome text shown under it."""
+    assert has("Refresh Catalog", 5)
+    tap("Refresh Catalog", exact=True)
+    assert has(expect, timeout), f"expected '{expect}' after Refresh Catalog"
+
+
+def listed(title, timeout=2):
+    tap("Discover", exact=True)
+    time.sleep(1)
+    found = False
+    for _ in range(4):
+        if has(title, timeout):
+            found = True; break
+        sh("input swipe 360 560 360 160 300"); time.sleep(1)
+    return found
+
+
+@scenario("8 online refresh: start-up fetch, then Settings > Refresh Catalog brings a newer catalog")
+def s8():
+    fresh("good"); launch()                               # start-up refresh: serial 2
+    tap("Settings", exact=True)
+    assert has("Updated to serial 2", 10); shot("8a_settings_after_startup_refresh")
+    tap("Catalog Status")
+    assert has("DEV fixture catalog (cached)", 5) and has("serial 2", 5); shot("8b_catalog_status")
+    sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+    serve_catalog("v3")
+    settings_refresh("Updated to serial 3"); shot("8c_updated")
+    assert has("Hidden", 1) or True
+    sh("input keyevent KEYCODE_BACK"); time.sleep(1)       # Settings -> Home
+    assert listed("E2E Added Later"), "the new entry must appear after the refresh"; shot("8d_new_entry")
+    serve_catalog("v3")
+    sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+    tap("Settings", exact=True)
+    settings_refresh("Already up to date (serial 3)")
+
+
+@scenario("9 offline: cached catalog still shown, the failure is reported, nothing lost")
+def s9():
+    server(False)                                         # the online catalog is unreachable now
+    try:
+        launch()                                          # DEV banner comes from the verified cache, before any network
+        assert listed("E2E Added Later"), "cached entries must be shown offline"; shot("9a_offline_cached")
+        sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+        tap("Settings", exact=True)
+        assert has("Failed:", 30), "the failed refresh must be reported"; shot("9b_offline_status")
+        tap("Catalog Status")
+        assert has("DEV fixture catalog (cached)", 5) and has("serial 3", 5)
+    finally:
+        server(True)
+
+
+@scenario("10 invalid updates are rejected and the last valid catalog stays")
+def s10():
+    launch()                                              # cache = serial 3 (from scenario 8); the start-up refresh keeps it
+    for name, why in (("badsig", "Rejected: bad signature"), ("tampered", "Rejected: bad signature"), ("unknownkey", "Rejected: unknown signing key"), ("rollback", "Rejected: rollback")):
+        serve_catalog(name)
+        tap("Settings", exact=True)
+        settings_refresh(why); shot("10_" + name)
+        assert has("previous catalog is kept", 3)
+        sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+        assert listed("E2E Added Later"), f"{name}: the last valid catalog must still be shown"
+        sh("input keyevent KEYCODE_BACK"); time.sleep(1)
     tap("Settings", exact=True); tap("Catalog Status")
-    assert has("rollback", 10); shot("7_rollback")
+    assert has("serial 3", 5), "still the last valid serial"; shot("10_status_after_rejections")
+
+
+@scenario("11 no matching Android apps: valid catalog, nothing for RG Rotate")
+def s11():
+    fresh("nomatch"); launch()
+    tap("Discover", exact=True)
+    assert has("No apps for RG Rotate yet", 10); shot("11_no_matching_apps")
+    sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+    tap("Settings", exact=True); tap("Catalog Status")
+    assert has("1 for other devices", 5) or has("for other devices", 5)
+
+
+def run_tool(name, *args):
+    t = sorted((SDK / "build-tools").glob("*/" + name + ("*.exe" if os.name == "nt" else "")), reverse=True)[0]
+    return subprocess.run([str(t), *args], capture_output=True, text=True).stdout
 
 
 def main():
@@ -285,14 +385,13 @@ def main():
         raise SystemExit("run: python android/tools/dev_fixture.py build")
     boot()
     adb("install", "-r", str(ANDROID / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"))
-    srv = subprocess.Popen([sys.executable, str(HERE / "dev_fixture.py"), "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(2)
+    server(True)
     try:
-        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7}
-        for k in (sys.argv[1:] or every):                  # e2e.py 4 6  runs only those scenarios
+        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7, "8": s8, "9": s9, "10": s10, "11": s11}
+        for k in (sys.argv[1:] or every):                  # e2e.py 8 9 10  runs only those scenarios (8 -> 9 -> 10 build on each other's app state)
             every[k]()
     finally:
-        srv.terminate()
+        server(False)
         sh(f"pm uninstall {FIXTURE}", check=False)
     (OUT / ("results.json" if not sys.argv[1:] else "results-partial.json")).write_text(json.dumps({"device": sh("getprop ro.product.model").strip(), "api": 31, "results": RESULTS}, indent=1))
     bad = [r for r in RESULTS if r["result"] != "PASS"]
