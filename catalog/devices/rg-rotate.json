@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "rg-rotate",
+  "name": "RG Rotate",
+  "adapter": "android-packageinstaller",
+  "package_format": "apk",
+  "display": {"w": 720, "h": 720},
+  "firmware": ["android-12"],
+  "notes": "Android 12 (API 31), Unisoc T618 (arm64), 3 GB RAM, 720x720 touchscreen, physical D-pad and buttons."
+}

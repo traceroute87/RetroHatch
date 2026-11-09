@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sunset Ember background (0x171B19), same as the Nano UI. Views are built in code (ui/). -->
+    <style name="Theme.RetroHatch" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/rh_bg</item>
+        <item name="android:colorBackground">@color/rh_bg</item>
+        <item name="android:statusBarColor">@color/rh_bg</item>
+        <item name="android:navigationBarColor">@color/rh_bg</item>
+    </style>
+</resources>
