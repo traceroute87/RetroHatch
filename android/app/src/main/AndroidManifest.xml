@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- M1 is offline: no INTERNET permission yet (catalog refresh and PackageInstaller come in M2). -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <!-- download the signed catalog's APKs over HTTPS -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- standard PackageInstaller sessions: the user still confirms every install in Android's own screen, and must allow RetroHatch under "Install unknown apps" -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- tell which catalog apps are installed (their package names come from the catalog, so they cannot be listed in <queries>) -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
     <application
         android:allowBackup="false"
@@ -18,5 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name=".android.InstallResultReceiver" android:exported="false" />
     </application>
 </manifest>

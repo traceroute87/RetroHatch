@@ -6,4 +6,4 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 rootProject.name = "RetroHatchRotate"
-include(":app")
+include(":app", ":fixtureapp")

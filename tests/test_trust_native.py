@@ -120,6 +120,40 @@ ex_idx, ex_sig = (FX / "signed" / "index.json").read_bytes(), (FX / "signed" / "
 rc, line = one(ex_idx, ex_sig, keys=((FX / "signed" / "PUBKEY.hex").read_text().strip(),))
 assert rc == OK, line                                                      # the committed example verifies natively too
 
+# Android APK entries (package, version_code, signer_sha256) in a SHARED index: the Nano verifier keeps accepting it, for either target device,
+# and the native and Python policies agree on every APK-field mutation (native may be stricter, never looser).
+AX = HERE / "trust_fixture_android" / "signed"
+ax_idx, ax_sig, ax_pub = (AX / "index.json").read_bytes(), (AX / "index.json.sig").read_bytes(), (AX / "PUBKEY.hex").read_text().strip()
+for dv, fw_ in (("rg-nano", "funkeyos-drum78"), ("rg-rotate", "android-12")):
+    rc, line = one(ax_idx, ax_sig, keys=(ax_pub,), dev=dv, fw=fw_)
+    assert rc == OK and "apps=2 artifacts=1" in line, (dv, line)
+ax_doc = json.loads(ax_idx)
+
+
+def ax_mut(fn):
+    d = copy.deepcopy(ax_doc)
+    fn(next(a for a in d["apps"] if a["id"] == "fixtureapk")["artifacts"][0], next(a for a in d["apps"] if a["id"] == "examplepad")["artifacts"][0])
+    b = T.canonical(d)
+    return b, sigdoc(b)
+
+
+AX_CASES = [lambda a, o: a.pop("android"), lambda a, o: a["android"].pop("package"), lambda a, o: a["android"].pop("signer_sha256"),
+            lambda a, o: a["android"].update(package="nodots"), lambda a, o: a["android"].update(package="app.1bad"), lambda a, o: a["android"].update(package="a." + "b" * 254),
+            lambda a, o: a["android"].update(package="app..x"), lambda a, o: a["android"].update(package="app.x."), lambda a, o: a["android"].update(package="app.x y"),
+            lambda a, o: a["android"].update(version_code=0), lambda a, o: a["android"].update(version_code=2**31 - 1),
+            lambda a, o: a["android"].update(version_code="7"), lambda a, o: a["android"].update(signer_sha256=[]),
+            lambda a, o: a["android"].update(signer_sha256=["AB" * 32]), lambda a, o: a["android"].update(signer_sha256=["ab" * 32] * 2),
+            lambda a, o: a["android"].update(signer_sha256=["%064x" % i for i in range(9)]), lambda a, o: a["android"].update(signer_sha256=["%064x" % i for i in range(8)]),
+            lambda a, o: a["android"].update(extra=1), lambda a, o: a.update(install={"dest_name": "x.opk"}),
+            lambda a, o: a.update(url="https://example.com/f.apk"), lambda a, o: o.update(android=dict(a["android"])), lambda a, o: o.pop("install"),
+            lambda a, o: o["install"].update(dest_name="examplepad.bin"), lambda a, o: a.update(format="opk")]
+for n, fn in enumerate(AX_CASES):
+    b, s = ax_mut(fn)
+    pyok = py(b, s, keys=(PUB,))
+    for dv, fw_ in (("rg-nano", "funkeyos-drum78"), ("rg-rotate", "android-12")):
+        rc, line = one(b, s, dev=dv, fw=fw_)
+        assert (rc == OK) == pyok or (rc != OK and pyok is True and False), (n, dv, pyok, line)
+
 # a richer base: second device, second app, revoked entry, expires
 rich = copy.deepcopy(base)
 dev2 = copy.deepcopy(rich["devices"][0]); dev2.update(id="other-nano", firmware=["fw-two"])

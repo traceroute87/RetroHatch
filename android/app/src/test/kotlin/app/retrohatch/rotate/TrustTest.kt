@@ -144,7 +144,8 @@ class PolicyTest {
     private fun artifact(device: String = "rg-rotate", fw: String = "android-12", fmt: String = "apk", level: String = "verified", status: String = "available",
                          url: String = "https://github.com/acme/tool/releases/download/v1/tool.apk", extra: Map<String, Any?> = emptyMap()) =
         mapOf("device" to device, "firmware" to fw, "format" to fmt, "status" to status, "version" to "1.0", "url" to url, "sha256" to sha, "size" to 1000L,
-            "compatibility" to mapOf("level" to level, "evidence" to listOf(mapOf("sha256" to sha, "date" to "2026-11-01", "tester" to "t")))) + extra
+            "compatibility" to mapOf("level" to level, "evidence" to listOf(mapOf("sha256" to sha, "date" to "2026-11-01", "tester" to "t")))) +
+            (if (fmt == "apk") mapOf("android" to mapOf("package" to "app.acme.tool", "version_code" to 3L, "signer_sha256" to listOf("cd".repeat(32)))) else emptyMap()) + extra
 
     private fun app(art: Map<String, Any?>) = mapOf("schema" to 1L, "id" to "tool", "name" to "Tool", "description" to "d", "developer" to "acme",
         "source" to "https://github.com/acme/tool", "license" to "MIT", "category" to "utility", "artifacts" to listOf(art))

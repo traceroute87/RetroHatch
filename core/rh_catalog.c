@@ -448,6 +448,61 @@ typedef struct {
 	size_t dest, dev, fw, app;
 } art;
 
+#define NO_DEST ((size_t)-1) /* Android artifacts have no destination file */
+
+/* Android application id: the regex of tools/trust.py PKG, at most 255 bytes */
+static int pkg_ok(const uint8_t *s, size_t l)
+{
+	size_t i, seg = 0, dots = 0;
+
+	if (l < 3 || l > 255)
+		return 0;
+	for (i = 0; i < l; i++) {
+		int letter = (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z');
+		int other = (s[i] >= '0' && s[i] <= '9') || s[i] == '_';
+		if (s[i] == '.') {
+			if (!seg)
+				return 0;
+			seg = 0;
+			dots++;
+		} else if (letter || (other && seg)) {
+			seg++;
+		} else {
+			return 0;
+		}
+	}
+	return seg && dots;
+}
+
+/* artifact.android: {package, version_code, signer_sha256[1..8], unique}. Only apk artifacts carry it. */
+static int check_android(ps *P, long o)
+{
+	long pk, vc, sg;
+	size_t m, e, f;
+
+	if (o < 0)
+		return fail(P, RH_CAT_E_POLICY, "missing field");
+	if (check_obj(P, (size_t)o, "package version_code signer_sha256", "package version_code signer_sha256"))
+		return -1;
+	pk = oget(P, (size_t)o, "package");
+	if (chk(P, pk, K_ANY, NULL) || !plain(P, (size_t)pk) || !pkg_ok(sptr(P, (size_t)pk), slen(P, (size_t)pk)))
+		return fail(P, RH_CAT_E_POLICY, "bad android package");
+	vc = oget(P, (size_t)o, "version_code");
+	if (chk(P, vc, K_PINT, NULL) || ival(P, (size_t)vc) > 2147483647L)
+		return fail(P, RH_CAT_E_POLICY, "bad version_code");
+	sg = oget(P, (size_t)o, "signer_sha256");
+	if (P->t[sg].t != T_ARR || P->t[sg].n < 1 || P->t[sg].n > 8)
+		return fail(P, RH_CAT_E_POLICY, "bad signer_sha256");
+	for (m = (size_t)sg + 1, e = 0; e < P->t[sg].n; e++, m = P->t[m].next) {
+		if (chk(P, (long)m, K_SHA, NULL))
+			return -1;
+		for (f = (size_t)sg + 1; f != m; f = P->t[f].next)
+			if (tok_eq(P, f, m))
+				return fail(P, RH_CAT_E_POLICY, "duplicate signer_sha256");
+	}
+	return 0;
+}
+
 static int policy(ps *P, const char *device, const char *firmware, rh_cat_info *info)
 {
 	size_t devs[MAXDEV], ndev = 0, apprs[RH_CAT_MAX_ARTIFACTS], nappr = 0, i, j, k, n;
@@ -580,11 +635,12 @@ static int policy(ps *P, const char *device, const char *firmware, rh_cat_info *
 			return fail(P, RH_CAT_E_POLICY, "published app has no artifacts");
 		for (a = ar + 1, j = 0; j < P->t[ar].n; j++, a = P->t[a].next) {
 			long dev = -1, inst, comp, ev, sha, url, level;
+			int isapk;
 			size_t d, e, m;
 			int matched = 0;
 
-			CK(check_obj(P, a, "device firmware format status unavailable_reason version url sha256 size install compatibility",
-				     "device firmware format status version url sha256 size install compatibility"));
+			CK(check_obj(P, a, "device firmware format status unavailable_reason version url sha256 size install android compatibility",
+				     "device firmware format status version url sha256 size compatibility"));
 			dv = oget(P, a, "device");
 			CK(chk(P, dv, K_ID, NULL));
 			CK(chk(P, oget(P, a, "firmware"), K_ID, NULL));
@@ -613,9 +669,21 @@ static int policy(ps *P, const char *device, const char *firmware, rh_cat_info *
 				return fail(P, RH_CAT_E_POLICY, "artifact format differs from device");
 			if (!release_ok(P, src, (size_t)url, -1))
 				return fail(P, RH_CAT_E_POLICY, "url is not a release download of the source repo");
-			inst = oget(P, a, "install");
-			CK(check_obj(P, (size_t)inst, "dest_name", "dest_name"));
-			CK(chk(P, oget(P, (size_t)inst, "dest_name"), K_DEST, NULL));
+			isapk = span_eq(P, (size_t)oget(P, a, "format"), "apk");
+			if (isapk) { /* Android: package identity instead of a destination file; a shared index must stay valid for the Nano */
+				if (oget(P, a, "install") >= 0)
+					return fail(P, RH_CAT_E_POLICY, "install is for opk artifacts");
+				CK(check_android(P, oget(P, a, "android")));
+				inst = -1;
+			} else {
+				if (oget(P, a, "android") >= 0)
+					return fail(P, RH_CAT_E_POLICY, "android is for apk artifacts");
+				inst = oget(P, a, "install");
+				if (inst < 0)
+					return fail(P, RH_CAT_E_POLICY, "missing field");
+				CK(check_obj(P, (size_t)inst, "dest_name", "dest_name"));
+				CK(chk(P, oget(P, (size_t)inst, "dest_name"), K_DEST, NULL));
+			}
 			comp = oget(P, a, "compatibility");
 			CK(check_obj(P, (size_t)comp, "level evidence", "level"));
 			level = oget(P, (size_t)comp, "level");
@@ -657,13 +725,13 @@ static int policy(ps *P, const char *device, const char *firmware, rh_cat_info *
 					return fail(P, RH_CAT_E_POLICY, "artifact is revoked");
 			if (nart >= RH_CAT_MAX_ARTIFACTS)
 				return fail(P, RH_CAT_E_LIMIT, "too many artifacts");
-			arts[nart].dest = (size_t)oget(P, (size_t)inst, "dest_name");
+			arts[nart].dest = isapk ? NO_DEST : (size_t)oget(P, (size_t)inst, "dest_name");
 			arts[nart].dev = (size_t)dv;
 			arts[nart].fw = (size_t)oget(P, a, "firmware");
 			arts[nart].app = i;
 			/* one file per device: only the same app may reuse a name, and only for a different firmware profile */
 			for (m = 0; m < nart; m++)
-				if (tok_eq(P, arts[m].dev, (size_t)dv) && slen(P, arts[m].dest) == slen(P, arts[nart].dest) &&
+				if (!isapk && arts[m].dest != NO_DEST && tok_eq(P, arts[m].dev, (size_t)dv) && slen(P, arts[m].dest) == slen(P, arts[nart].dest) &&
 				    ci_eq(sptr(P, arts[m].dest), (const char *)sptr(P, arts[nart].dest), slen(P, arts[nart].dest)) &&
 				    (arts[m].app != i || tok_eq(P, arts[m].fw, arts[nart].fw)))
 					return fail(P, RH_CAT_E_POLICY, "duplicate destination");

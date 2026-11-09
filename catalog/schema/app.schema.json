@@ -34,6 +34,12 @@
         "url": {"$ref": "#/$defs/https"},
         "sha256": {"$ref": "#/$defs/sha256"},
         "size": {"type": "integer", "minimum": 1},
+        "android": {"type": "object", "additionalProperties": false, "required": ["package", "version_code", "signer_sha256"],
+          "description": "APK identity, only for format apk: package name, versionCode, and the SHA-256 of the signing certificate(s) the APK must carry. The APK file hash is the artifact sha256.",
+          "properties": {
+            "package": {"type": "string", "maxLength": 255, "pattern": "^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$"},
+            "version_code": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+            "signer_sha256": {"type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}}},
         "install": {"type": "object", "additionalProperties": false,
           "properties": {"dest_name": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$"}}},
         "compatibility": {

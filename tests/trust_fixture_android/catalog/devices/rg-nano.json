@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "rg-nano",
+  "name": "Anbernic RG Nano",
+  "adapter": "opk-funkeyos",
+  "package_format": "opk",
+  "display": {"w": 240, "h": 240},
+  "firmware": ["funkeyos-drum78"]
+}

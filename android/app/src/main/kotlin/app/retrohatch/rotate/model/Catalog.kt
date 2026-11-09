@@ -6,9 +6,12 @@ data class DeviceProfile(
     val width: Int?, val height: Int?, val firmware: List<String>, val notes: String? = null,
 )
 
+/** APK identity from the signed entry: what the downloaded file must be, besides its SHA-256 (the artifact's own `sha256`). */
+data class AndroidPackage(val packageName: String, val versionCode: Long, val signerSha256: List<String>)
+
 data class Artifact(
     val device: String, val firmware: String, val format: String, val available: Boolean, val unavailableReason: String?,
-    val version: String?, val url: String?, val sha256: String?, val size: Long?, val level: String,
+    val version: String?, val url: String?, val sha256: String?, val size: Long?, val level: String, val android: AndroidPackage? = null,
 )
 
 data class AppEntry(
@@ -22,14 +25,22 @@ data class Catalog(val devices: List<DeviceProfile>, val apps: List<AppEntry>, v
 
 /** One catalog entry as shown on this device: the app plus the single artifact built for it. */
 data class Listing(val app: AppEntry, val artifact: Artifact) {
-    /** M1 never installs. True only for an `available` artifact; M2 wires the Android PackageInstaller to it. */
-    val installable: Boolean get() = artifact.available
+    /** True only for an `available` artifact with full APK identity (package, versionCode, signer, size, URL, hash). Also needs a verified catalog (checked by the UI). */
+    val installable: Boolean get() = artifact.available && artifact.android != null && artifact.url != null && artifact.sha256 != null && artifact.size != null
 }
 
 object CatalogMapper {
     @Suppress("UNCHECKED_CAST")
     private fun objs(v: Any?): List<Map<String, Any?>> = (v as? List<*>)?.filterIsInstance<Map<String, Any?>>() ?: emptyList()
     private fun s(m: Map<String, Any?>, k: String): String? = m[k] as? String
+
+    private fun android(v: Any?): AndroidPackage? {
+        val m = v as? Map<*, *> ?: return null
+        val pkg = m["package"] as? String ?: return null
+        val vc = m["version_code"] as? Long ?: return null
+        val sg = (m["signer_sha256"] as? List<*>)?.filterIsInstance<String>() ?: return null
+        return AndroidPackage(pkg, vc, sg)
+    }
 
     /** Lenient mapping for display: a malformed entry is skipped, never crashes the UI. Trust decisions are made by [CatalogPolicy], not here. */
     fun fromDoc(doc: Map<String, Any?>): Catalog {
@@ -45,7 +56,7 @@ object CatalogMapper {
             val arts = objs(a["artifacts"]).mapNotNull { x ->
                 Artifact(s(x, "device") ?: return@mapNotNull null, s(x, "firmware") ?: return@mapNotNull null, s(x, "format") ?: return@mapNotNull null,
                     s(x, "status") == "available", s(x, "unavailable_reason"), s(x, "version"), s(x, "url"), s(x, "sha256"), x["size"] as? Long,
-                    ((x["compatibility"] as? Map<*, *>)?.get("level") as? String) ?: "untested")
+                    ((x["compatibility"] as? Map<*, *>)?.get("level") as? String) ?: "untested", android(x["android"]))
             }
             AppEntry(id, s(a, "name") ?: id, s(a, "description") ?: "", s(a, "developer") ?: "", s(a, "source") ?: "", s(a, "website"),
                 s(a, "license") ?: "unknown", s(a, "category") ?: "other", arts)
@@ -84,7 +95,7 @@ object DeviceFilter {
 
 sealed class CatalogSource {
     /** Signature, rollback state and every publish gate verified against a pinned key. */
-    data class Signed(val serial: Long, val keyId: String, val generated: String?) : CatalogSource()
+    data class Signed(val serial: Long, val keyId: String, val generated: String?, val dev: Boolean = false) : CatalogSource()
 
     /** Offline sample data. Not signed, not approved, not installable. The UI must label it as such everywhere it shows apps. */
     data class Preview(val reason: String) : CatalogSource()
@@ -101,13 +112,15 @@ object CatalogLoader {
      */
     fun load(
         signedIndex: ByteArray?, signedSig: ByteArray?, previewIndex: ByteArray?,
-        trusted: List<String> = Trust.PRODUCTION_KEYS, state: TrustState? = null,
+        trusted: List<String> = Trust.PRODUCTION_KEYS, state: TrustState? = null, devKeys: List<String> = emptyList(),
     ): LoadedCatalog {
         var why = NO_SIGNED
         if (signedIndex != null) {
             try {
-                val v = Trust.verify(signedIndex, signedSig ?: ByteArray(0), trusted, state)
-                return LoadedCatalog(CatalogSource.Signed(v.state.serial, v.keyId, v.doc["generated"] as? String), CatalogMapper.fromDoc(v.doc), v.state)
+                // devKeys (DEBUG builds only) are test-fixture keys; a catalog they verify is labelled DEV everywhere and is never "production"
+                val v = Trust.verify(signedIndex, signedSig ?: ByteArray(0), trusted + devKeys, state)
+                val dev = devKeys.any { Trust.keyId(Trust.unhex(it)) == v.keyId } && trusted.none { Trust.keyId(Trust.unhex(it)) == v.keyId }
+                return LoadedCatalog(CatalogSource.Signed(v.state.serial, v.keyId, v.doc["generated"] as? String, dev), CatalogMapper.fromDoc(v.doc), v.state)
             } catch (e: TrustException) {
                 why = "Signed catalog rejected: ${e.message}"
             }

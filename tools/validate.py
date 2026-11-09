@@ -38,6 +38,13 @@ def check(catalog=ROOT, schema_dir=None):
             if art.get("format") != dev["package_format"]:
                 errs.append(f"{w}: format != device package_format")
             comp = art.get("compatibility", {})
+            if art.get("format") == "apk":
+                if "install" in art:
+                    errs.append(f"{w}: apk artifact must not have install (that is for opk)")
+                if art.get("status") == "available" and "android" not in art:
+                    errs.append(f"{w}: available apk artifact needs android (package, version_code, signer_sha256)")
+            elif "android" in art:
+                errs.append(f"{w}: android is only for apk artifacts")
             if art.get("status") == "available":
                 for f in ("version", "url", "sha256", "size"):
                     if f not in art:

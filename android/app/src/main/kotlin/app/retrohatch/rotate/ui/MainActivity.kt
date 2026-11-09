@@ -8,6 +8,7 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.widget.FrameLayout
+import app.retrohatch.rotate.DevHooks
 import app.retrohatch.rotate.model.CatalogLoader
 import app.retrohatch.rotate.model.LoadedCatalog
 import app.retrohatch.rotate.model.Targets
@@ -34,6 +35,7 @@ class MainActivity : Activity() {
         root = FrameLayout(this).apply { setBackgroundColor(Pal.BG) }
         setContentView(root)
         window.insetsController?.let { it.hide(WindowInsets.Type.systemBars()); it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE }
+        DevHooks.init(this)
         ui = Ui(this, Metrics(side / 240f), b.width(), loadCatalog(), Targets.RG_ROTATE)
         push(HomeScreen(ui))
     }
@@ -46,7 +48,7 @@ class MainActivity : Activity() {
         val index = fi ?: asset("catalog/index.json"); val sig = if (fi != null) fs else asset("catalog/index.json.sig")
         val prefs = getSharedPreferences("trust", Context.MODE_PRIVATE)
         val st = if (prefs.contains("serial")) TrustState(prefs.getLong("serial", 0), prefs.getString("sha256", "") ?: "") else null
-        val r = CatalogLoader.load(index, sig, asset("preview/index.json"), state = st)
+        val r = CatalogLoader.load(index, sig, asset("preview/index.json"), state = st, devKeys = DevHooks.devKeys(this))
         r.newState?.let { prefs.edit().putLong("serial", it.serial).putString("sha256", it.sha256).apply() }
         return r
     }
@@ -59,7 +61,10 @@ class MainActivity : Activity() {
         v.post { if (!v.isInTouchMode) focusFirst() }
     }
 
+    fun isTouchMode(): Boolean = root.isInTouchMode
+
     fun back() {
+        if (stack.lastOrNull()?.screen?.onBack() == true) return
         if (stack.size <= 1) { finish(); return }
         val gone = stack.removeAt(stack.size - 1)
         root.removeView(gone.view)
@@ -72,7 +77,10 @@ class MainActivity : Activity() {
     fun confirm() { (currentFocus ?: focusables().firstOrNull())?.performClick() }
 
     private fun focusables(): List<View> = stack.lastOrNull()?.let { it.screen.focusables(it.view) } ?: emptyList()
-    private fun focusFirst() { focusables().firstOrNull()?.requestFocus() }
+    private fun focusFirst() {
+        val e = stack.lastOrNull() ?: return
+        (e.screen.initialFocus(e.view) ?: focusables().firstOrNull())?.requestFocus()
+    }
 
     private fun jump(dir: Int) {
         val f = focusables(); if (f.isEmpty()) return

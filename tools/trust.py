@@ -110,6 +110,8 @@ def dest_problems(apps):
     errs, seen = [], []
     for app in apps:
         for art in app.get("artifacts", []):
+            if art.get("format") == "apk":
+                continue   # APKs are installed by Android's PackageInstaller: no destination file on the device
             d = (art.get("install") or {}).get("dest_name")
             if not d:
                 errs.append(f"{app['id']}: artifact has no install.dest_name")
@@ -147,6 +149,7 @@ ID = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
 
 URLISH = re.compile(r"https://[\x21\x23-\x5b\x5d-\x7e]+")   # ASCII, no space, quote or backslash: what the device parser accepts
 DEST = re.compile(r"[A-Za-z0-9._-]{1,64}")
+PKG = re.compile(r"[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+")   # Android application id
 
 
 def strict_patterns(doc):
@@ -163,7 +166,12 @@ def strict_patterns(doc):
         for x in a["artifacts"]:
             need(ID.fullmatch(x["device"]) and ID.fullmatch(x["firmware"]) and SHA.fullmatch(x.get("sha256", "")) and URLISH.fullmatch(x.get("url", "")),
                  f"{a['id']} artifact fields")
-            need(DEST.fullmatch((x.get("install") or {}).get("dest_name", "")), f"{a['id']} dest_name")
+            if x["format"] == "apk":
+                an = x.get("android") or {}
+                need(PKG.fullmatch(an.get("package", "")) and len(an["package"]) <= 255 and an.get("signer_sha256") and all(SHA.fullmatch(s) for s in an["signer_sha256"]),
+                     f"{a['id']} android package/signer")
+            else:
+                need(DEST.fullmatch((x.get("install") or {}).get("dest_name", "")), f"{a['id']} dest_name")
             for e in x["compatibility"].get("evidence", []):
                 need(SHA.fullmatch(e["sha256"]) and DATE.fullmatch(e["date"]), f"{a['id']} evidence")
     return errs

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "fixtureapk",
+  "name": "Fixture APK (synthetic)",
+  "description": "FIXTURE ONLY - not a real app.",
+  "developer": "retrohatch-fixture",
+  "source": "https://github.com/retrohatch-fixture/fixtureapk",
+  "license": "MIT",
+  "category": "utility",
+  "artifacts": [
+    {
+      "device": "rg-rotate",
+      "firmware": "android-12",
+      "format": "apk",
+      "status": "available",
+      "version": "1.0.0",
+      "url": "https://github.com/retrohatch-fixture/fixtureapk/releases/download/v1.0.0/fixtureapk.apk",
+      "sha256": "930bf7a54faa69a6cf77f6541e8631eb2b949b773c941b79665a117e93e1ef13",
+      "size": 4096,
+      "android": {
+        "package": "app.retrohatch.fixture",
+        "version_code": 7,
+        "signer_sha256": [
+          "56ab1f333e5a1b3dba2ca9d9b555bb0a449fce06a4a0572f6b9cc699ba2c3d51"
+        ]
+      },
+      "compatibility": {
+        "level": "verified",
+        "evidence": [
+          {
+            "sha256": "930bf7a54faa69a6cf77f6541e8631eb2b949b773c941b79665a117e93e1ef13",
+            "date": "2026-11-09",
+            "tester": "fixture",
+            "note": "synthetic"
+          }
+        ]
+      }
+    }
+  ]
+}

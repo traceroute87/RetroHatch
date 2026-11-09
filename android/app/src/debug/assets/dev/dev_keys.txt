@@ -1,0 +1,2 @@
+# DEV fixture catalog signing key, PUBLIC half (test only, debug builds)
+b6f6fdd6477f8acb59a4f25e0cf5d14854a497d8e6bb141fee6db1cd511c77da

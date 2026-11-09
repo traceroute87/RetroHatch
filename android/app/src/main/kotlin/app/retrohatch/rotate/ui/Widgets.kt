@@ -1,6 +1,9 @@
 package app.retrohatch.rotate.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.drawable.StateListDrawable
+import android.widget.ProgressBar
 import android.graphics.Typeface
 import android.text.TextUtils
 import android.view.Gravity
@@ -34,8 +37,8 @@ object W {
         }
     }
 
-    /** Red strip that must be visible wherever catalog apps are listed while the data is not a verified signed catalog. */
-    fun previewStrip(c: Context, m: Metrics): View = text(c, "PREVIEW ONLY  -  offline sample data, not a signed catalog", m.tiny, Pal.ERR, true).apply {
+    /** Strip that must be visible wherever catalog apps are listed while the data is not a production-signed catalog (red: PREVIEW, orange: DEV fixture). */
+    fun previewStrip(c: Context, m: Metrics, label: String = "PREVIEW ONLY  -  offline sample data, not a signed catalog", color: Int = Pal.ERR): View = text(c, label, m.tiny, color, true).apply {
         gravity = Gravity.CENTER
         setBackgroundColor(Pal.ROW)
         isSingleLine = true; ellipsize = TextUtils.TruncateAt.END
@@ -59,7 +62,7 @@ object W {
             gravity = Gravity.CENTER_VERTICAL
             setPadding(m.px(4), m.px(2), m.px(6), m.px(2))
             addView(badge(c, m, letter, color))
-            addView(text(c, label, m.body, Pal.TXT).apply { setPadding(m.px(4), 0, 0, 0) })
+            addView(text(c, label, m.body, Pal.TXT).apply { setPadding(m.px(4), 0, 0, 0); tag = "label:$letter" })
             isClickable = true
             isFocusable = false     // D-pad focus belongs to the list; A/B are hardware buttons here
             setOnClickListener { go() }
@@ -145,18 +148,37 @@ object W {
         addView(text(c, body, m.body, Pal.TXT2).apply { gravity = Gravity.CENTER; setPadding(0, m.px(4), 0, 0) }, lp(MATCH, WRAP))
     }
 
-    /** Native Button, orange when usable, flat grey when not. */
-    fun button(c: Context, m: Metrics, label: String, enabled: Boolean, onClick: () -> Unit): Button = Button(c).apply {
+    /** Native Button: orange (primary) or card (secondary); a cream ring shows D-pad focus; flat grey when disabled. */
+    fun button(c: Context, m: Metrics, label: String, enabled: Boolean, primary: Boolean = true, onClick: () -> Unit): Button = Button(c).apply {
         text = label
         isAllCaps = false
         setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, m.body)
         typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
         isEnabled = enabled
-        setTextColor(if (enabled) Pal.ONACC else Pal.DIS)
         stateListAnimator = null
-        background = if (enabled) roundRect(Pal.ACC, m.px(5).toFloat()) else roundRect(Pal.CARD, m.px(5).toFloat(), Pal.LINE, 1)
+        val r = m.px(5).toFloat()
+        if (!enabled) {
+            setTextColor(Pal.DIS); background = roundRect(Pal.CARD, r, Pal.LINE, 1)
+        } else {
+            val fill = if (primary) Pal.ACC else Pal.ROW
+            setTextColor(if (primary) Pal.ONACC else Pal.TXT)
+            background = StateListDrawable().apply {
+                addState(intArrayOf(android.R.attr.state_focused), roundRect(if (primary) 0xFFF3B957.toInt() else Pal.ACC, r, Pal.TXT, maxOf(2, m.px(1.5f))))
+                addState(intArrayOf(android.R.attr.state_pressed), roundRect(0xFFF3B957.toInt(), r))
+                addState(intArrayOf(), roundRect(fill, r, if (primary) fill else Pal.LINE, 1))
+            }
+            if (!primary) setTextColor(ColorStateList(arrayOf(intArrayOf(android.R.attr.state_focused), intArrayOf()), intArrayOf(Pal.ONACC, Pal.TXT)))
+        }
         layoutParams = lp(MATCH, m.px(26)).apply { topMargin = m.px(4) }
-        isFocusable = true
+        isFocusable = enabled
         setOnClickListener { onClick() }
+    }
+
+    /** Native horizontal ProgressBar in the accent colour. */
+    fun progress(c: Context, m: Metrics, percent: Int): ProgressBar = ProgressBar(c, null, android.R.attr.progressBarStyleHorizontal).apply {
+        max = 100; progress = percent
+        progressTintList = ColorStateList.valueOf(Pal.ACC)
+        progressBackgroundTintList = ColorStateList.valueOf(Pal.ROW)
+        layoutParams = lp(MATCH, m.px(6)).apply { topMargin = m.px(3); bottomMargin = m.px(3) }
     }
 }

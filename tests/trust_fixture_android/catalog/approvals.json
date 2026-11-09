@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "approvals": [
+    {
+      "app": "examplepad",
+      "device": "rg-nano",
+      "firmware": "funkeyos-drum78",
+      "sha256": "0687e32859e6102f99ae34b15249396dd0a0e3f7455d759a258b15b21dc42f0e",
+      "size": 232,
+      "release": "https://github.com/retrohatch-fixture/examplepad/releases/tag/v1.0.0",
+      "approved_by": "fixture",
+      "date": "2026-10-26"
+    },
+    {
+      "app": "fixtureapk",
+      "device": "rg-rotate",
+      "firmware": "android-12",
+      "sha256": "930bf7a54faa69a6cf77f6541e8631eb2b949b773c941b79665a117e93e1ef13",
+      "size": 4096,
+      "release": "https://github.com/retrohatch-fixture/fixtureapk/releases/tag/v1.0.0",
+      "approved_by": "fixture",
+      "date": "2026-11-09"
+    }
+  ],
+  "revoked": []
+}

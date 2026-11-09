@@ -25,7 +25,8 @@ object CatalogPolicy {
     private val APPROVAL_KEYS = setOf("app", "device", "firmware", "sha256", "size", "release", "approved_by", "date")
     private val DEVICE_KEYS = setOf("schema", "id", "name", "adapter", "package_format", "display", "firmware", "notes")
     private val APP_KEYS = setOf("schema", "id", "name", "description", "developer", "website", "source", "license", "category", "artifacts")
-    private val ART_KEYS = setOf("device", "firmware", "format", "status", "unavailable_reason", "version", "url", "sha256", "size", "install", "compatibility")
+    private val ART_KEYS = setOf("device", "firmware", "format", "status", "unavailable_reason", "version", "url", "sha256", "size", "install", "android", "compatibility")
+    private val PKG = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
     private val CATEGORIES = setOf("application", "utility", "launcher", "theme", "port", "other")
 
     /** (tokens, max depth) counted the way the native parser counts them. */
@@ -44,6 +45,19 @@ object CatalogPolicy {
     }
 
     private fun isInt(v: Any?) = v is Long
+
+    /** artifact.android: {package, version_code 1..2^31-1, signer_sha256: 1..8 unique sha256}. Mirrors tools/trust.py and core/rh_catalog.c. */
+    private fun androidProblem(w: String, v: Any?): String? {
+        val a = v as? Map<*, *> ?: return "$w: apk artifact needs android (package, version_code, signer_sha256)"
+        if (a.keys != setOf("package", "version_code", "signer_sha256")) return "$w: android has wrong fields"
+        val pkg = a["package"] as? String
+        if (pkg == null || pkg.length > 255 || !PKG.matches(pkg)) return "$w: android package is not an application id"
+        val vc = a["version_code"]
+        if (vc !is Long || vc < 1 || vc > 2147483647L) return "$w: android version_code out of range"
+        val sg = a["signer_sha256"] as? List<*>
+        if (sg == null || sg.isEmpty() || sg.size > 8 || sg.any { it !is String || !SHA.matches(it) } || sg.toSet().size != sg.size) return "$w: android signer_sha256 must be 1-8 unique sha256 values"
+        return null
+    }
 
     @Suppress("UNCHECKED_CAST")
     private fun objs(v: Any?): List<Map<String, Any?>>? = (v as? List<*>)?.let { l -> if (l.all { it is Map<*, *> }) l as List<Map<String, Any?>> else null }
@@ -132,8 +146,12 @@ object CatalogPolicy {
                 }
                 if (!matched) return "$w: verified needs evidence whose sha256 matches the artifact"
                 if (art["format"] == "opk") {
+                    if ("android" in art) return "$w: android is only for apk artifacts"
                     val dn = (art["install"] as? Map<*, *>)?.get("dest_name") as? String ?: return "$w: artifact has no install.dest_name"
                     if (!DEST.matches(dn) || !dn.lowercase().endsWith(".opk")) return "$w: destination '$dn' is not a plain .opk name"
+                } else {
+                    if ("install" in art) return "$w: apk artifact must not have install"
+                    androidProblem(w, art["android"])?.let { return it }
                 }
                 if (!releaseOk(app["source"] as String, url)) return "$w: url is not a release download of the source repo"
                 val key = listOf(aid, art["device"], art["firmware"], sha)

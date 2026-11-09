@@ -26,7 +26,7 @@ object Trust {
 
     fun keyId(pub: ByteArray): String = sha256Hex(pub).substring(0, 16)
 
-    private fun unhex(h: String): ByteArray {
+    fun unhex(h: String): ByteArray {
         if (h.length % 2 != 0 || !h.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) throw IllegalArgumentException("hex")
         return ByteArray(h.length / 2) { h.substring(2 * it, 2 * it + 2).toInt(16).toByte() }
     }
