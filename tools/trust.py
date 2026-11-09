@@ -214,6 +214,9 @@ def check_index(doc):
     if errs:   # structure is not trustworthy enough for the policy pass below
         return errs
     errs += strict_patterns(doc)
+    for a in doc["apps"]:   # Android-client-only text fields: the RG Nano device verifier rejects unknown app fields, so a production index must not carry them
+        if "long_description" in a or "features" in a:
+            errs.append(f"{a['id']}: long_description/features are Android-only; the Nano verifier would reject this index")
     appr = {}
     for a in doc["approvals"]:
         if set(a) != {"app", "device", "firmware", "sha256", "size", "release", "approved_by", "date"}:

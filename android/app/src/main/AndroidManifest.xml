@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- standard PackageInstaller sessions: the user still confirms every install in Android's own screen, and must allow RetroHatch under "Install unknown apps" -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Android's own "Do you want to uninstall this app?" screen for the Uninstall button. A normal permission (no prompt); nothing is ever removed without that screen. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <!--
       Package visibility without QUERY_ALL_PACKAGES. Tested on Android 12 (API 31): an installer is NOT automatically allowed to see the app it installed, so
       "Installed" / "Open" need an explicit rule. Catalog package names are not known at build time, so <package> entries are impossible; the narrowest

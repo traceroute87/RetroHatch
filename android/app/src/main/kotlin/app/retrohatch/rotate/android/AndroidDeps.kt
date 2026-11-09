@@ -4,7 +4,9 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInstaller
+import android.graphics.drawable.Drawable
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -33,6 +35,30 @@ class PmApkInspector(private val ctx: Context) : ApkInspector {
 /** Installed versions. Android 11+ hides other packages; the manifest's <queries> (launchable apps) is what makes catalog apps visible. No QUERY_ALL_PACKAGES. */
 class PmPackageState(private val ctx: Context) : PackageState {
     override fun installedVersion(pkg: String): Long? = try { ctx.packageManager.getPackageInfo(pkg, 0).longVersionCode } catch (e: PackageManager.NameNotFoundException) { null }
+
+    @Suppress("DEPRECATION")
+    override fun installedSigners(pkg: String): Set<String>? = try {
+        ctx.packageManager.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo?.apkContentsSigners
+            ?.map { sig -> MessageDigest.getInstance("SHA-256").digest(sig.toByteArray()).joinToString("") { "%02x".format(it) } }?.toSet()
+    } catch (e: Exception) { null }
+
+    /** Everything the UI shows about an installed package; null = not installed (or not visible: see the manifest's <queries>). */
+    fun info(pkg: String): InstalledApp? = try {
+        val pm = ctx.packageManager
+        val pi = pm.getPackageInfo(pkg, 0)
+        InstalledApp(pi.versionName, pi.longVersionCode, ((pi.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_SYSTEM) != 0,
+            pm.getLaunchIntentForPackage(pkg), installedSigners(pkg) ?: emptySet(), try { pm.getApplicationIcon(pkg) } catch (e: Exception) { null })
+    } catch (e: PackageManager.NameNotFoundException) { null }
+}
+
+/** An installed package as Android reports it. [system]: shipped with the device (never offered for uninstall). [launch]: null = no launcher activity. */
+class InstalledApp(val versionName: String?, val versionCode: Long, val system: Boolean, val launch: Intent?, val signers: Set<String>, val icon: Drawable?)
+
+/** Android's own uninstall confirmation screen (ACTION_DELETE). Never silent; needs only the normal REQUEST_DELETE_PACKAGES permission. */
+object Uninstaller {
+    fun start(ctx: Context, pkg: String): Boolean = try {
+        ctx.startActivity(Intent(Intent.ACTION_DELETE, Uri.parse("package:$pkg")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true
+    } catch (e: Exception) { false }
 }
 
 /** Result of installer sessions, delivered to whoever registered (the UI thread). */

@@ -24,7 +24,7 @@ object CatalogPolicy {
     private val DEST = Regex("[A-Za-z0-9._-]{1,64}")
     private val APPROVAL_KEYS = setOf("app", "device", "firmware", "sha256", "size", "release", "approved_by", "date")
     private val DEVICE_KEYS = setOf("schema", "id", "name", "adapter", "package_format", "display", "firmware", "notes")
-    private val APP_KEYS = setOf("schema", "id", "name", "description", "developer", "website", "source", "license", "category", "artifacts")
+    private val APP_KEYS = setOf("schema", "id", "name", "description", "developer", "website", "source", "license", "category", "artifacts", "long_description", "features")
     private val ART_KEYS = setOf("device", "firmware", "format", "status", "unavailable_reason", "version", "url", "sha256", "size", "install", "android", "compatibility")
     private val PKG = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
     private val CATEGORIES = setOf("application", "utility", "launcher", "theme", "port", "other")
@@ -126,6 +126,8 @@ object CatalogPolicy {
             if (!APP_KEYS.containsAll(app.keys) || !app.keys.containsAll(listOf("schema", "id", "name", "description", "developer", "source", "license", "category", "artifacts"))) return "$aid: wrong fields"
             if (app["schema"] != 1L || listOf("name", "description", "developer", "source", "license").any { app[it] !is String || (app[it] as String).isEmpty() }) return "$aid: bad field value"
             if (app["category"] !in CATEGORIES) return "$aid: bad category"
+            app["long_description"]?.let { if (it !is String || it.isEmpty() || it.length > 2000) return "$aid: bad long_description" }
+            app["features"]?.let { f -> if (f !is List<*> || f.isEmpty() || f.size > 8 || f.any { it !is String || it.isEmpty() || it.length > 120 }) return "$aid: bad features" }
             if (!URLISH.matches(app["source"] as String) || (app["website"]?.let { it !is String || !URLISH.matches(it) } == true)) return "$aid: bad urls"
             val arts = objs(app["artifacts"]) ?: return "$aid: artifacts must be a list of objects"
             if (arts.isEmpty()) return "$aid: published app has no artifacts"

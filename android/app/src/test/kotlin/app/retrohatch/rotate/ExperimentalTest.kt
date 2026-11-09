@@ -88,7 +88,7 @@ class ExperimentalTest {
         assertEquals("every entry is for RG Rotate", 8, shown.size)
         for (l in shown) {
             val a = l.artifact
-            assertEquals("experimental", a.level); assertTrue(l.app.description.startsWith("EXPERIMENTAL / UNVERIFIED"))
+            assertEquals("experimental", a.level); assertTrue("the EXPERIMENTAL label comes from the artifact level (the UI), not from the text", l.app.description.isNotBlank())
             @Suppress("UNCHECKED_CAST") val e = entries.single { ((it["packages"] as List<Map<String, Any?>>)[0]["android"] as Map<String, Any?>)["package"] == a.android!!.packageName }
             assertNull("held entries must not be in the catalog", e["hold"])
             @Suppress("UNCHECKED_CAST") val p = (e["packages"] as List<Map<String, Any?>>)[0]

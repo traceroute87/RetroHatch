@@ -20,7 +20,7 @@ import java.io.File
  *   touch                       tap a row; tap A / B in the hint bar
  *   D-pad                       move the highlight (native focus search), A / Enter / D-pad centre = select
  *   B / Escape / system Back    back (on Home: leave the app)
- *   L1 / R1                     jump four rows
+ *   L1 / R1                     jump four rows (App Details: scroll a page)
  */
 class MainActivity : Activity() {
     private lateinit var root: FrameLayout
@@ -42,6 +42,14 @@ class MainActivity : Activity() {
     }
 
     private val store by lazy { FileCatalogStore(this) }
+
+    private var resumed = false
+    /** Back from Android's installer / uninstaller / permission screen or from a launched app: re-read the device (installed versions, Open, Uninstall). */
+    override fun onResume() {
+        super.onResume()
+        if (resumed && ::ui.isInitialized) ui.onResume()
+        resumed = true
+    }
 
     /**
      * The best catalog we can VERIFY: the last valid online one from the cache (production or, in debug builds, DEV), else a bundled signed snapshot,
@@ -101,6 +109,7 @@ class MainActivity : Activity() {
     }
 
     private fun jump(dir: Int) {
+        if (stack.lastOrNull()?.screen?.onShoulder(dir) == true) return
         val f = focusables(); if (f.isEmpty()) return
         val i = f.indexOf(currentFocus).let { if (it < 0) 0 else it }
         f[(i + dir * 4).coerceIn(0, f.size - 1)].requestFocus()

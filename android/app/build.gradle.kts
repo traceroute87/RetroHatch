@@ -11,8 +11,8 @@ android {
         applicationId = "app.retrohatch.rotate"
         minSdk = 31          // RG Rotate: Android 12 (API 31)
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0-m1"
+        versionCode = 2
+        versionName = "0.4.0-ui"
     }
 
     buildTypes {

@@ -33,7 +33,7 @@ import java.security.MessageDigest
 import java.util.concurrent.Executor
 
 /** A scripted HTTP reply; no network involved. */
-private class FakeConn(url: URL, val code: Int, val headers: Map<String, String>, val body: ByteArray, val onRead: (() -> Unit)? = null) : HttpURLConnection(url) {
+class FakeConn(url: URL, val code: Int, val headers: Map<String, String>, val body: ByteArray, val onRead: (() -> Unit)? = null) : HttpURLConnection(url) {
     override fun connect() {}
     override fun disconnect() {}
     override fun usingProxy() = false
@@ -44,7 +44,7 @@ private class FakeConn(url: URL, val code: Int, val headers: Map<String, String>
     }
 }
 
-private fun sha(b: ByteArray) = MessageDigest.getInstance("SHA-256").digest(b).joinToString("") { "%02x".format(it) }
+fun sha(b: ByteArray) = MessageDigest.getInstance("SHA-256").digest(b).joinToString("") { "%02x".format(it) }
 
 class DownloaderTest {
     @get:Rule val tmp = TemporaryFolder()
@@ -139,9 +139,9 @@ class InstallFlowTest {
         AppEntry("fx", "Fixture", "d", "dev", "https://github.com/a/b", null, "MIT", "utility", emptyList()),
         Artifact("rg-rotate", "android-12", "apk", available, if (available) null else "later", "1.0", "https://github.com/a/b/releases/download/v1/f.apk", hash, body.size.toLong(), "verified", android))
 
-    private class Env(var installed: Long? = null, var info: ApkInfo? = null, var canInstall: Boolean = true) {
+    class Env(var installed: Long? = null, var info: ApkInfo? = null, var canInstall: Boolean = true, var signers: Set<String>? = null) {
         var started = 0; var settings = 0; var startFails: String? = null
-        val packages = object : PackageState { override fun installedVersion(pkg: String) = installed }
+        val packages = object : PackageState { override fun installedVersion(pkg: String) = installed; override fun installedSigners(pkg: String) = signers }
         val inspector = object : ApkInspector { override fun inspect(file: File) = info }
         val starter = object : InstallStarter {
             override fun canInstall() = canInstall
@@ -226,5 +226,61 @@ class InstallFlowTest {
         assertEquals(InstState.Installed(7), flow(Env(installed = 7)).state)
         assertEquals(InstState.Installed(9), flow(Env(installed = 9)).state)           // never downgrades
         assertEquals(InstState.Ready(3), flow(Env(installed = 3)).state)                // older installed: update offered
+    }
+}
+
+
+/** Managed apps: update safety (signer, downgrade), one-tap install, and the state the user last saw surviving a return from Android's screens. */
+class ManagedAppsTest {
+    @get:Rule val tmp = TemporaryFolder()
+    private val body = ByteArray(3000) { (it * 13).toByte() }
+    private val pkg = AndroidPackage("app.fixture", 7, listOf("cc".repeat(32)))
+    private val good = ApkInfo("app.fixture", 7, setOf("cc".repeat(32)))
+    private val listing = Listing(AppEntry("fx", "Fixture", "d", "dev", "https://github.com/a/b", null, "MIT", "utility", emptyList()),
+        Artifact("rg-rotate", "android-12", "apk", true, null, "1.0", "https://github.com/a/b/releases/download/v1/f.apk", sha(body), body.size.toLong(), "verified", pkg))
+
+    private fun flow(env: InstallFlowTest.Env, auto: Boolean = false): InstallFlow {
+        val dl = Downloader(open = { u -> FakeConn(u, 200, mapOf("Content-Length" to body.size.toString()), body) })
+        return InstallFlow(listing, true, File(tmp.root, "dl"), dl, env.inspector, env.packages, env.starter, { it.run() }) { it.run() }.also { it.autoInstall = auto }
+    }
+
+    @Test fun oneTapInstallGoesStraightToAndroidsInstaller() {
+        val env = InstallFlowTest.Env(info = good); val f = flow(env, auto = true)
+        f.primary()
+        assertEquals(InstState.Installing, f.state); assertEquals(1, env.started)       // the system still asks the user to confirm
+    }
+
+    @Test fun oneTapInstallStopsAtThePermissionScreen() {
+        val env = InstallFlowTest.Env(info = good, canInstall = false); val f = flow(env, auto = true)
+        f.primary()
+        assertEquals(InstState.NeedsPermission, f.state); assertEquals(1, env.settings); assertEquals(0, env.started)
+    }
+
+    @Test fun updateIsOfferedOnlyForTheSameSigningKey() {
+        assertEquals(InstState.Ready(3), flow(InstallFlowTest.Env(installed = 3, signers = setOf("cc".repeat(32)))).state)
+        assertEquals(InstState.Ready(3), flow(InstallFlowTest.Env(installed = 3, signers = null)).state)                       // unknown: Android decides
+        val s = flow(InstallFlowTest.Env(installed = 3, signers = setOf("dd".repeat(32)))).state
+        assertTrue(s is InstState.Unavailable && s.reason.contains("different developer key"))
+    }
+
+    @Test fun neverDowngradesNeverReinstallsTheSameBuild() {
+        for (have in listOf(7L, 9L)) {
+            val env = InstallFlowTest.Env(installed = have, info = good); val f = flow(env)
+            assertEquals(InstState.Installed(have), f.state); f.primary(); assertEquals(0, env.started)
+        }
+    }
+
+    @Test fun anAppThatArrivesAfterTheDownloadIsNotInstalledOver() {
+        val env = InstallFlowTest.Env(info = good); val f = flow(env)
+        f.primary(); assertEquals(InstState.Downloaded, f.state)
+        env.installed = 9                                                                     // installed from elsewhere in the meantime
+        f.primary(); assertEquals(InstState.Installed(9), f.state); assertEquals(0, env.started)
+    }
+
+    @Test fun cancelStateSurvivesReturningFromAndroidsScreens() {
+        val env = InstallFlowTest.Env(info = good); val f = flow(env)
+        f.primary(); f.primary(); f.onInstallEvent(InstallEvent.Cancelled)
+        f.refresh(); assertEquals(InstState.InstallCancelled, f.state)                        // what the activity's onResume does
+        env.installed = 7; f.refresh(); assertEquals(InstState.Installed(7), f.state)         // installed meanwhile: that wins
     }
 }

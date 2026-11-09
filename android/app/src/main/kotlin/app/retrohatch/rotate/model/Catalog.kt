@@ -17,6 +17,8 @@ data class Artifact(
 data class AppEntry(
     val id: String, val name: String, val description: String, val developer: String, val source: String,
     val website: String?, val license: String, val category: String, val artifacts: List<Artifact>,
+    /** Optional Android-only text (see catalog/schema/app.schema.json): paragraphs split on blank lines, and a short feature list. */
+    val longDescription: String? = null, val features: List<String> = emptyList(),
 )
 
 data class Catalog(val devices: List<DeviceProfile>, val apps: List<AppEntry>, val serial: Long? = null, val generated: String? = null) {
@@ -59,7 +61,8 @@ object CatalogMapper {
                     ((x["compatibility"] as? Map<*, *>)?.get("level") as? String) ?: "untested", android(x["android"]))
             }
             AppEntry(id, s(a, "name") ?: id, s(a, "description") ?: "", s(a, "developer") ?: "", s(a, "source") ?: "", s(a, "website"),
-                s(a, "license") ?: "unknown", s(a, "category") ?: "other", arts)
+                s(a, "license") ?: "unknown", s(a, "category") ?: "other", arts, s(a, "long_description"),
+                (a["features"] as? List<*>)?.filterIsInstance<String>() ?: emptyList())
         }
         return Catalog(devices, apps, doc["serial"] as? Long, s(doc, "generated"))
     }

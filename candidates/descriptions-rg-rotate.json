@@ -1,0 +1,114 @@
+{
+ "schema": 1,
+ "note": "Hand-written from each project's own README (source field). Only claims the README makes; no compatibility claim for RG Rotate. Merged into the DEV catalog by android/tools/dev_fixture.py real.",
+ "apps": {
+  "aegis": {
+   "source": "https://github.com/beemdevelopment/Aegis#readme",
+   "description": "A free, open-source two-factor authentication (2FA) app with an encrypted vault.",
+   "long_description": "Aegis Authenticator generates the one-time codes that online services ask for as a second step when you sign in. It supports the industry-standard HOTP and TOTP algorithms, so it works with thousands of services, and it is compatible with Google Authenticator.\n\nYour codes are kept in an encrypted vault (AES-256-GCM) that you unlock with a password or with biometrics. The app can block screen capture and hide codes until you tap to reveal them.\n\nNew entries can be added by scanning a QR code or an image of one, by typing the details in, or by importing from other authenticator apps. Entries can be sorted, grouped, searched and given custom icons, and the vault can be exported or backed up automatically to a location you choose.",
+   "features": [
+    "Encrypted vault (AES-256-GCM)",
+    "Unlock with a password or biometrics",
+    "HOTP and TOTP codes",
+    "Add entries by QR code, image or by hand",
+    "Import from other authenticator apps",
+    "Group, sort and search entries",
+    "Export and automatic backups",
+    "Light, Dark and AMOLED themes"
+   ]
+  },
+  "droidify": {
+   "source": "https://github.com/Droid-ify/client#readme",
+   "description": "A clutter-free client for browsing and installing apps from F-Droid repositories.",
+   "long_description": "Droid-ify is an Android client for F-Droid repositories. It lets you browse the apps a repository offers and install them straight from the app.\n\nRepositories are synced to the device, so you can keep browsing offline after the first sync. You can add custom repositories with one tap, and the app can update your apps automatically in the background.\n\nDroid-ify supports several installation methods: the standard session installer, root, or Shizuku.",
+   "features": [
+    "Browse and install apps from F-Droid repositories",
+    "Automatic app updates in the background",
+    "Install with Session, Root or Shizuku",
+    "Add custom repositories with one tap",
+    "Browse offline after the first sync"
+   ]
+  },
+  "gallery": {
+   "source": "https://github.com/FossifyOrg/Gallery#readme",
+   "description": "A private photo and video gallery with no ads, a basic photo editor and a recycle bin.",
+   "long_description": "Fossify Gallery is a photo and video app that says it has no ads and no unnecessary permissions. It opens a wide range of formats, including JPEG, JPEG XL, PNG, MP4, MKV, RAW, SVG, GIF and AVIF.\n\nA basic editor lets you crop, resize, rotate, flip and draw on photos and apply filters. You can strip EXIF metadata such as GPS coordinates and camera details, and protect chosen photos and videos, or the whole app, with a PIN, pattern or fingerprint.\n\nDeleted photos and videos go to a built-in recycle bin so you can recover them. The look of the app and its function buttons can be customized, with Material Design dynamic themes and custom themes.",
+   "features": [
+    "Photo and video viewer for many formats",
+    "Basic editor: crop, resize, rotate, flip, draw, filters",
+    "Remove EXIF metadata such as GPS location",
+    "PIN, pattern or fingerprint protection",
+    "Recycle bin to recover deleted items",
+    "Customizable themes and function buttons"
+   ]
+  },
+  "lemuroid": {
+   "source": "https://github.com/Swordfish90/Lemuroid#readme",
+   "description": "An open-source, all-in-one retro game emulator for Android, built on Libretro.",
+   "long_description": "Lemuroid is an open-source emulation app for Android based on Libretro. Its main goal is ease of use, good Android integration and a great user experience.\n\nIt scans and indexes your game files, saves and restores game states automatically, and supports zipped ROMs and gamepads. It can simulate LCD or CRT displays, and offers local multiplayer, tilt input, customizable touch controls and optional cloud save sync.\n\nAccording to the project page, supported systems include Atari 2600, 7800 and Lynx; NES, SNES, Game Boy, Game Boy Color and Game Boy Advance; Sega Master System, Game Gear, Genesis and Sega CD; Nintendo 64 and Nintendo DS; PlayStation and PSP; Neo Geo Pocket; PC Engine; WonderSwan; and arcade games through FinalBurn Neo. You supply your own game files.",
+   "features": [
+    "Many classic consoles and handhelds",
+    "Automatic save states, quick save and load",
+    "Game library scanning and indexing",
+    "Gamepad support",
+    "Customizable touch controls",
+    "LCD and CRT display simulation",
+    "Local multiplayer",
+    "Cloud save sync"
+   ]
+  },
+  "materialfiles": {
+   "source": "https://github.com/zhanghai/MaterialFiles#readme",
+   "description": "An open-source Material Design file manager.",
+   "long_description": "Material Files is an open-source file manager for Android 5.0 and later. It follows Material Design closely and aims to be lightweight, clean and secure.\n\nBesides browsing local storage with breadcrumb navigation, it can view, extract and create common archives, and view and manage files on FTP, SFTP, SMB and WebDAV servers. With root access it can also manage files that need it.\n\nLike the Nautilus file manager on Linux, it understands symbolic links, file permissions and SELinux context. Colors are customizable, and there is a night mode with an optional true black.",
+   "features": [
+    "Material Design interface",
+    "Breadcrumb navigation",
+    "View, extract and create archives",
+    "FTP, SFTP, SMB and WebDAV servers",
+    "Root access support",
+    "Understands symlinks, permissions and SELinux",
+    "Custom colors and a true-black night mode"
+   ]
+  },
+  "melonds": {
+   "source": "https://github.com/rafaelvcaetano/melonDS-android#readme",
+   "description": "An Android port of the melonDS Nintendo DS and DSi emulator.",
+   "long_description": "melonDS for Android is a port of melonDS, an emulator for the Nintendo DS and DSi. You supply your own game files.\n\nAccording to the project, performance is solid on 64-bit devices with threaded rendering and JIT enabled. Older 32-bit devices run much slower because JIT is not supported there.\n\nOther launchers and frontends can start melonDS once it has scanned the ROMs. The project lists local multiplayer, DSi SD card support, customizable button skins and more display filters as features it does not have yet.",
+   "features": [
+    "Nintendo DS and DSi emulation",
+    "ROM list",
+    "Dark theme",
+    "On-screen layout editor",
+    "Can be launched from third-party frontends"
+   ]
+  },
+  "newpipe": {
+   "source": "https://github.com/TeamNewPipe/NewPipe#readme",
+   "description": "A libre, lightweight streaming front-end for YouTube, PeerTube, SoundCloud and more.",
+   "long_description": "NewPipe is a free, lightweight front-end for video and audio streaming services. It fetches data from each service's official API, or reads the website when that is not possible, so you do not need an account on any service.\n\nIt uses no proprietary libraries such as Google Play Services, so it can run on devices without Google apps.\n\nIt currently supports YouTube and YouTube Music, PeerTube, Bandcamp, SoundCloud and media.ccc.de, with YouTube the best supported. The project describes the app as beta.",
+   "features": [
+    "Watch videos up to 4K",
+    "Background audio playback",
+    "Popup (floating) player",
+    "Subscribe to channels without an account",
+    "Download videos, audio and subtitles",
+    "Local playlists and watch history",
+    "Search videos, channels, playlists and albums",
+    "Open in Kodi"
+   ]
+  },
+  "obtainium": {
+   "source": "https://github.com/ImranR98/Obtainium#readme",
+   "description": "Install and update Android apps straight from their release pages.",
+   "long_description": "Obtainium installs and updates apps directly from their releases pages, and notifies you when a new release is available.\n\nIt supports many app sources, including GitHub, GitLab, Codeberg, F-Droid, IzzyOnDroid, SourceHut and direct APK links. Crowdsourced app configurations are available on the project's website.\n\nFor some sources the data is gathered by scraping web pages, which can break when a site changes its design.",
+   "features": [
+    "Install and update apps from release pages",
+    "Notifications for new releases",
+    "GitHub, GitLab, F-Droid, IzzyOnDroid and more",
+    "Direct APK link support",
+    "Crowdsourced app configurations"
+   ]
+  }
+ }
+}

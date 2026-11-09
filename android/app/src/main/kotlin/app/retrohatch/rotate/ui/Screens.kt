@@ -11,6 +11,8 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.text.TextUtils
 import android.widget.Toast
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -20,6 +22,8 @@ import java.util.Date
 import java.util.concurrent.Executors
 import app.retrohatch.rotate.DevHooks
 import app.retrohatch.rotate.android.InstallEvents
+import app.retrohatch.rotate.android.InstalledApp
+import app.retrohatch.rotate.android.Uninstaller
 import app.retrohatch.rotate.android.PmApkInspector
 import app.retrohatch.rotate.android.PmPackageState
 import app.retrohatch.rotate.android.SessionInstaller
@@ -92,7 +96,24 @@ class Ui(val host: MainActivity, val m: Metrics, val width: Int, initial: Loaded
         f
     }
 
-    fun installedVersion(l: Listing): Long? = l.artifact.android?.let { packages.installedVersion(it.packageName) }
+    /** What Android says about this entry's package (null: not installed). Needs only the manifest's launcher-activity <queries>, not QUERY_ALL_PACKAGES. */
+    fun installed(l: Listing): InstalledApp? = l.artifact.android?.let { packages.info(it.packageName) }
+
+    /** Managed = the installed copy carries the signing certificate the signed catalog names. Anything else is somebody else's build of that package name. */
+    fun managed(l: Listing, a: InstalledApp): Boolean = l.artifact.android?.signerSha256?.map { it.lowercase() }?.let { want -> a.signers.any { it in want } } == true
+
+    /** Never true for a downgrade or an equal build, and never for a copy the catalog's key cannot update. */
+    fun updateAvailable(l: Listing, a: InstalledApp): Boolean = managed(l, a) && (l.artifact.android?.versionCode ?: 0L) > a.versionCode
+
+    /** Catalog apps (this device, verified catalog) that are on the device. */
+    fun installedListings(): List<Pair<Listing, InstalledApp>> =
+        if (!verified) emptyList() else listings.filter { it.installable }.mapNotNull { l -> installed(l)?.let { l to it } }
+
+    /** Android's own uninstall confirmation; the result is picked up in [onResume]. */
+    fun uninstall(l: Listing): Boolean = l.artifact.android?.let { Uninstaller.start(host, it.packageName) } ?: false
+
+    /** Back from an installer, uninstaller, settings or launched app: re-read what is on the device. */
+    fun onResume() { flows.values.forEach { it.refresh() }; host.rebuildAll() }
 }
 
 abstract class Screen(val ui: Ui) {
@@ -118,17 +139,27 @@ abstract class Screen(val ui: Ui) {
     protected fun banner(): View =
         if (ui.dev) W.previewStrip(ui.ctx, ui.m, "EXPERIMENTAL DEV CATALOG  -  " + (if ((ui.source as? CatalogSource.Signed)?.cached == true) "cached" else "bundled, offline") + "  -  test key", Pal.ACC) else W.previewStrip(ui.ctx, ui.m)
 
-    /** Standard frame: header, optional preview strip, content, hint bar. */
+        /** Standard frame: header (with a touch back arrow), optional preview strip, content, hint bar. */
     protected fun frame(content: View, showPreview: Boolean = ui.preview || ui.dev): View {
         val c = ui.ctx; val m = ui.m
         return LinearLayout(c).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(Pal.BG)
-            addView(W.header(c, m, title, ui.width))
+            addView(W.header(c, m, title, ui.width, onBack = { ui.host.back() }))
             if (showPreview) addView(banner())
             addView(content)
             addView(W.hints(c, m, aLabel, bLabel, onA = { ui.host.confirm() }, onB = { ui.back() }))
         }
+    }
+
+    /** L1 / R1: return true if this screen scrolled or moved by itself; false = the host jumps four rows. */
+    open fun onShoulder(dir: Int): Boolean = false
+
+    protected fun versionText(v: String?, code: Long?) = v?.let { "v$it" } ?: code?.let { "code $it" } ?: "-"
+    protected fun size(n: Long?): String = when {
+        n == null -> "-"
+        n >= 1_048_576 -> "%.1f MB".format(n / 1_048_576.0)
+        else -> "%d KB".format((n + 1023) / 1024)
     }
 }
 
@@ -139,7 +170,7 @@ class HomeScreen(ui: Ui) : Screen(ui) {
     override fun build(): View {
         val c = ui.ctx; val m = ui.m
         val root = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(Pal.BG) }
-        val bannerH = m.px(116)
+        val bannerH = m.px(104)
         // forest from Header2.png (cropped to the banner shape, never stretched) with the logo from Retro_Hatch.png on top
         root.addView(FrameLayout(c).apply {
             layoutParams = W.lp(W.MATCH, bannerH)
@@ -148,16 +179,17 @@ class HomeScreen(ui: Ui) : Screen(ui) {
                 scaleType = ImageView.ScaleType.FIT_XY
             }, FrameLayout.LayoutParams(W.MATCH, W.MATCH))
             addView(ImageView(c).apply {
-                setImageBitmap(Art.fit(c, "art_logo", m.px(112), m.px(112)))
+                setImageBitmap(Art.fit(c, "art_logo", m.px(104), m.px(104)))
                 scaleType = ImageView.ScaleType.FIT_CENTER
             }, FrameLayout.LayoutParams(W.MATCH, W.MATCH, Gravity.CENTER))
-            if (ui.preview || ui.dev) addView(banner().apply { alpha = 0.92f }, FrameLayout.LayoutParams(W.MATCH, m.px(14), Gravity.TOP))
+            if (ui.preview || ui.dev) addView(banner().apply { alpha = 0.94f }, FrameLayout.LayoutParams(W.MATCH, m.px(13), Gravity.TOP))
         })
-        val list = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(m.px(8), m.px(4), m.px(8), 0); layoutParams = W.lp(W.MATCH, 0, 1f) }
-        list.addView(W.row(c, m, "ic_search_20", "Discover", null, 23, { ui.push(DiscoverScreen(ui)) }))
-        list.addView(W.row(c, m, "ic_grid_20", "Installed", null, 23, { ui.push(InstalledScreen(ui)) }))
-        list.addView(W.row(c, m, "ic_refresh_20", "Updates", null, 23, { ui.push(InstalledScreen(ui, updatesOnly = true)) }))
-        list.addView(W.row(c, m, "ic_gear_20", "Settings", null, 23, { ui.push(SettingsScreen(ui)) }))
+        val inst = ui.installedListings(); val upd = inst.count { (l, a) -> ui.updateAvailable(l, a) }
+        val list = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL; setPadding(m.px(8), m.px(5), m.px(8), 0); layoutParams = W.lp(W.MATCH, 0, 1f) }
+        list.addView(W.row(c, m, "compass", "Discover", null, 25, { ui.push(DiscoverScreen(ui)) }, trailing = ui.listings.size.takeIf { it > 0 }?.toString()))
+        list.addView(W.row(c, m, "layout-grid", "Installed", null, 25, { ui.push(InstalledScreen(ui)) }, trailing = inst.size.takeIf { it > 0 }?.toString()))
+        list.addView(W.row(c, m, "refresh-cw", "Updates", null, 25, { ui.push(InstalledScreen(ui, updatesOnly = true)) }, status = if (upd > 0) "$upd new" to Pal.ACC else null))
+        list.addView(W.row(c, m, "settings", "Settings", null, 25, { ui.push(SettingsScreen(ui)) }))
         root.addView(list)
         root.addView(W.hints(c, m, aLabel, bLabel, onA = { ui.host.confirm() }, onB = { ui.back() }))
         return root
@@ -169,13 +201,20 @@ class DiscoverScreen(ui: Ui) : Screen(ui) {
 
     override fun build(): View {
         val c = ui.ctx; val m = ui.m
-        val content = if (ui.listings.isEmpty()) W.empty(c, m, "ic_grid_48", "No apps for ${ui.target.name} yet",
+        val content = if (ui.listings.isEmpty()) W.empty(c, m, "package-open", "No apps for ${ui.target.name} yet",
             "Nothing in the catalog is built for this device. Entries for other handhelds are hidden.")
         else {
             val col = W.column(c, m)
             ui.listings.forEach { l ->
-                col.addView(W.row(c, m, "ic_package_28", l.app.name, (if (l.artifact.level != "verified") "EXPERIMENTAL  -  " else "") + l.app.category.replaceFirstChar { it.uppercase() } + "  -  " + l.app.developer + (if (ui.installedVersion(l) != null) "  -  installed" else ""), 42,
-                    { ui.push(DetailsScreen(ui, l)) }, tile = true))
+                val inst = ui.installed(l)
+                val status = when {
+                    inst == null -> null
+                    ui.managed(l, inst) && ui.updateAvailable(l, inst) -> "Update" to Pal.ACC
+                    ui.managed(l, inst) -> "Installed" to Pal.GREEN
+                    else -> "Installed" to Pal.TXT2
+                }
+                col.addView(W.row(c, m, null, l.app.name, l.app.description.ifBlank { l.app.category.replaceFirstChar { it.uppercase() } }, 36, { ui.push(DetailsScreen(ui, l)) },
+                    leading = W.tile(c, m, m.px(24), inst?.icon), status = status))
             }
             W.scroll(c, col)
         }
@@ -183,60 +222,82 @@ class DiscoverScreen(ui: Ui) : Screen(ui) {
     }
 }
 
+/** An app-store page: hero, what's happening / what you can do, then Overview, Features, App information and Compatibility (each only with real content). */
 class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
     override val title = "App Details"
     private val flow = ui.flow(l)
     private lateinit var dyn: LinearLayout
     private lateinit var root: View
+    private var scroller: ScrollView? = null
     private var shownKind: Class<*>? = null
     private var bar: ProgressBar? = null
     private var head: TextView? = null
     private var sub: TextView? = null
     private var primary: View? = null
 
-    private fun size(n: Long?): String = when {
-        n == null -> "-"
-        n >= 1_048_576 -> "%.1f MB".format(n / 1_048_576.0)
-        else -> "%d KB".format((n + 1023) / 1024)
-    }
-
     override fun onBack(): Boolean { if (flow.state is InstState.Downloading) { flow.cancelDownload(); return true }; return false }
     override fun initialFocus(root: View): View? = primary?.takeIf { it.isFocusable }
+    override fun onShoulder(dir: Int): Boolean { val s = scroller ?: return false; s.smoothScrollBy(0, dir * (s.height * 3 / 4)); return true }
 
     override fun build(): View {
         val c = ui.ctx; val m = ui.m
         val a = l.artifact
-        val col = W.column(c, m, 6)
+        val inst = ui.installed(l)
+        val col = W.column(c, m, 8)
+        // hero: icon, name, developer, then the facts people look at first
         col.addView(LinearLayout(c).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            layoutParams = W.lp(W.MATCH, W.WRAP).apply { bottomMargin = m.px(4) }
-            addView(FrameLayout(c).apply {
-                background = roundRect(Pal.ROW, m.px(6).toFloat())
-                addView(icon(c, "ic_package_28", m.px(28), Pal.TXT), FrameLayout.LayoutParams(m.px(28), m.px(28), Gravity.CENTER))
-            }, W.lp(m.px(40), m.px(40)).apply { rightMargin = m.px(7) })
+            layoutParams = W.lp(W.MATCH, W.WRAP).apply { bottomMargin = m.px(3) }
+            addView(W.tile(c, m, m.px(40), inst?.icon), W.lp(m.px(40), m.px(40)).apply { rightMargin = m.px(8) })
             addView(LinearLayout(c).apply {
                 orientation = LinearLayout.VERTICAL
-                addView(text(c, l.app.name, m.title, Pal.TXT, true).apply { isSingleLine = true; ellipsize = android.text.TextUtils.TruncateAt.END })
-                addView(text(c, "by ${l.app.developer}", m.small, Pal.TXT2))
+                addView(text(c, l.app.name, m.big, Pal.TXT, true).apply { isSingleLine = true; ellipsize = TextUtils.TruncateAt.END })
+                addView(text(c, "by ${l.app.developer}", m.small, Pal.TXT2).apply { setPadding(0, m.px(1), 0, m.px(3)); isSingleLine = true; ellipsize = TextUtils.TruncateAt.END })
+                addView(LinearLayout(c).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    fun chip(t: String, color: Int) = addView(W.chip(c, m, t, color), W.lp(W.WRAP, W.WRAP).apply { rightMargin = m.px(3) })
+                    a.version?.let { chip("v$it", Pal.TXT2) }
+                    chip(size(a.size), Pal.TXT2)
+                    if (a.level != "verified") chip("EXPERIMENTAL", Pal.ACC)
+                })
             }, W.lp(0, W.WRAP, 1f))
         })
-        // state and the action button come first so they are on screen without scrolling; the description follows
+        // state and the actions come first so they are on screen without scrolling
         dyn = LinearLayout(c).apply { orientation = LinearLayout.VERTICAL }
         col.addView(dyn, W.lp(W.MATCH, W.WRAP))
-        col.addView(text(c, l.app.description, m.body, Pal.TXT).apply { setPadding(0, m.px(2), 0, m.px(5)); setLineSpacing(0f, 1.05f) }, W.lp(W.MATCH, W.WRAP))
-        col.addView(W.table(c, m, listOf(
-            "Version" to (a.version ?: "-"), "Device" to ui.target.name,
-            "Package" to (a.android?.let { "${it.packageName}  (code ${it.versionCode})" } ?: a.format.uppercase()),
-            "License" to l.app.license.let { if (it == "unknown") "Unknown" else it }, "Size" to size(a.size)) +
-            (if (a.level != "verified") listOf("Status" to "EXPERIMENTAL / UNVERIFIED") else emptyList())))
+
+        col.addView(W.section(c, m, "Overview"))
+        col.addView(W.paragraphs(c, m, listOfNotNull(l.app.description.takeIf { it.isNotBlank() }, l.app.longDescription).joinToString("\n\n").ifBlank { "No description is available." }, firstBold = l.app.longDescription != null))
+
+        if (l.app.features.isNotEmpty()) { col.addView(W.section(c, m, "Features")); col.addView(W.bullets(c, m, l.app.features)) }
+
+        col.addView(W.section(c, m, "App information"))
+        val info = ArrayList<Pair<String, String>>(); val icons = ArrayList<String?>()
+        fun add(k: String, v: String?, ic: String) { info.add(k to (v ?: "Unavailable")); icons.add(ic) }
+        add("Developer", l.app.developer.ifBlank { null }, "user")
+        add("Version", a.version?.let { v -> a.android?.let { "$v  (code ${it.versionCode})" } ?: v }, "tag")
+        add("Download size", a.size?.let { size(it) }, "hard-drive")
+        add("License", l.app.license.takeIf { it != "unknown" }, "scale")
+        a.android?.let { add("Package", it.packageName, "package") }
+        col.addView(W.table(c, m, info, icons))
         if (l.app.source.startsWith("https://") && !l.app.source.contains(".invalid") && !l.app.source.contains("retrohatch-fixture")) {
-            col.addView(W.row(c, m, "ic_info_20", "Website", null, 24, {
+            col.addView(W.row(c, m, "code", "Source repository", l.app.source.removePrefix("https://"), 25, {
                 try { ui.host.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(l.app.source))) }
                 catch (e: Exception) { Toast.makeText(ui.ctx, "No browser available", Toast.LENGTH_SHORT).show() }
             }))
         }
-        root = frame(W.scroll(c, col))
+
+        col.addView(W.section(c, m, "Compatibility"))
+        val exp = a.level != "verified"
+        col.addView(W.table(c, m, listOf(
+            "Device" to "${ui.target.name}, ${a.firmware.replace("android-", "Android ")}",
+            "Status" to if (exp) "Experimental: not approved or tested on ${ui.target.name}" else "Verified for ${ui.target.name}",
+            "Checks" to "SHA-256, package and signer are verified before install"),
+            listOf("smartphone", if (exp) "triangle-alert" else "shield-check", "shield-check")))
+
+        root = frame(W.scroll(c, col).also { scroller = it })
+        flow.autoInstall = true
         flow.onChange = { s -> render(s) }
         flow.refresh()
         render(flow.state)
@@ -254,63 +315,79 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
         val hadFocus = ui.host.currentFocus.let { it != null && isInside(dyn, it) }
         shownKind = s.javaClass
         dyn.removeAllViews(); bar = null
-        val (title, detail, color) = when (s) {
-            is InstState.Unavailable -> Triple(if (ui.preview) "Preview only" else "Not available", s.reason, if (ui.preview) Pal.ERR else Pal.TXT)
+        val inst = ui.installed(l)
+        val managed = inst != null && ui.managed(l, inst)
+        val ver = inst?.let { versionText(it.versionName, it.versionCode) } ?: "-"
+        // (icon, title, detail, colour)
+        val st: List<Any> = when (s) {
+            is InstState.Unavailable -> listOf(if (ui.preview) "triangle-alert" else "info", if (ui.preview) "Preview only" else "Not available", s.reason, if (ui.preview) Pal.ERR else Pal.TXT)
             is InstState.Ready ->
-                if (s.installed != null) Triple("Update available", "Installed code ${s.installed}; the signed catalog has ${l.artifact.android!!.versionCode}. ${size(l.artifact.size)}.", Pal.ACC)
-                else Triple(if (l.artifact.level != "verified") "Experimental - ready to download" else "Ready to download",
-                    (if (l.artifact.level != "verified") "Not approved, not tested on ${ui.target.name}. " else "Verified build for ${ui.target.name}. ") + "${size(l.artifact.size)}. It is checked against the signed SHA-256, package and signer before anything is installed.", Pal.TXT)
-            is InstState.Downloading -> Triple("Downloading  ${pct(s)}%", "${size(s.done)} of ${size(s.total)}", Pal.ACC)
-            InstState.Verifying -> Triple("Verifying", "Checking size, SHA-256, package name and signing certificate.", Pal.ACC)
-            InstState.Downloaded -> Triple("Ready to install", "SHA-256, package and signing certificate match the catalog." + (if (l.artifact.level != "verified") " Experimental, unverified on ${ui.target.name}." else "") + " Android will ask you to confirm.", Pal.GREEN)
-            InstState.Installing -> Triple("Waiting for Android", "Confirm in the system installer screen.", Pal.ACC)
-            InstState.NeedsPermission -> Triple("Allow installs", "Turn on \"Allow from this source\" for RetroHatch in Android's settings, come back, and press Install.", Pal.ACC)
-            InstState.InstallCancelled -> Triple("Install cancelled", "You declined in Android's installer. Nothing was installed.", Pal.TXT)
-            is InstState.Installed -> Triple("Installed", "Version code ${s.versionCode} is on this device.", Pal.GREEN)
-            is InstState.Failed -> Triple("Error", s.message, Pal.ERR)
+                if (s.installed != null) listOf("circle-arrow-up", "Update available", "Installed $ver (code ${s.installed}), the catalog has ${versionText(l.artifact.version, l.artifact.android?.versionCode)} (code ${l.artifact.android?.versionCode}). ${size(l.artifact.size)}.", Pal.ACC)
+                else listOf("download", "Ready to install", "Checked against the signed SHA-256, package name and signing certificate before Android is asked to install.", Pal.TXT)
+            is InstState.Downloading -> listOf("download", "Downloading  ${pct(s)}%", "${size(s.done)} of ${size(s.total)}", Pal.ACC)
+            InstState.Verifying -> listOf("shield-check", "Verifying", "Checking size, SHA-256, package name and signing certificate.", Pal.ACC)
+            InstState.Downloaded -> listOf("shield-check", "Verified", "SHA-256, package and signing certificate match the catalog. Android will ask you to confirm.", Pal.GREEN)
+            InstState.Installing -> listOf("loader-circle", "Waiting for Android", "Confirm in the system installer screen.", Pal.ACC)
+            InstState.NeedsPermission -> listOf("lock", "Allow installs", "Turn on \"Allow from this source\" for RetroHatch in Android's settings, come back, and press Install.", Pal.ACC)
+            InstState.InstallCancelled -> listOf("info", "Install cancelled", "You declined in Android's installer. Nothing was installed.", Pal.TXT)
+            is InstState.Installed ->
+                if (managed || inst == null) listOf("circle-check", "Installed", "Version $ver is on this device. You have the newest version in the catalog.", Pal.GREEN)
+                else listOf("info", "Installed from another source", "Version $ver is on this device but is not signed with the catalog's key, so RetroHatch cannot update it.", Pal.TXT)
+            is InstState.Failed -> listOf("triangle-alert", "Error", s.message, Pal.ERR)
         }
+        val color = st[3] as Int
         dyn.addView(LinearLayout(c).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            background = roundRect(Pal.CARD, m.px(5).toFloat(), Pal.LINE, 1)
-            setPadding(m.px(8), m.px(5), m.px(8), m.px(5))
-            layoutParams = W.lp(W.MATCH, W.WRAP).apply { bottomMargin = m.px(4) }
-            val ic = when (s) {
-                is InstState.Installed -> "ic_check_20"; is InstState.Failed -> "ic_alert_48"
-                is InstState.Downloading, InstState.Verifying, InstState.Installing -> "ic_download_20"; else -> "ic_lock_24"
-            }
-            addView(icon(c, ic, m.px(24), color), W.lp(m.px(24), m.px(24)).apply { rightMargin = m.px(7) })
+            background = roundRect(Pal.CARD, m.r, if (s is InstState.Failed) Pal.ERR else Pal.LINE, 2)
+            setPadding(m.px(8), m.px(6), m.px(8), m.px(6))
+            layoutParams = W.lp(W.MATCH, W.WRAP).apply { topMargin = m.px(3); bottomMargin = m.px(3) }
+            addView(icon(c, st[0] as String, m.px(14), color), W.lp(m.px(14), m.px(14)).apply { rightMargin = m.px(8) })
             addView(LinearLayout(c).apply {
                 orientation = LinearLayout.VERTICAL
-                head = text(c, title, m.body, color, true)
-                sub = text(c, detail, m.small, Pal.TXT2).apply { setPadding(0, m.px(1), 0, 0) }
+                head = text(c, st[1] as String, m.body, color, true)
+                sub = text(c, st[2] as String, m.small, Pal.TXT2).apply { setPadding(0, m.px(1), 0, 0); setLineSpacing(0f, 1.08f); gravity = Gravity.START }
                 addView(head); addView(sub)
                 if (s is InstState.Downloading) { bar = W.progress(c, m, pct(s)); addView(bar) }
             }, W.lp(0, W.WRAP, 1f))
         })
-        primary = null
+        // actions: Install / Update / Cancel / Try again by state, then Open and Uninstall whenever the app is on the device and nothing is in flight
+        val acts = ArrayList<View>()
+        val busy = s is InstState.Downloading || s === InstState.Verifying || s === InstState.Installing
+        val updating = inst != null && (s is InstState.Ready || s === InstState.Downloaded || s === InstState.NeedsPermission || s === InstState.InstallCancelled)
         when (s) {
-            is InstState.Unavailable -> primary = W.button(c, m, if (ui.preview) "Install unavailable (preview)" else "Install unavailable", false) {}
-            is InstState.Ready -> primary = W.button(c, m, if (s.installed != null) "Update" else "Download", true) { flow.primary() }
-            is InstState.Downloading -> {
-                dyn.addView(W.button(c, m, "Downloading...", false) {})
-                primary = W.button(c, m, "Cancel download", true, primary = false) { flow.cancelDownload() }
-            }
-            InstState.Verifying -> primary = W.button(c, m, "Verifying...", false) {}
-            InstState.Downloaded, InstState.InstallCancelled, InstState.NeedsPermission -> primary = W.button(c, m, "Install", true) { flow.primary() }
-            InstState.Installing -> primary = W.button(c, m, "Installing...", false) {}
-            is InstState.Installed -> {
-                val launch = ui.ctx.packageManager.getLaunchIntentForPackage(l.artifact.android!!.packageName)
-                if (launch != null) {
-                    dyn.addView(W.button(c, m, "Installed", false) {})
-                    primary = W.button(c, m, "Open", true, primary = false) { try { ui.host.startActivity(launch) } catch (e: Exception) { } }
-                } else primary = W.button(c, m, "Installed", false) {}
-            }
-            is InstState.Failed -> primary = W.button(c, m, if (s.message == "Download cancelled") "Download again" else "Try again", true) { flow.primary() }
+            is InstState.Unavailable -> acts.add(W.button(c, m, "Not available", false, iconName = "circle-x", weight = 1f) {})
+            is InstState.Ready -> acts.add(W.button(c, m, if (s.installed != null) "Update" else "Install", true, iconName = if (s.installed != null) "circle-arrow-up" else "download", weight = 1f) { flow.primary() })
+            is InstState.Downloading -> acts.add(W.button(c, m, "Cancel download", true, W.Kind.SECONDARY, "x", weight = 1f) { flow.cancelDownload() })
+            InstState.Verifying -> acts.add(W.button(c, m, "Verifying...", false, iconName = "shield-check", weight = 1f) {})
+            InstState.Installing -> acts.add(W.button(c, m, "Installing...", false, iconName = "loader-circle", weight = 1f) {})
+            InstState.Downloaded, InstState.InstallCancelled, InstState.NeedsPermission ->
+                acts.add(W.button(c, m, if (updating) "Update" else "Install", true, iconName = if (updating) "circle-arrow-up" else "package-plus", weight = 1f) { flow.primary() })
+            is InstState.Installed -> {}
+            is InstState.Failed -> acts.add(W.button(c, m, if (s.message == "Download cancelled") "Download again" else "Try again", true, iconName = "refresh-cw", weight = 1f) { flow.primary() })
         }
-        dyn.addView(primary)
+        if (inst != null && !busy) {
+            inst.launch?.let { intent ->
+                acts.add(W.button(c, m, "Open", true, if (acts.isEmpty()) W.Kind.PRIMARY else W.Kind.SECONDARY, "external-link", weight = 1f) {
+                    try { ui.host.startActivity(intent) } catch (e: Exception) { Toast.makeText(ui.ctx, "Could not open the app", Toast.LENGTH_SHORT).show() }
+                })
+            }
+            if (!inst.system) acts.add(W.button(c, m, "Uninstall", true, W.Kind.DANGER, "trash-2", weight = 1f) {
+                if (!ui.uninstall(l)) Toast.makeText(ui.ctx, "Could not open Android's uninstall screen", Toast.LENGTH_SHORT).show()
+            })
+        }
+        primary = acts.firstOrNull { it.isFocusable }
+        if (acts.isNotEmpty()) dyn.addView(LinearLayout(c).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = W.lp(W.MATCH, W.WRAP)
+            acts.forEachIndexed { i, b -> addView(b, (b.layoutParams as LinearLayout.LayoutParams).also { if (i > 0) it.leftMargin = m.px(5) }) }
+        })
+        if (inst != null && !inst.system && !busy)
+            dyn.addView(text(c, "Uninstall removes the app and may delete its data. Android asks you to confirm; nothing is removed silently.", m.tiny, Pal.TXT2).apply {
+                setPadding(m.px(2), m.px(2), m.px(2), 0); gravity = Gravity.START
+            }, W.lp(W.MATCH, W.WRAP))
         root.findViewWithTag<TextView>("label:B")?.text = if (s is InstState.Downloading) "Cancel" else "Back"
-        if (hadFocus || !ui.host.isTouchMode()) primary?.takeIf { it.isFocusable }?.requestFocus()
+        if (hadFocus || !ui.host.isTouchMode()) primary?.requestFocus()
     }
 
     private fun isInside(parent: View, v: View): Boolean {
@@ -320,23 +397,28 @@ class DetailsScreen(ui: Ui, private val l: Listing) : Screen(ui) {
     }
 }
 
-/** Catalog apps (for this device) that are on the device. [updatesOnly]: only those older than the signed catalog's versionCode. */
+/** Catalog apps (for this device) that are on the device, with Android's real version and icon. [updatesOnly]: only managed apps older than the signed catalog. */
 class InstalledScreen(ui: Ui, private val updatesOnly: Boolean = false) : Screen(ui) {
     override val title = if (updatesOnly) "Updates" else "Installed"
     override fun build(): View {
         val c = ui.ctx; val m = ui.m
-        val rows = ui.listings.filter { it.installable && ui.verified }.mapNotNull { l ->
-            val inst = ui.installedVersion(l) ?: return@mapNotNull null
-            val want = l.artifact.android!!.versionCode
-            if (updatesOnly == (inst < want)) Triple(l, inst, want) else null
-        }
+        val rows = ui.installedListings().filter { (l, a) -> !updatesOnly || ui.updateAvailable(l, a) }
         val content = if (rows.isEmpty()) {
-            if (updatesOnly) W.empty(c, m, "ic_refresh_48", "No updates available", "All of your applications are up to date.")
-            else W.empty(c, m, "ic_grid_48", "No installed applications", "You haven't installed any applications with RetroHatch yet.")
+            if (updatesOnly) W.empty(c, m, "circle-check-big", "No updates available", "All of your applications are up to date.", Pal.GREEN)
+            else W.empty(c, m, "package-open", "No installed applications", "Apps you install from Discover appear here, with their installed version.")
         } else {
             val col = W.column(c, m)
-            rows.forEach { (l, inst, want) ->
-                col.addView(W.row(c, m, "ic_package_28", l.app.name, if (updatesOnly) "code $inst  ->  $want" else "Installed  -  code $inst", 42, { ui.push(DetailsScreen(ui, l)) }, tile = true))
+            rows.forEach { (l, a) ->
+                val have = versionText(a.versionName, a.versionCode)
+                val managed = ui.managed(l, a); val upd = ui.updateAvailable(l, a)
+                val sub = when {
+                    upd -> "$have  ->  ${versionText(l.artifact.version, l.artifact.android?.versionCode)}"
+                    !managed -> "$have  -  installed from another source"
+                    a.system -> "$have  -  system app"
+                    else -> "$have  -  up to date"
+                }
+                col.addView(W.row(c, m, null, l.app.name, sub, 36, { ui.push(DetailsScreen(ui, l)) }, leading = W.tile(c, m, m.px(24), a.icon),
+                    status = if (upd) "Update" to Pal.ACC else if (!managed) "Other source" to Pal.TXT2 else null))
             }
             W.scroll(c, col)
         }
@@ -354,10 +436,11 @@ class SettingsScreen(ui: Ui) : Screen(ui) {
         val col = W.column(c, m, 8)
         val st = ui.refreshStatus()
         val sub = if (ui.refreshing) "Refreshing..." else st?.text ?: "Not refreshed yet"
-        col.addView(W.row(c, m, "ic_refresh_20", "Refresh Catalog", sub, 28, { ui.refresh() }, enabled = !ui.refreshing))
-        col.addView(W.row(c, m, "ic_database_20", "Catalog Status", null, 28, { ui.push(InfoScreen(ui, "Catalog Status", { catalogRows() }, { trustNote() })) }))
-        col.addView(W.row(c, m, "ic_phone_20", "Device Information", null, 28, { ui.push(InfoScreen(ui, "Device Information", { deviceRows() }, { null })) }))
-        col.addView(W.row(c, m, "ic_info_20", "About RetroHatch", null, 28, { ui.push(InfoScreen(ui, "About", { aboutRows() }, { null })) }))
+        val online = DevHooks.refreshEnabled
+        col.addView(W.row(c, m, if (online) "wifi" else "wifi-off", "Refresh Catalog", if (online) sub else "Off: this build uses its bundled experimental catalog", 30, { ui.refresh() }, enabled = online && !ui.refreshing))
+        col.addView(W.row(c, m, "database", "Catalog Status", null, 30, { ui.push(InfoScreen(ui, "Catalog Status", { catalogRows() }, { trustNote() })) }))
+        col.addView(W.row(c, m, "smartphone", "Device Information", null, 30, { ui.push(InfoScreen(ui, "Device Information", { deviceRows() }, { null })) }))
+        col.addView(W.row(c, m, "info", "About RetroHatch", null, 30, { ui.push(InfoScreen(ui, "About", { aboutRows() }, { null })) }))
         return frame(W.scroll(c, col), showPreview = false)
     }
 
@@ -400,7 +483,7 @@ class SettingsScreen(ui: Ui) : Screen(ui) {
     else if (ui.dev) "DEBUG build: catalogs signed with the DEV fixture key are accepted and shown as DEV; their cache and rollback state are kept apart from production. Release builds trust only the production key." else null
 
     private fun aboutRows() = listOf(
-        "App" to "RetroHatch for ${ui.target.name}", "Version" to "0.3.0-m3", "Catalog" to "Online, signed, cached for offline use",
+        "App" to "RetroHatch for ${ui.target.name}", "Version" to "0.4.0", "Catalog" to "Online, signed, cached for offline use",
         "Install" to "Download, verify, then the Android installer",
         "Trust" to "Same Ed25519 signing key and catalog format as RetroHatch for RG Nano",
     )
@@ -411,7 +494,7 @@ class InfoScreen(ui: Ui, override val title: String, private val rows: () -> Lis
         val c = ui.ctx; val m = ui.m
         val col = W.column(c, m, 8)
         col.addView(W.table(c, m, rows()))
-        note()?.let { n -> col.addView(text(c, n, m.small, Pal.TXT2).apply { setPadding(m.px(2), m.px(2), m.px(2), 0) }, W.lp(W.MATCH, W.WRAP)) }
+        note()?.let { n -> col.addView(text(c, n, m.small, Pal.TXT2).apply { setPadding(m.px(2), m.px(3), m.px(2), 0); gravity = Gravity.START; setLineSpacing(0f, 1.08f) }, W.lp(W.MATCH, W.WRAP)) }
         return frame(W.scroll(c, col), showPreview = false)
     }
 }

@@ -231,6 +231,8 @@ def real(ids=None, tested_file=None):
     inv = json.loads((ROOT / "candidates" / "inventory-rg-rotate.json").read_text(encoding="utf-8"))
     tested = json.loads(Path(tested_file).read_text(encoding="utf-8")) if tested_file else {}
     by = {a["id"]: a for a in inv["applications"]}
+    dp = ROOT / "candidates" / "descriptions-rg-rotate.json"
+    DESCRIPTIONS = json.loads(dp.read_text(encoding="utf-8"))["apps"] if dp.is_file() else {}
     want = [i.strip() for i in ids.split(",") if i.strip()] if ids else [a["id"] for a in inv["applications"] if not a.get("hold")]
     for i in want:
         if i not in by:
@@ -250,14 +252,15 @@ def real(ids=None, tested_file=None):
         (pk,) = a["packages"]
         repo = a["sources"][0]["url"]
         t = tested.get(repo.removeprefix("https://github.com/"))
-        desc = "EXPERIMENTAL / UNVERIFIED: not approved, not tested on RG Rotate hardware. " + a["description"]
+        # The text shown to the user comes from candidates/descriptions-rg-rotate.json (hand-written from each project's own README); the UI, not the
+        # text, says EXPERIMENTAL. Without an entry there the repository's own one-line description is used and no long text is invented.
+        txt = DESCRIPTIONS.get(i, {})
+        desc = txt.get("description") or a["description"]
         comp = {"level": "experimental"}
         if t:
-            desc += f" Emulator: installed through RetroHatch and launched on {t['date']} (x86_64, Android 12)."
             comp["evidence"] = [{"sha256": pk["sha256"], "date": t["date"], "tester": "emulator rotate720 (x86_64, Android 12 API 31)", "note": t["note"]}]
-        elif not a["evidence"]["fits_from_metadata"]["emulator_x86_64"]:
-            desc += " arm64-only: cannot run on the x86_64 emulator."
         app = {"schema": 1, "id": re.sub(r"[^a-z0-9-]", "", i.lower()), "name": a["name"], "description": desc, "developer": repo.split("/")[3], "source": repo, "license": a["license"],
+               **({"long_description": txt["long_description"]} if txt.get("long_description") else {}), **({"features": txt["features"]} if txt.get("features") else {}),
                "category": "application", "artifacts": [{"device": "rg-rotate", "firmware": "android-12", "format": "apk", "status": "available", "version": a["version"], "url": pk["url"],
                                                           "sha256": pk["sha256"], "size": pk["size"], "android": pk["android"], "compatibility": comp}]}
         (d / "apps" / f"{app['id']}.json").write_text(json.dumps(app, indent=2) + "\n")

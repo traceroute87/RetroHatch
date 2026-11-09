@@ -200,13 +200,11 @@ def s1():
     fresh(); launch()
     shot("1a_home_dev_banner")
     open_entry("E2E Good APK")
-    assert has("Ready to download", 10); shot("1b_ready")
-    tap("Download", exact=True)
-    assert has("Ready to install", 40), "download + verification"; shot("1c_ready_to_install")
+    assert has("Ready to install", 10); shot("1b_ready")
+    tap("Install", exact=True)                            # one tap: download, verify, then Android's own installer
     assert not fixture_installed()
-    tap("Install", exact=True)
-    time.sleep(2); shot("1d_android_installer")
-    assert find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and "install" in n["text"].lower(), 25), "Android's own installer screen did not appear"
+    assert find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and "install" in n["text"].lower(), 60), "Android's own installer screen did not appear"
+    shot("1d_android_installer")
     assert not fixture_installed(), "nothing may be installed before the user confirms"
     installer_button("Install")
     for _ in range(40):
@@ -235,15 +233,14 @@ def s2():
     assert has("Installed", 15) and has("Open", 5); shot("2a_installed_after_restart")
     sh(f"pm uninstall {FIXTURE}")
     launch(); open_entry("E2E Good APK")
-    assert has("Ready to download", 15); shot("2b_after_uninstall")
+    assert has("Ready to install", 15); shot("2b_after_uninstall")
 
 
 @scenario("3 user cancel in Android's installer")
 def s3():
     fresh(); launch(); open_entry("E2E Good APK")
-    tap("Download", exact=True); assert has("Ready to install", 40)
     tap("Install", exact=True)
-    time.sleep(2)
+    assert find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and "install" in n["text"].lower(), 60), "installer"
     installer_button("Cancel")
     sh(f"am start -n {APP}/.ui.MainActivity"); time.sleep(3)
     assert has("Install cancelled", 20), "app must report the cancel"; shot("3_install_cancelled")
@@ -252,7 +249,7 @@ def s3():
 
 def failing(title, expect, shotname):
     fresh(); launch(); open_entry(title)
-    tap("Download", exact=True)
+    tap("Install", exact=True)
     assert has(expect, 40), f"expected error '{expect}'"
     shot(shotname)
     assert has("Error", 5)
@@ -275,7 +272,7 @@ def s6(): failing("E2E Wrong Package", "Wrong package", "6_wrong_package")
 @scenario("7 cancel a download in progress (physical B button)")
 def s7():
     fresh(); launch(); open_entry("E2E Slow Download")
-    tap("Download", exact=True)
+    tap("Install", exact=True)
     for _ in range(20):                                   # wait for the partial file instead of a UI dump: the UI never idles while the progress bar moves
         if any(d.endswith(".part") for d in downloads()):
             break
@@ -387,11 +384,10 @@ def s12():
     sh(f"appops set {APP} REQUEST_INSTALL_PACKAGES allow"); sh("settings put secure immersive_mode_confirmations confirmed")
     launch(); open_entry(name)
     assert has("EXPERIMENTAL", 5), "the entry must say it is experimental/unapproved"; shot("12a_details_real")
-    tap("Download", exact=True)
-    assert has("Ready to install", 240), "real download + verification"; shot("12b_ready_to_install")
+    tap("Install", exact=True)
     assert pkg not in sh(f"pm list packages {pkg}", check=False)
-    tap("Install", exact=True); time.sleep(2); shot("12c_android_installer")
-    assert find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and "install" in n["text"].lower(), 25)
+    assert find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and "install" in n["text"].lower(), 240), "real download + verification, then Android's installer"
+    shot("12c_android_installer")
     installer_button("Install")
     for _ in range(90):
         if pkg in sh(f"pm list packages {pkg}", check=False):
@@ -429,10 +425,58 @@ def s13():
     serve_catalog("real")
     sh(f"appops set {APP} REQUEST_INSTALL_PACKAGES allow"); sh("settings put secure immersive_mode_confirmations confirmed")
     launch(); open_entry(name)
-    assert has("EXPERIMENTAL / UNVERIFIED", 5), "status row"; shot("13a_details_arm64")
-    tap("Download", exact=True)
-    assert has("Ready to install", 240), "arm64-only APK must still download and verify (package, versionCode, signer)"; shot("13b_arm64_verified_not_installed")
-    assert "Ready to install" in " ".join(n["text"] for n in nodes())
+    assert has("Experimental: not approved", 5) or has("EXPERIMENTAL", 5), "status"; shot("13a_details_arm64")
+    tap("Install", exact=True)
+    assert has("Not compatible", 240), "arm64-only APK must download and verify (package, versionCode, signer); Android then refuses it on x86_64"; shot("13b_arm64_verified_not_installed")
+
+
+@scenario("14 managed app: update, no downgrade, Open, Uninstall (cancel, then confirm in Android's own screen)")
+def s14():
+    """Needs android/build/ui/fx6.apk (older) and fx9.apk (newer): gradlew :fixtureapp:assembleDebug -PfxVersionCode=6|9, copied there. The catalog says versionCode 7."""
+    ui = ANDROID / "build" / "ui"
+    sysscreen = lambda t: find(lambda n: "retrohatch" not in n["pkg"] and n["pkg"] not in ("", "com.android.systemui") and t in n["text"].lower(), 25)
+    fresh(); launch()
+    adb("install", "-r", str(ui / "fx6.apk"))                                # older build, same signing key: an update is due
+    tap("Discover", exact=True); assert has("Update", 10); shot("14a_discover_update_chip")
+    sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+    tap("Updates", exact=True); assert has("E2E Good APK", 10); shot("14b_updates_list")
+    sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+    open_entry("E2E Good APK")
+    assert has("Update available", 10) and has("Open", 5) and has("Uninstall", 5); shot("14c_details_update_open_uninstall")
+    tap("Update", exact=True)
+    assert sysscreen("update") or sysscreen("install"), "Android's installer screen"
+    installer_button("Update") if sysscreen("update") else installer_button("Install")
+    for _ in range(40):
+        if "versionCode=7" in sh(f"dumpsys package {FIXTURE}"):
+            break
+        time.sleep(1)
+    assert "versionCode=7" in sh(f"dumpsys package {FIXTURE}"), "updated to the catalog's versionCode"
+    sh(f"am start -n {APP}/.ui.MainActivity"); time.sleep(3)
+    assert has("Installed", 15) and has("Open", 5) and has("Uninstall", 5); shot("14d_after_update")
+    # no downgrade: a NEWER build on the device is never replaced by the catalog's older one
+    adb("install", "-r", str(ui / "fx9.apk")); time.sleep(2)
+    sh(f"am start -n {APP}/.ui.MainActivity"); time.sleep(3)
+    assert has("Installed", 15) and not find(lambda n: n["text"] == "Update", 3), "no Update button for a newer installed build"; shot("14e_no_downgrade")
+    # uninstall, user cancels in Android's own screen: still installed
+    tap("Uninstall", exact=True)
+    assert sysscreen("uninstall"), "Android's uninstall confirmation"; shot("14f_android_uninstall_screen")
+    installer_button("Cancel")
+    assert fixture_installed(), "cancelled uninstall must keep the app"
+    sh(f"am start -n {APP}/.ui.MainActivity"); time.sleep(3)
+    assert has("Uninstall", 10)
+    # uninstall, user confirms: the page returns to Install by itself
+    tap("Uninstall", exact=True)
+    assert sysscreen("uninstall")
+    installer_button("OK")
+    for _ in range(20):
+        if not fixture_installed():
+            break
+        time.sleep(1)
+    assert not fixture_installed(), "package removed"
+    sh(f"am start -n {APP}/.ui.MainActivity"); time.sleep(3)
+    assert has("Ready to install", 15) and not find(lambda n: n["text"] == "Uninstall", 2); shot("14g_after_uninstall")
+    sh("input keyevent KEYCODE_BACK"); time.sleep(1); sh("input keyevent KEYCODE_BACK"); time.sleep(1)
+    tap("Installed", exact=True); assert not has("E2E Good APK", 3); shot("14h_installed_list_without_it")
 
 
 def run_tool(name, *args):
@@ -448,7 +492,7 @@ def main():
     adb("install", "-r", str(ANDROID / "app" / "build" / "outputs" / "apk" / "debug" / "app-debug.apk"))
     server(True)
     try:
-        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7, "8": s8, "9": s9, "10": s10, "11": s11, "12": scenario("12 real APK from the developer's GitHub release, installed through RetroHatch")(s12),
+        every = {"1": s1, "2": s2, "3": s3, "4": s4, "5": s5, "6": s6, "7": s7, "8": s8, "9": s9, "10": s10, "11": s11, "14": s14, "12": scenario("12 real APK from the developer's GitHub release, installed through RetroHatch")(s12),
                  "13": scenario("13 arm64-only app: listed, downloaded and verified, NOT installed (cannot run on the x86_64 emulator)")(s13)}
         for k in (sys.argv[1:2] if sys.argv[1:2] in (["12"], ["13"]) else sys.argv[1:] or [x for x in every if x not in ("12", "13")]):                  # e2e.py 8 9 10  runs only those scenarios (8 -> 9 -> 10 build on each other's app state)
             every[k]()

@@ -9,6 +9,8 @@
     "id": {"$ref": "#/$defs/id"},
     "name": {"type": "string", "minLength": 1},
     "description": {"type": "string", "minLength": 1},
+    "long_description": {"type": "string", "minLength": 1, "maxLength": 2000, "description": "ANDROID CLIENT ONLY. Paragraphs separated by a blank line. The RG Nano verifier (core/rh_catalog.c) rejects unknown app fields, so tools/trust.py refuses to sign an index that carries this."},
+    "features": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "string", "minLength": 1, "maxLength": 120}, "description": "ANDROID CLIENT ONLY, same rule as long_description."},
     "developer": {"type": "string", "minLength": 1},
     "website": {"$ref": "#/$defs/https"},
     "source": {"$ref": "#/$defs/https"},

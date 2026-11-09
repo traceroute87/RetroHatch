@@ -8,7 +8,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 data class ApkInfo(val packageName: String, val versionCode: Long, val signerSha256: Set<String>)
 
 interface ApkInspector { fun inspect(file: File): ApkInfo? }
-interface PackageState { fun installedVersion(pkg: String): Long? }
+interface PackageState {
+    fun installedVersion(pkg: String): Long?
+    /** SHA-256 of the installed copy's signing certificates, null when unknown. Android refuses an update signed by a different key. */
+    fun installedSigners(pkg: String): Set<String>? = null
+}
 
 /** Starts an Android PackageInstaller session; the result arrives later through [InstallFlow.onInstallEvent]. */
 interface InstallStarter {
@@ -64,6 +68,8 @@ class InstallFlow(
 ) {
     @Volatile var state: InstState = InstState.Ready(null); private set
     var onChange: (InstState) -> Unit = {}
+    /** UI: after a verified download go straight on to Android's installer (the system still asks the user to confirm). Off in the unit tests. */
+    @Volatile var autoInstall = false
     private val cancel = AtomicBoolean(false)
     private val art get() = listing.artifact
     private val android get() = art.android
@@ -82,9 +88,12 @@ class InstallFlow(
             !listing.installable || a == null -> InstState.Unavailable(art.unavailableReason ?: "A verified build for this device is not available yet.")
             else -> {
                 val inst = packages.installedVersion(a.packageName)
+                val have = if (inst != null && inst < a.versionCode) packages.installedSigners(a.packageName) else null
                 when {
-                    inst != null && inst >= a.versionCode -> InstState.Installed(inst)
-                    state is InstState.Downloaded && file?.isFile == true -> state
+                    inst != null && inst >= a.versionCode -> InstState.Installed(inst)   // never offered again: no downgrade, no reinstall of the same build
+                    have != null && have.isNotEmpty() && have.none { it in a.signerSha256.map { s -> s.lowercase() } } ->
+                        InstState.Unavailable("The installed copy is signed by a different developer key, so Android would refuse this update. Uninstall it first.")
+                    (state is InstState.Downloaded || state is InstState.InstallCancelled || state is InstState.NeedsPermission) && file?.isFile == true -> state   // keep what the user last saw while the verified file is still there
                     else -> InstState.Ready(inst)
                 }
             }
@@ -125,6 +134,7 @@ class InstallFlow(
                 val problem = IdentityCheck.problem(inspector.inspect(file!!), a)
                 if (problem != null) { file!!.delete(); file = null; set(InstState.Failed(problem)); return@execute }
                 set(InstState.Downloaded)
+                if (autoInstall) install()
             } catch (e: DownloadCancelled) {
                 set(InstState.Failed("Download cancelled"))
             } catch (e: DownloadException) {
@@ -138,6 +148,7 @@ class InstallFlow(
     private fun install() {
         val a = android ?: return; val f = file ?: return
         if (!f.isFile) { set(InstState.Failed("The downloaded file is gone; download it again")); return }
+        packages.installedVersion(a.packageName)?.let { if (it >= a.versionCode) { set(InstState.Installed(it)); return } }   // never downgrade or reinstall the same build
         if (!starter.canInstall()) { set(InstState.NeedsPermission); starter.openPermissionSettings(); return }
         set(InstState.Installing)
         // re-check right before handing the file to the system: size, hash and identity (the file lives in app-private storage, but this is cheap)
