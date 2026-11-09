@@ -21,6 +21,7 @@ class DownloadCancelled : Exception("Cancelled")
 class Downloader(
     private val open: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
     private val mapUrl: (String) -> String = { it },
+    private val allowedRedirectHosts: Set<String>? = null,       // a redirect may only lead to one of these hosts (TrustedSources.redirectHosts); null = no restriction
     private val connectMs: Int = 15000, private val readMs: Int = 15000, private val totalMs: Long = 10 * 60_000L,
 ) {
     companion object { const val MAX_REDIRECTS = 5 }
@@ -50,6 +51,7 @@ class Downloader(
                 val next = try { cur.toURI().resolve(loc).toString() } catch (e: Exception) { throw DownloadException("Bad redirect") }
                 if (!next.startsWith("https://")) throw DownloadException("Redirect to a non-https link refused")
                 cur = httpsUrl(next)
+                if (allowedRedirectHosts != null && cur.host.lowercase() !in allowedRedirectHosts) throw DownloadException("Redirect to an unexpected host refused (${cur.host})")
                 continue
             }
             if (code != 200) { c.disconnect(); throw DownloadException(if (code == 404) "Not found on the server (404)" else "Server error (HTTP $code)") }

@@ -101,8 +101,9 @@ class Ui(val host: MainActivity, val m: Metrics, val width: Int, initial: Loaded
 
     /** One install flow per catalog entry, kept alive while the app runs so a download continues when the screen is left. */
     fun flow(l: Listing): InstallFlow = flows.getOrPut(l.app.id) {
-        val f = InstallFlow(l, verified, File(host.filesDir, "downloads"), Downloader(mapUrl = DevHooks::mapUrl), PmApkInspector(host), packages,
-            SessionInstaller(host), worker) { uiHandler.post(it) }
+        val f = InstallFlow(l, verified, File(host.filesDir, "downloads"), Downloader(mapUrl = DevHooks::mapUrl, allowedRedirectHosts = app.retrohatch.rotate.model.TrustedSources.redirectHosts(l.artifact.url)),
+            PmApkInspector(host), packages, SessionInstaller(host), worker) { uiHandler.post(it) }
+        f.deviceSdk = Build.VERSION.SDK_INT
         l.artifact.android?.let { a -> InstallEvents.listen(a.packageName) { e -> f.onInstallEvent(e); noteInstalledChange(rebuildTop = false) } }
         f
     }

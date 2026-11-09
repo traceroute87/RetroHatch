@@ -2,7 +2,7 @@
 """One real install and uninstall of a curated catalog app on the rotate720 emulator, through RetroHatch's own UI and Android's installer: the smallest pure-Java entry of
 candidates/android-curated.json (no native libraries, so the x86_64 emulator can run it). Proves the curated, signed DEV catalog entry downloads from its GitHub release, passes the
 SHA-256 / package / signer checks and installs only after the user confirms. Also confirms an external listing shows no Install button.
-    python -u android/tools/curated_install_check.py"""
+    python -u android/tools/curated_install_check.py [fdroid|izzy]"""
 import json, sys, time
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -10,7 +10,8 @@ import e2e as E
 import nav_check as N
 
 cur = json.loads((E.ANDROID.parent / "candidates" / "android-curated.json").read_text(encoding="utf-8"))["apps"]
-cands = sorted([x for x in cur if x["mode"] == "install" and x["apk"].get("abis") == [] and x["apk"]["min_sdk"] <= 31 and x["apk"]["size"] < 15_000_000], key=lambda x: x["apk"]["size"])
+KIND = sys.argv[1] if len(sys.argv) > 1 else None          # e.g. "fdroid": use the smallest entry of that source instead of the smallest overall
+cands = sorted([x for x in cur if x["mode"] == "install" and (KIND is None or x["apk"].get("source_kind") == KIND) and x["apk"].get("abis") == [] and x["apk"]["min_sdk"] <= 31 and x["apk"]["size"] < 15_000_000], key=lambda x: x["apk"]["size"])
 app = cands[0]; pkg = app["package"]
 RES = []
 def check(name, ok, detail=""):

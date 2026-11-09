@@ -8,7 +8,9 @@ import app.retrohatch.rotate.model.DeviceFilter
 import app.retrohatch.rotate.model.StrictJson
 import app.retrohatch.rotate.model.Targets
 import app.retrohatch.rotate.model.Trust
+import app.retrohatch.rotate.model.TrustedSources
 import app.retrohatch.rotate.model.TrustException
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -105,7 +107,7 @@ class ExperimentalTest {
             assertEquals("experimental", a.level); assertTrue(l.installable)
             assertEquals(ap["sha256"], a.sha256); assertEquals(ap["url"], a.url); assertEquals(ap["size"], a.size)
             assertEquals(ap["version_code"], a.android!!.versionCode); assertEquals(ap["signers"], a.android!!.signerSha256); assertEquals(e["package"], a.android!!.packageName)
-            assertTrue(a.url!!.startsWith(l.app.source + "/releases/download/") || a.url!!.lowercase().startsWith((l.app.source + "/releases/download/").lowercase()))
+            assertNotNull(a.url, TrustedSources.kind(l.app.source, a.url, a.android!!.packageName, a.android!!.versionCode))     // a trusted source, whichever one
         }
         for (e in ext) { val l = shown.single { it.app.id == e["id"] }; assertTrue(l.app.external != null && !l.installable && l.artifact.url == null) }
         // a held entry is never installable

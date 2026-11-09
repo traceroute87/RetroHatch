@@ -23,8 +23,9 @@ import categories as CAT, mainstream as M, android_import as A
 
 OUT = ROOT / "candidates" / "android-curated.json"
 INV = ROOT / "build" / "discovery" / "android-500-candidates.json"
-QUOTA = {"emulators": 30, "ports": 26, "games": 20, "themes-launchers": 14, "utilities": 24, "media": 18}
+QUOTA = {"emulators": 45, "ports": 40, "games": 40, "themes-launchers": 25, "utilities": 45, "media": 25}
 RECENT = "2024-11-01"                    # non-seed apps must have a release in the last ~two years
+RECENT_EMU = "2019-01-01"                # standalone emulators change slowly; an older one is listed with a "not updated since" flag
 ROLLING = C_ROLLING = re.compile(r"continuous|nightly|latest|snapshot|pre-?release|beta|dev", re.I)
 NO_REDIST = re.compile(r"-NC|NonCommercial|NC-ND|proprietary|unlicensed|unverified|none|unknown|noassertion", re.I)
 NO_INSTALL_PKG = {"xyz.aethersx2.android": "A patched build of the closed-source, abandoned AetherSX2: the right to redistribute the APK is unclear, so RetroHatch only links to the project."}
@@ -35,10 +36,78 @@ HEAVY_PLATFORMS = {"xbox360", "xbox", "switch", "ps4", "wiiu", "ps2", "gamecube"
 RECOMPA_CAP = 12                       # community ports are many and heavy: cap them so the catalog is not a port list
 # reviewed false positives of the keyword rules (an "emulates gestures" app, a weather app that mentions moonlight, a root-only SMB server, ...)
 DENY = {"Timed Shutdown [No Root]", "GeoJoystick", "Suntimes", "DebForge", "SeekPrivacy", "SimbaDroid", "LetterBox", "SuperShopaholic", "AeroPayout", "Janken (Rock Paper Scissors)", "Burger Party", "Bim!",
-        "Astro Loop", "AuraOrbit", "ConnectFour Studio", "Tennis Score Manager", "RootlessJamesDSP", "werewolves_game", "Orion Master", "Live Wallpaper Dino Game", "Dino Game"}
+        "Authorizer", "Accordion", "Melodeon", "Android Virtual Pen", "Holey Light", "Android USB Script", "Astro Loop", "AuraOrbit", "ConnectFour Studio", "Tennis Score Manager", "RootlessJamesDSP", "werewolves_game", "Orion Master", "Live Wallpaper Dino Game", "Dino Game"}
 OFFICIAL_HOSTS = {"buildbot.libretro.com": "libretro buildbot", "www.ppsspp.org": "ppsspp.org", "downloads.duckstation.org": "downloads.duckstation.org", "dl.dolphin-emu.org": "dolphin-emu.org"}
 HAND = {"com.beemdevelopment.aegis": "aegis", "com.looker.droidify": "droidify", "org.fossify.gallery": "gallery", "com.swordfish.lemuroid": "lemuroid", "me.zhanghai.android.files": "materialfiles",
         "me.magnum.melonds": "melonds", "org.schabi.newpipe": "newpipe", "dev.imranr.obtainium": "obtainium"}
+
+
+# ---- trusted sources (mirror of android/.../model/TrustedSources.kt; tests/test_curate.py keeps the two in step) ----------------------------------------------------------
+PINS = json.loads((HERE / "trusted_sources.json").read_text(encoding="utf-8"))
+OFFICIAL = PINS["official_servers"]
+
+
+def source_kind(source, url, pkg, vc):
+    """-> github | gitlab | codeberg | fdroid | izzy | official | None. The same rules the app's catalog policy applies to a signed entry."""
+    if not url or not url.startswith("https://") or any(c <= " " or c == "\\" or ord(c) >= 0x7F for c in url) or "@" in url.split("://", 1)[1].split("/", 1)[0]: return None
+    src = (source or "").rstrip("/")
+    src = src[:-4] if src.endswith(".git") else src
+    low = url.lower()
+    if re.fullmatch(r"https://github\.com/[^/\s]+/[^/\s]+", src or "") and M.release_ok(src, url): return "github"
+    m = re.fullmatch(r"https://gitlab\.com/([^\s]+/[^\s/]+)", src)
+    if m:
+        base = f"https://gitlab.com/{m.group(1)}".lower()
+        if (low.startswith(base + "/-/releases/") and "/downloads/" in low) or low.startswith(base + "/uploads/"): return "gitlab"
+    m = re.fullmatch(r"https://codeberg\.org/([^/\s]+)/([^/\s]+)", src)
+    if m and re.fullmatch(re.escape(f"https://codeberg.org/{m.group(1)}/{m.group(2)}".lower()) + r"/releases/download/[^/\s]+/[^/\s]+", low): return "codeberg"
+    if pkg and vc is not None:
+        if url == f"https://f-droid.org/repo/{pkg}_{vc}.apk": return "fdroid"
+        if url == f"https://apt.izzysoft.de/fdroid/repo/{pkg}_{vc}.apk": return "izzy"
+        pre = OFFICIAL.get(pkg)
+        if pre and url.startswith(pre) and len(url) > len(pre) and ".." not in url and "?" not in url and "#" not in url: return "official"
+    return None
+
+
+def _tool(name):
+    import shutil, os
+    t = shutil.which(name) or (str(Path(os.environ.get("JAVA_HOME", "")) / "bin" / (name + (".exe" if os.name == "nt" else ""))) if os.environ.get("JAVA_HOME") else None)
+    if not t or not Path(t).exists(): raise SystemExit(f"{name} (JDK) is required to verify repository metadata")
+    return t
+
+
+_INDEX = {}
+
+
+def verified_index(kind):
+    """Repository metadata ONLY after its authenticity is established: the signed entry.jar must verify (jarsigner) with the pinned certificate fingerprint (keytool), and the index file
+    must hash to the SHA-256 in the signed entry.json. -> {package: latest version facts}. Raises SystemExit when anything differs."""
+    import subprocess, tempfile, hashlib
+    if kind in _INDEX: return _INDEX[kind]
+    pin = PINS["repos"][kind]
+    with tempfile.TemporaryDirectory() as t:
+        jar = Path(t) / "entry.jar"
+        st, _, _, b = M.get(pin["repo"] + "/entry.jar", n=5_000_000)
+        if st != 200: raise SystemExit(f"{kind}: entry.jar HTTP {st}")
+        jar.write_bytes(b)
+        v = subprocess.run([_tool("jarsigner"), "-verify", str(jar)], capture_output=True, text=True)
+        if "jar verified" not in v.stdout + v.stderr: raise SystemExit(f"{kind}: entry.jar signature does not verify")
+        fp = re.search(r"SHA256:\s*([0-9A-F:]{95})", subprocess.run([_tool("keytool"), "-printcert", "-jarfile", str(jar)], capture_output=True, text=True).stdout)
+        if not fp or fp.group(1).upper() != pin["fingerprint_sha256"].upper(): raise SystemExit(f"{kind}: entry.jar is signed by {fp and fp.group(1)}, not the pinned certificate")
+        import zipfile
+        entry = json.loads(zipfile.ZipFile(jar).read("entry.json"))
+    st, _, _, idx = M.get(pin["repo"] + entry["index"]["name"], n=200_000_000)
+    if st != 200 or hashlib.sha256(idx).hexdigest() != entry["index"]["sha256"]: raise SystemExit(f"{kind}: the index does not match the SHA-256 in the signed entry.json")
+    pk = json.loads(idx)["packages"]
+    out = {}
+    for name, p in pk.items():
+        if not p.get("versions"): continue
+        v = max(p["versions"].values(), key=lambda x: x["manifest"].get("versionCode", 0)); mf = v["manifest"]
+        out[name] = {"url": f"{pin['repo']}/{name}_{mf['versionCode']}.apk", "file": v["file"]["name"].lstrip("/"), "sha256": v["file"]["sha256"], "size": v["file"]["size"], "version_code": mf["versionCode"],
+                     "version_name": mf.get("versionName", ""), "min_sdk": (mf.get("usesSdk") or {}).get("minSdkVersion", 1), "abis": mf.get("nativecode") or [], "signers": (mf.get("signer") or {}).get("sha256", []),
+                     "anti": sorted((v.get("antiFeatures") or {}))}
+    _INDEX[kind] = out
+    print(f"  {kind}: entry.jar verified against the pinned certificate; index hash matches ({len(out)} packages)", flush=True)
+    return out
 
 
 def slug(name, taken):
@@ -55,8 +124,20 @@ def recent(r): return (r["released"] or "") >= RECENT
 SEEDS = {s["name"]: s for s in json.loads((HERE / "mainstream.json").read_text(encoding="utf-8"))["apps"]}
 
 
+_DESC = {}
+_DESC_FILE = ROOT / "build" / "discovery" / "cache" / "repodesc.json"
+if _DESC_FILE.is_file(): _DESC.update(json.loads(_DESC_FILE.read_text(encoding="utf-8")))
+
+
 def repo_description(rid):
     """The project's own one-line GitHub description (the page's og:description). Used only when no index carries a summary."""
+    if rid in _DESC: return _DESC[rid]
+    t = _repo_description(rid)
+    _DESC[rid] = t
+    return t
+
+
+def _repo_description(rid):
     st, _, h = M.text(f"https://github.com/{rid.split(':', 1)[1]}", 200_000)
     m = re.search(r'<meta property="og:description" content="([^"]+)"', h) or re.search(r'<meta name="description" content="([^"]+)"', h)
     if not m: return None
@@ -102,16 +183,30 @@ def eligible(r):
     if not r["apk_url"]: return False, "No direct APK found."
     if r["package"] in NO_INSTALL_PKG: return False, NO_INSTALL_PKG[r["package"]]
     host = re.match(r"https?://([^/]+)", r["apk_url"]).group(1)
-    if host in OFFICIAL_HOSTS: return False, f"The official download is hosted on {OFFICIAL_HOSTS[host]}; RetroHatch's trust policy accepts only GitHub release downloads of the app's own repository."
+    if host in OFFICIAL_HOSTS and r["package"] not in OFFICIAL: return False, f"The official download is hosted on {OFFICIAL_HOSTS[host]}, which is not a pinned source for this app (pinned official servers: " + ", ".join(sorted({u.split('/')[2] for u in OFFICIAL.values()})) + ")."
     if not r["license"] or NO_REDIST.search(r["license"]):
         return False, ("The licence forbids redistribution or is not free; use the official download." if r["license"] and re.search(r"-NC|NonCommercial|proprietary", r["license"], re.I)
                        else "No licence was found; RetroHatch does not install unlicensed software.")
     if r["status"] != "verified": return False, "Download or compatibility details are incomplete."
     if ROLLING.search(r["version"] or ""): return False, "Rolling or pre-release build: not pinned to a stable release."
     if (r["apk_size"] or 0) > MAX_APK: return False, "The APK is larger than RetroHatch downloads (200 MB)."
-    if rid and rid.startswith("github:") and M.release_ok("https://github.com/" + rid.split(":", 1)[1], r["apk_url"]): return True, ""
+    src = "https://github.com/" + rid.split(":", 1)[1] if rid and rid.startswith("github:") else (r["official_url"] or r["repo"])
+    if rid and rid.startswith("github:") and M.release_ok(src, r["apk_url"]): return True, ""
+    kind = host_kind(r)
+    if kind in ("fdroid", "izzy"): return True, ""                      # facts come from the verified repository index (see select)
+    if kind in ("gitlab", "codeberg", "official"): return None, ""      # inspected like a GitHub release
     if rid and rid.startswith("github:"): return None, "GitHub repo but the listed APK is not a release of it (resolved at inspect time)"
-    return False, f"Distributed from a package repository ({host}) that RetroHatch's trust policy does not yet accept; it installs only GitHub release builds."
+    return False, f"No trusted source for this download ({host}): RetroHatch installs from GitHub, GitLab or Codeberg releases of the app's own repository, the F-Droid and IzzyOnDroid repositories, and pinned official servers."
+
+
+def host_kind(r):
+    """Which trusted source (if any) serves this record's APK."""
+    pkg = r["package"]
+    rid = A.repo_id(r["repo"] or r["official_url"])
+    src = ("https://" + {"github": "github.com", "gitlab": "gitlab.com", "codeberg": "codeberg.org"}[rid.split(":", 1)[0]] + "/" + rid.split(":", 1)[1]) if rid else (r["official_url"] or "")
+    for kind, base in (("fdroid", "https://f-droid.org/repo/"), ("izzy", "https://apt.izzysoft.de/fdroid/repo/")):
+        if r["apk_url"].startswith(base) and kind in r["sources"] and pkg: return kind
+    return source_kind(src, r["apk_url"], pkg, None) or (source_kind(src, r["apk_url"], pkg, 0) if r["apk_url"].startswith(tuple(OFFICIAL.values())) else None)
 
 
 def external_for(r, why):
@@ -134,6 +229,13 @@ def select(a):
     chosen, used_repo, per = [], set(), {g: 0 for g in QUOTA}
     pool = sorted([r for r in inv if (r["package"] or r["status"] == "external_listing") and (r["status"] != "needs_verification" or "mainstream-seed" in r["sources"] or "retrohandhelds-rotate" in r["sources"])],
                   key=lambda r: -score(r))
+    for r in pool:                                                        # seed licences: what GitHub reports for the project (the seed file only says "unverified")
+        if (r["license"] or "").lower() == "unverified":
+            seed = SEEDS.get(r["name"]); lic = SEED_REPO_LICENSE.get(seed["id"]) if seed else None
+            if lic and lic not in ("NOASSERTION", "none"): r["license"] = lic
+    need = [A.repo_id(r["repo"] or r["official_url"]) for r in pool if not (r.get("summary") or "").strip() and A.repo_id(r["repo"] or r["official_url"])]
+    with ThreadPoolExecutor(8) as ex: list(ex.map(repo_description, [n for n in need if n and n.startswith("github:") and n not in _DESC]))
+    _DESC_FILE.write_text(json.dumps(_DESC), encoding="utf-8")
     seeds = [r for r in pool if r["package"] in HAND or "mainstream-seed" in r["sources"] or "retrohandhelds-rotate" in r["sources"]]
     for r in seeds + pool:
         g = r["group"]
@@ -144,7 +246,7 @@ def select(a):
         if r in [c for c in chosen]: continue
         key = r["project"] or A.repo_id(r["repo"] or r["official_url"]) or r["package"] or r["name"]
         if key in used_repo: continue                                                         # one entry per upstream project (icon-pack variants, flavours)
-        if not recent(r) and not ({"mainstream-seed", "retrohandhelds-rotate"} & set(r["sources"])) and r["package"] not in HAND: continue
+        if not recent(r) and not ({"mainstream-seed", "retrohandhelds-rotate"} & set(r["sources"])) and r["package"] not in HAND and not (g == "emulators" and (r["released"] or "") >= RECENT_EMU): continue
         desc = describe(r)
         if desc is None and r["package"] in HAND: desc = hand[HAND[r["package"]]]["description"]
         if not desc: continue
@@ -160,7 +262,17 @@ def select(a):
         entry = {"id": aid, "name": r["name"].replace("﻿", "").strip()[:60], "group": r["group"], "tags": r["tags"][:8], "description": desc, "developer": (r["developer"] or (rid.split(":", 1)[1].split("/")[0] if rid else "unknown"))[:60],
                  "source": source, "license": r["license"] or "unknown", "package": pkg, "released": r["released"][:10] if r["released"] else "", "version": r["version"],
                  "recommended_by": [x for x in ("rgc-guide", "retrohandhelds-rotate", "mainstream-seed") if x in r["sources"]], "sources": r["sources"], "reasons": r["reasons"][:2],
-                 "min_sdk": r["min_sdk"], "abis": r["abis"], "needs_game_files": r["needs_game_files"], "flags": [f for f in r["flags"] if not f.startswith("also published")][:4], "added": e.get("added") or "2026-11-09"}
+                 "min_sdk": r["min_sdk"], "abis": r["abis"], "needs_game_files": r["needs_game_files"], "flags": ([f"not updated since {r['released'][:7]}"] if r["released"] and r["released"] < RECENT and g == "emulators" else []) + [f for f in r["flags"] if not f.startswith("also published")][:4], "added": e.get("added") or "2026-11-09"}
+        kind = host_kind(r) if ok is not False else None
+        if ok is True and kind in ("fdroid", "izzy"):                      # facts from the authenticated repository index: no download needed, the app re-checks the file on the device
+            facts = verified_index(kind).get(pkg)
+            if facts and facts["min_sdk"] <= 31 and (not facts["abis"] or set(facts["abis"]) & A.ROTATE_ABIS) and facts["signers"] and not ROLLING.search(facts["version_name"] or ""):
+                entry["mode"] = "install"; entry["apk"] = {**{k: facts[k] for k in ("url", "file", "sha256", "size", "version_code", "version_name", "min_sdk", "abis", "signers")}, "tag": facts["version_name"],
+                                                          "source_kind": kind, "sha256_inspected": f"{kind} index (entry.jar signature verified against the pinned certificate)"}
+                entry["needs"] = ["device testing"]; entry["version"] = facts["version_name"]
+                if facts["anti"]: entry["flags"] = (entry.get("flags", []) + ["anti-features: " + ", ".join(facts["anti"])])[:5]
+                apps.append(entry); continue
+            ok, why = False, f"{kind} index does not carry a compatible, stable build of this package."
         if ok is True or ok is None:
             entry["mode"] = "install"; entry["apk"] = e.get("apk") or {"url": r["apk_url"], "file": r["apk_file"], "tag": r["version"], "size": r["apk_size"], "sha256": r["apk_sha256"]}
             entry["fallback_external"] = external_for(r, why or "Could not be verified for direct install.")
@@ -194,7 +306,8 @@ def inspect(a):
         ap = x["apk"]
         url = ap["url"]
         rid = A.repo_id(x["source"])
-        if not (rid and rid.startswith("github:") and M.release_ok(x["source"], url)):     # a package-repository URL: look for the same build in the project's own GitHub release
+        if source_kind(x["source"], url, x["package"], None) or source_kind(x["source"], url, x["package"], 0): pass                  # a trusted source already
+        elif not (rid and rid.startswith("github:") and M.release_ok(x["source"], url)):     # a package-repository URL: look for the same build in the project's own GitHub release
             rel = A.github_release(rid.split(":", 1)[1]) if rid and rid.startswith("github:") else None
             if not rel or not rel.get("apk"): return x, "no APK in the project's own latest GitHub release"
             url = rel["url"]; ap.update(file=rel["apk"], tag=rel["tag"], url=url)
@@ -294,7 +407,7 @@ def check(a):
         if x["mode"] == "install":
             ap = x["apk"]
             if not all(ap.get(k) for k in ("url", "sha256", "size", "version_code", "signers")): errs.append(f"{w}: install entry without full APK identity")
-            elif not M.release_ok(x["source"], ap["url"]): errs.append(f"{w}: url is not a release download of the source repo")
+            elif not source_kind(x["source"], ap["url"], x["package"], ap["version_code"]): errs.append(f"{w}: url is not from a trusted source for this entry")
             if NO_REDIST.search(x["license"] or "unknown"): errs.append(f"{w}: licence '{x['license']}' cannot be installed")
             if ROLLING.search(ap.get("tag") or ""): errs.append(f"{w}: rolling tag")
             if ap.get("min_sdk", 99) > 31: errs.append(f"{w}: minSdk")

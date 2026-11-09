@@ -5,7 +5,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** What the platform says about an APK file: package, versionCode and the SHA-256 of each signing certificate (DER). */
-data class ApkInfo(val packageName: String, val versionCode: Long, val signerSha256: Set<String>)
+data class ApkInfo(val packageName: String, val versionCode: Long, val signerSha256: Set<String>, val minSdk: Int? = null)
 
 interface ApkInspector { fun inspect(file: File): ApkInfo? }
 interface PackageState {
@@ -29,8 +29,9 @@ sealed class InstallEvent {
 
 object IdentityCheck {
     /** null = the APK is what the signed catalog entry says; otherwise the reason it must not be installed. */
-    fun problem(info: ApkInfo?, want: AndroidPackage): String? {
+    fun problem(info: ApkInfo?, want: AndroidPackage, deviceSdk: Int = Int.MAX_VALUE): String? {
         if (info == null) return "Not a valid, signed APK"
+        if (info.minSdk != null && info.minSdk > deviceSdk) return "Needs Android API ${info.minSdk}; this device runs API $deviceSdk"
         if (info.packageName != want.packageName) return "Wrong package: the APK is ${info.packageName}, the catalog says ${want.packageName}"
         if (info.versionCode != want.versionCode) return "Wrong version: the APK is versionCode ${info.versionCode}, the catalog says ${want.versionCode}"
         if (info.signerSha256.isEmpty()) return "The APK has no signing certificate"
@@ -70,6 +71,8 @@ class InstallFlow(
     var onChange: (InstState) -> Unit = {}
     /** UI: after a verified download go straight on to Android's installer (the system still asks the user to confirm). Off in the unit tests. */
     @Volatile var autoInstall = false
+    /** The device's Android API level (set by the UI); a downloaded APK that needs a newer one is refused before the installer is opened. */
+    @Volatile var deviceSdk: Int = Int.MAX_VALUE
     private val cancel = AtomicBoolean(false)
     private val art get() = listing.artifact
     private val android get() = art.android
@@ -131,7 +134,7 @@ class InstallFlow(
                     file = dest
                 }
                 set(InstState.Verifying)
-                val problem = IdentityCheck.problem(inspector.inspect(file!!), a)
+                val problem = IdentityCheck.problem(inspector.inspect(file!!), a, deviceSdk)
                 if (problem != null) { file!!.delete(); file = null; set(InstState.Failed(problem)); return@execute }
                 set(InstState.Downloaded)
                 if (autoInstall) install()
@@ -156,7 +159,7 @@ class InstallFlow(
             val problem = when {
                 f.length() != art.size -> "The downloaded file changed on disk"
                 Sha.ofFile(f) != art.sha256 -> "The downloaded file changed on disk"
-                else -> IdentityCheck.problem(inspector.inspect(f), a)
+                else -> IdentityCheck.problem(inspector.inspect(f), a, deviceSdk)
             }
             if (problem != null) { f.delete(); file = null; set(InstState.Failed(problem)); return@execute }
             starter.start(f, a.packageName).onFailure { set(InstState.Failed(it.message ?: "Could not start the installer")) }

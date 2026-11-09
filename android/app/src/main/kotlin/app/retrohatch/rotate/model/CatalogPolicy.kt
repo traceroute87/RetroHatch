@@ -12,7 +12,8 @@ package app.retrohatch.rotate.model
  */
 object CatalogPolicy {
     private const val FORMAT = 1L
-    private const val MAX_TOKENS = 8192
+    private const val MAX_TOKENS = 8192            // production / Nano-compatible budget
+    private const val MAX_TOKENS_DEV = 16384        // DEV-signed Android catalogs only (the Nano never reads them); the 256 KB size cap still applies
     private const val MAX_DEPTH = 12
     private const val MAX_ITEMS = 256
     private const val MAX_DEVICES = 16
@@ -73,7 +74,7 @@ object CatalogPolicy {
      */
     fun check(doc: Map<String, Any?>, allowExperimental: Boolean = false): String? {
         val (tokens, depth) = shape(doc)
-        if (tokens > MAX_TOKENS || depth > MAX_DEPTH) return "index too complex for the device verifier ($tokens tokens, depth $depth)"
+        if (tokens > (if (allowExperimental) MAX_TOKENS_DEV else MAX_TOKENS) || depth > MAX_DEPTH) return "index too complex for the device verifier ($tokens tokens, depth $depth)"
         val extra = doc.keys - TOP - "expires" - (if (allowExperimental) setOf("external") else emptySet())     // "external": Android-only, DEV catalogs only
         if (extra.isNotEmpty() || (TOP - doc.keys).isNotEmpty()) return "index keys wrong: missing ${(TOP - doc.keys).sorted()}, unexpected ${extra.sorted()}"
         if (doc["format"] != FORMAT) return "unsupported format ${doc["format"]}"
@@ -168,7 +169,10 @@ object CatalogPolicy {
                     if ("install" in art) return "$w: apk artifact must not have install"
                     androidProblem(w, art["android"])?.let { return it }
                 }
-                if (!releaseOk(app["source"] as String, url)) return "$w: url is not a release download of the source repo"
+                if (allowExperimental) {
+                    val an = art["android"] as? Map<*, *>
+                    if (TrustedSources.kind(app["source"] as String, url, an?.get("package") as? String, an?.get("version_code") as? Long) == null) return "$w: url is not from a trusted source for this entry"
+                } else if (!releaseOk(app["source"] as String, url)) return "$w: url is not a release download of the source repo"
                 val key = listOf(aid, art["device"], art["firmware"], sha)
                 if (!experimental) {
                     val a = appr[key] ?: return "$w: no human approval for this exact sha256"

@@ -28,7 +28,7 @@ class PmApkInspector(private val ctx: Context) : ApkInspector {
         val pi = try { ctx.packageManager.getPackageArchiveInfo(file.path, PackageManager.GET_SIGNING_CERTIFICATES) } catch (e: Exception) { null } ?: return null
         val signers = pi.signingInfo?.apkContentsSigners ?: return null
         val sha = signers.map { sig -> MessageDigest.getInstance("SHA-256").digest(sig.toByteArray()).joinToString("") { "%02x".format(it) } }.toSet()
-        return ApkInfo(pi.packageName ?: return null, pi.longVersionCode, sha)
+        return ApkInfo(pi.packageName ?: return null, pi.longVersionCode, sha, pi.applicationInfo?.minSdkVersion)
     }
 }
 

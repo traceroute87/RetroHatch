@@ -289,6 +289,9 @@ def real(ids=None, tested_file=None):
     print(f"signed DEV catalog (EXPERIMENTAL, serial {doc['serial']}) with {len(want)} real app(s): {', '.join(want)}\n  -> {out}\n  -> {bundled} (bundled into the debug APK)")
 
 
+DEV_MAX_TOKENS = 16384     # mirrors CatalogPolicy.MAX_TOKENS_DEV; DEV-signed Android catalogs only
+
+
 def curated():
     """DEV catalog from candidates/android-curated.json (discovery/curate.py): install entries are signed artifacts (GitHub release of the app's own repository, APK identity read from the
     file); external entries go into the DEV-only top-level `external` list with a link and a reason and NO download. Hand-written text for the first eight apps comes from
@@ -332,7 +335,7 @@ def curated():
            "devices": [json.loads((d / "devices" / "rg-rotate.json").read_text())], "apps": [json.loads(p.read_text()) for p in sorted((d / "apps").glob("*.json"))], "approvals": [], "revoked": [], "external": external}
     errs = T.strict_patterns(doc)
     idx = T.canonical(doc)
-    if errs or T.shape(doc)[0] > T.MAX_TOKENS or len(idx) > T.MAX_INDEX:   # the same 8192-token / 256 KB budget as production
+    if errs or T.shape(doc)[0] > DEV_MAX_TOKENS or len(idx) > T.MAX_INDEX:   # DEV Android catalog: 16384 tokens (production/Nano stay at 8192), same 256 KB cap
         raise SystemExit(f"index format: {errs[:3]} tokens={T.shape(doc)[0]} bytes={len(idx)}")
     key = load_pem_private_key((KEYS / "catalog-dev.key").read_bytes(), None)
     sig = T.canonical({"v": 1, "alg": "ed25519", "key_id": T.key_id(T.raw_pub(key)), "sig": base64.b64encode(key.sign(idx)).decode()})

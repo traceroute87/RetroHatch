@@ -53,12 +53,12 @@ def main():
 
     tap("Sort"); N.sh("input", "swipe", "360", "560", "360", "160", "300"); time.sleep(1); tap("External listings"); N.key("B"); time.sleep(1.2); N.shot("05_external_filter")
     t = texts(); ee = [e for e in ENTRIES if e["group"] == g and e["ext"]]
-    check("External listings filter shows only external entries, each marked External", "External listings" in t and (not ee or ("External" in t and ee[0]["name"] in t)) and f"{len(ee)} of {total}" in t, t[:220])
+    check("External listings filter shows only external entries, each marked External", "External listings" in t and (not ee or ("External" in t and any(x["name"] in t for x in ee))) and f"{len(ee)} of {total}" in t, t[:220])
     if not tap("Clear search and filters"): tap("", exact=True)
     N.start(); N.key("A"); time.sleep(1)
 
     if ext:                                           # an external listing: link and reason, no install button
-        e = sorted(ext, key=lambda x: x["name"].lower())[0]
+        e = sorted(ext, key=lambda x: (len(x["name"].split()) < 2, x["name"].lower()))[0]       # a multi-word name: the typed search word never equals the result row's text
         tap("Search"); time.sleep(0.8); N.sh("input", "text", e["name"].split()[0]); time.sleep(1.2)
         check(f"search finds the external entry '{e['name']}'", e["name"] in texts(), texts()[:160])
         tap(e["name"]); time.sleep(1.5); N.shot("06_external_details"); t = texts()

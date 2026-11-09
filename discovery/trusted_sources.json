@@ -1,0 +1,14 @@
+{
+ "schema": 1,
+ "note": "Pinned identities of the package repositories RetroHatch may install from (discovery/curate.py verifies them; android/.../TrustedSources.kt mirrors the URL rules). A repository's metadata is only used after its signed entry.jar verifies against the pinned certificate fingerprint and the index file matches the SHA-256 inside the signed entry.json. An APK is still checked again on the device against the SHA-256, package, versionCode and signer pinned in the signed catalog.",
+ "repos": {
+  "fdroid": {"name": "F-Droid", "repo": "https://f-droid.org/repo", "fingerprint_sha256": "43:23:8D:51:2C:1E:5E:B2:D6:56:9F:4A:3A:FB:F5:52:34:18:B8:2E:0A:3E:D1:55:27:70:AB:B9:A9:C9:CC:AB",
+             "basis": "F-Droid's long-standing main repository certificate (CN=Ciaran Gultnieks); matches the certificate that signs https://f-droid.org/repo/entry.jar"},
+  "izzy": {"name": "IzzyOnDroid", "repo": "https://apt.izzysoft.de/fdroid/repo", "fingerprint_sha256": "3B:F0:D6:AB:FE:AE:2F:40:17:07:B6:D9:66:BE:74:3B:F0:EE:E4:9C:25:61:B9:BA:39:07:37:11:F6:28:93:7A",
+          "basis": "the fingerprint printed on https://apt.izzysoft.de/fdroid/ equals the certificate that signs https://apt.izzysoft.de/fdroid/repo/entry.jar (two independent channels over HTTPS)"}
+ },
+ "official_servers": {
+  "com.retroarch.aarch64": "https://buildbot.libretro.com/stable/",
+  "org.ppsspp.ppsspp": "https://www.ppsspp.org/files/"
+ }
+}
